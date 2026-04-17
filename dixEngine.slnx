@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="dixEngine.vcxproj" Id="3dfa78ea-0cd4-4cb7-a557-4a224365ca95" />
+</Solution>

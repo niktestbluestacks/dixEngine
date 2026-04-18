@@ -36,6 +36,9 @@
     <ClCompile Include="VulcanEngine\Pipeline\SwapChain\SwapChain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulcanEngine\Model\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp">
@@ -60,6 +63,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulcanEngine\Pipeline\SwapChain\SwapChain.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\Model\Model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

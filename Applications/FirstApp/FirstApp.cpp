@@ -10,6 +10,7 @@ namespace dix {
 FirstApp::FirstApp() {
 	Logger::get().log(Logger::INFO, "Initiating the application...");
 	Logger::get().log(Logger::INFO, "-----------------------------");
+	loadModels();
 	createPipelineLayout();
 	createPipeline();
 	createCommandBuffers();
@@ -30,6 +31,33 @@ void FirstApp::run(void) {
 	}
 
 	vkDeviceWaitIdle(m_dixDevice.device());
+}
+
+void FirstApp::sierpinski(
+	std::vector<Model::Vertex>& vertices,
+	int depth,
+	glm::vec2 left,
+	glm::vec2 right,
+	glm::vec2 top) {
+	if (depth <= 0) {
+		vertices.push_back({ top });
+		vertices.push_back({ right });
+		vertices.push_back({ left });
+	}
+	else {
+		auto leftTop = 0.5f * (left + top);
+		auto rightTop = 0.5f * (right + top);
+		auto leftRight = 0.5f * (left + right);
+		sierpinski(vertices, depth - 1, left, leftRight, leftTop);
+		sierpinski(vertices, depth - 1, leftRight, right, rightTop);
+		sierpinski(vertices, depth - 1, leftTop, rightTop, top);
+	}
+}
+
+void FirstApp::loadModels() {
+	std::vector <Model::Vertex> vertices{};
+	sierpinski(vertices, 7, { -0.5f, 0.5f }, { 0.5f, 0.5f }, { 0.0f, -0.5f });
+	m_dixModel = std::make_unique <Model>(m_dixDevice, vertices);
 }
 
 void FirstApp::createPipelineLayout() {
@@ -107,7 +135,8 @@ void FirstApp::createCommandBuffers() {
 		vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 		m_pipeline->bind(m_commandBuffers[i]);
-		vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
+		m_dixModel->bind(m_commandBuffers[i]);
+		m_dixModel->draw(m_commandBuffers[i]);
 
 		vkCmdEndRenderPass(m_commandBuffers[i]);
 		if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS) {

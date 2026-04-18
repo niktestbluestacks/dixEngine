@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClCompile Include="Applications\FirstApp\FirstApp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="VulcanEngine\Model\Model.cpp" />
     <ClCompile Include="VulcanEngine\Logger\Logger.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\EngineDevice\EngineDevice.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\Pipeline\Pipeline.cpp" />
@@ -177,6 +178,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Applications\FirstApp\FirstApp.hpp" />
+    <ClInclude Include="VulcanEngine\Model\Model.hpp" />
     <ClInclude Include="VulcanEngine\Logger\Logger.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\EngineDevice\EngineDevice.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\PipelineManager\PipelineManadger.hpp" />

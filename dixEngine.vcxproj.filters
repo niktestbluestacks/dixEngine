@@ -66,6 +66,6 @@
   <ItemGroup>
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.vert" />
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.frag" />
-    <None Include="VulcanEngine\Shaders\CompileSh\compile.bat" />
+    <None Include="VulcanEngine\Shaders\compile.bat" />
   </ItemGroup>
 </Project>

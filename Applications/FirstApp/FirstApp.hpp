@@ -5,6 +5,7 @@
 #include <Pipeline/Pipeline/Pipeline.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/SwapChain/SwapChain.hpp>
+#include <Logger/Logger.hpp>
 
 // std
 #include <memory>

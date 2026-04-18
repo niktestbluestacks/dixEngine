@@ -3,22 +3,33 @@
 
 // std
 #include <stdexcept>
+#include <cstdint>
+#include <array>
 
 namespace dix {
 FirstApp::FirstApp() {
+	Logger::get().log(Logger::INFO, "Initiating the application...");
+	Logger::get().log(Logger::INFO, "-----------------------------");
 	createPipelineLayout();
 	createPipeline();
 	createCommandBuffers();
+	Logger::get().log(Logger::INFO, "Application initialized succsesfully!");
 }
 
 FirstApp::~FirstApp() {
+	Logger::get().log(Logger::INFO, "Closing the application...");
+	Logger::get().log(Logger::INFO, "--------------------------");
 	vkDestroyPipelineLayout(m_dixDevice.device(), m_pipelineLayout, nullptr);
+	Logger::get().log(Logger::INFO, "Application has been closed succsesfully!");
 }
 
 void FirstApp::run(void) {
 	while (!m_Window.shouldClose()) {
 		glfwPollEvents();
+		drawFrame();
 	}
+
+	vkDeviceWaitIdle(m_dixDevice.device());
 }
 
 void FirstApp::createPipelineLayout() {
@@ -50,8 +61,73 @@ void FirstApp::createPipeline() {
 		pipelineConfig);
 }
 
-void FirstApp::createCommandBuffers() {}
+void FirstApp::createCommandBuffers() {
 
-void FirstApp::drawFrame() {}
+	m_commandBuffers.resize(m_dixSwapChain.imageCount());
+
+	VkCommandBufferAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+	allocInfo.commandPool = m_dixDevice.getCommandPool();
+	allocInfo.commandBufferCount = static_cast <uint32_t> (m_commandBuffers.size());
+
+	if (vkAllocateCommandBuffers(
+			m_dixDevice.device(), 
+			&allocInfo, 
+			m_commandBuffers.data()) != 
+			VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate command buffers!");
+	}
+
+	for (int i = 0, commandBuffersSize = static_cast <int> (m_commandBuffers.size()); i < commandBuffersSize; ++i) {
+		VkCommandBufferBeginInfo beginInfo{};
+		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+		if (vkBeginCommandBuffer(
+				m_commandBuffers[i], 
+				&beginInfo) !=
+				VK_SUCCESS) {
+			throw std::runtime_error("failed to begin recording command buffer!");
+		}
+
+		VkRenderPassBeginInfo renderPassInfo{};
+		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		renderPassInfo.renderPass = m_dixSwapChain.getRenderPass();
+		renderPassInfo.framebuffer = m_dixSwapChain.getFrameBuffer(i);
+
+		renderPassInfo.renderArea.offset = { 0, 0 };
+		renderPassInfo.renderArea.extent = m_dixSwapChain.getSwapChainExtent();
+
+		std::array <VkClearValue, 2> clearValues{};
+		clearValues[0].color = { 0.1f, 0.1f, 0.1f, 1.0f };
+		clearValues[1].depthStencil = { 1.0f, 0 };
+		renderPassInfo.clearValueCount = static_cast <uint32_t> (clearValues.size());
+		renderPassInfo.pClearValues = clearValues.data();
+
+		vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		m_pipeline->bind(m_commandBuffers[i]);
+		vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
+
+		vkCmdEndRenderPass(m_commandBuffers[i]);
+		if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS) {
+			throw std::runtime_error("failed to record command buffer!");
+		}
+	}
+}
+
+void FirstApp::drawFrame() {
+	uint32_t imageIndex;
+	auto result = m_dixSwapChain.acquireNextImage(&imageIndex);
+	
+	if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+		throw std::runtime_error("failed to acquire swap chain image!");
+	}
+
+	result = m_dixSwapChain.submitCommandBuffers(&m_commandBuffers[imageIndex], &imageIndex);
+	if (result != VK_SUCCESS) {
+		throw std::runtime_error("failed to present swap chain image!");
+	}
+}
 
 } // namespace dix

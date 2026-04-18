@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <cstdint>
 
 namespace dix {
 
@@ -20,6 +21,7 @@ public:
 	~Window(void);
 
 	bool shouldClose(void) const;
+	VkExtent2D getExtent() const;
 
 	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const;
 

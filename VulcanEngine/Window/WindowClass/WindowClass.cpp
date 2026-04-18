@@ -21,6 +21,10 @@ bool Window::shouldClose(void) const {
 	return glfwWindowShouldClose(m_window);
 }
 
+VkExtent2D Window::getExtent() const {
+	return VkExtent2D{ static_cast <uint32_t> (m_width), static_cast <uint32_t> (m_height) };
+}
+
 void Window::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const {
 	if (glfwCreateWindowSurface(instance, m_window, nullptr, surface) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create window surface!");

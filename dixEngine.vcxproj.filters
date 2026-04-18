@@ -33,6 +33,9 @@
     <ClCompile Include="VulcanEngine\Pipeline\EngineDevice\EngineDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulcanEngine\Pipeline\SwapChain\SwapChain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp">
@@ -56,10 +59,13 @@
     <ClInclude Include="VulcanEngine\Pipeline\EngineDevice\EngineDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VulcanEngine\Pipeline\SwapChain\SwapChain.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.vert" />
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.frag" />
-    <None Include="VulcanEngine\Shaders\compile.bat" />
+    <None Include="VulcanEngine\Shaders\CompileSh\compile.bat" />
   </ItemGroup>
 </Project>

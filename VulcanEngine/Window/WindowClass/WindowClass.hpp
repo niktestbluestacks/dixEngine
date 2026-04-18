@@ -12,7 +12,7 @@ namespace dix {
 class Window {
 private:
 	void initWindow(void);
-
+	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 public:
 	Window(int width, int height, std::string title);
 	Window(const Window&) = delete;
@@ -22,12 +22,15 @@ public:
 
 	bool shouldClose(void) const;
 	VkExtent2D getExtent() const;
+	bool wasWindowResized() const;
+	void resetWindowResizedFlag();
 
 	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const;
 
 private:
-	const int m_width;
-	const int m_height;
+	int m_width;
+	int m_height;
+	bool m_framebufferResized = false;
 
 	std::string m_title;
 	GLFWwindow* m_window;

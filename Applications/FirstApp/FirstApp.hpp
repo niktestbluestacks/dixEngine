@@ -20,15 +20,20 @@ private:
 	void createPipelineLayout();
 	void createPipeline();
 	void createCommandBuffers();
+	void freeCommandBuffers();
 	void drawFrame();
-
+	void recreateSwapChain();
+	void recordCommandBuffer(int imageIndex);
 private:
 	void sierpinski(
 		std::vector <Model::Vertex>& vertecies,
 		int depth,
 		glm::vec2 left,
 		glm::vec2 right,
-		glm::vec2 top);
+		glm::vec2 top,
+		glm::vec3 leftColor,
+		glm::vec3 rightColor,
+		glm::vec3 topColor);
 public:
 	static constexpr int WIDTH = 1440;
 	static constexpr int HEIGHT = 1080;
@@ -37,14 +42,14 @@ public:
 	~FirstApp();
 
 	FirstApp(const FirstApp&) = delete;
-	void operator=(const FirstApp&) = delete;
+	FirstApp& operator=(const FirstApp&) = delete;
 
 	void run(void);
 
 private:
 	Window m_Window{ WIDTH, HEIGHT, static_cast <std::string> ("Vulkan") };
 	EngineDevice m_dixDevice{ m_Window };
-	SwapChain m_dixSwapChain{ m_dixDevice, m_Window.getExtent() };
+	std::unique_ptr <SwapChain> m_dixSwapChain;
 	std::unique_ptr<Pipeline> m_pipeline;
 	VkPipelineLayout m_pipelineLayout;
 	std::vector<VkCommandBuffer> m_commandBuffers;

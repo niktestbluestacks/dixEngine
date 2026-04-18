@@ -35,7 +35,7 @@ public:
 
     // Not copyable or movable
     EngineDevice(const EngineDevice&) = delete;
-    void operator=(const EngineDevice&) = delete;
+    EngineDevice& operator=(const EngineDevice&) = delete;
     EngineDevice(EngineDevice&&) = delete;
     EngineDevice& operator=(EngineDevice&&) = delete;
 

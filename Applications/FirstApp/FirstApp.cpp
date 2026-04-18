@@ -6,6 +6,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 // std
 #include <stdexcept>
@@ -15,6 +16,7 @@
 namespace dix {
 
 struct SimplePushConstantData {
+	glm::mat2 transform{1.f};
 	glm::vec2 offset;
 	alignas(16) glm::vec3 color;
 };
@@ -22,7 +24,7 @@ struct SimplePushConstantData {
 FirstApp::FirstApp() {
 	Logger::get().log(Logger::INFO, "Initiating the application...");
 	Logger::get().log(Logger::INFO, "-----------------------------");
-	loadModels();
+	loadGameObjects();
 	createPipelineLayout();
 	recreateSwapChain();
 	createCommandBuffers();
@@ -74,12 +76,25 @@ void FirstApp::sierpinski(
 	}
 }
 
-void FirstApp::loadModels() {
-	std::vector <Model::Vertex> vertices{};
+void FirstApp::loadGameObjects() {
+	std::vector <Model::Vertex> vertices = {
+		{{ 0.0f, -0.5f }, { 1.0f, 0.0f, 0.0f }},
+		{{ 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }},
+		{{ -0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f }}
+	};
 
-	sierpinski(vertices, 8, { 0.0f, -0.5f }, { 0.5f, 0.5f }, { -0.5f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
+	//sierpinski(vertices, 8, { 0.0f, -0.5f }, { 0.5f, 0.5f }, { -0.5f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
 
-	m_dixModel = std::make_unique <Model>(m_dixDevice, vertices);
+	auto dixModel = std::make_shared <Model>(m_dixDevice, vertices);
+
+	auto triangle = GameObject::createGameObject();
+	triangle.model = dixModel;
+	triangle.color = { .1f, .8f, .1f };
+	triangle.transform2d.translation.x = .2f;
+	triangle.transform2d.scale = { 2.f, .5f };
+	triangle.transform2d.rotation = .25f * glm::two_pi <float>();
+
+	m_gameObjects.push_back(std::move(triangle));
 }
 
 void FirstApp::createPipelineLayout() {
@@ -170,9 +185,6 @@ void FirstApp::freeCommandBuffers() {
 }
 
 void FirstApp::recordCommandBuffer(int imageIndex) {
-	static int frame = 0;
-	frame = (frame + 1) % 1000;
-
 
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -211,31 +223,34 @@ void FirstApp::recordCommandBuffer(int imageIndex) {
 	vkCmdSetViewport(m_commandBuffers[imageIndex], 0, 1, &viewport);
 	vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
 
+	renderGameObjects(m_commandBuffers[imageIndex]);
 
-	m_pipeline->bind(m_commandBuffers[imageIndex]);
-	m_dixModel->bind(m_commandBuffers[imageIndex]);
+	vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
+	if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS) {
+		throw std::runtime_error("failed to record command buffer!");
+	}
+}
 
+void FirstApp::renderGameObjects(VkCommandBuffer commandBuffer) {
+	m_pipeline->bind(commandBuffer);
 
-	for (int j = 0; j < 4; ++j) {
+	for (auto& obj : m_gameObjects) {
+		obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi <float>());
+
 		SimplePushConstantData push{};
-		push.offset = { -0.5f + frame * 0.002f, -0.4 * j * 0.25f };
-		push.color = { 0.0f, 0.0f, 0.2f * j };
+		push.offset = obj.transform2d.translation;
+		push.color = obj.color;
+		push.transform = obj.transform2d.mat2();
 
 		vkCmdPushConstants(
-			m_commandBuffers[imageIndex],
+			commandBuffer,
 			m_pipelineLayout,
 			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
 			0,
 			sizeof(SimplePushConstantData),
 			&push);
-
-		m_dixModel->draw(m_commandBuffers[imageIndex]);
-	}
-
-
-	vkCmdEndRenderPass(m_commandBuffers[imageIndex]);
-	if (vkEndCommandBuffer(m_commandBuffers[imageIndex]) != VK_SUCCESS) {
-		throw std::runtime_error("failed to record command buffer!");
+		obj.model->bind(commandBuffer);
+		obj.model->draw(commandBuffer);
 	}
 }
 

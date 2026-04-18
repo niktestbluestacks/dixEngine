@@ -2,12 +2,12 @@
 #define _FIRST_APP_HPP
 
 // dix
-#include <Window/WindowClass/WindowClass.hpp>
-#include <Pipeline/Pipeline/Pipeline.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
+#include <Model/GameObject/GameObject.hpp>
+#include <Pipeline/Pipeline/Pipeline.hpp>
 #include <Pipeline/SwapChain/SwapChain.hpp>
+#include <Window/WindowClass/WindowClass.hpp>
 #include <Logger/Logger.hpp>
-#include <Model/Model.hpp>
 
 // std
 #include <memory>
@@ -16,7 +16,7 @@
 namespace dix {
 class FirstApp {
 private:
-	void loadModels();
+	void loadGameObjects();
 	void createPipelineLayout();
 	void createPipeline();
 	void createCommandBuffers();
@@ -24,6 +24,7 @@ private:
 	void drawFrame();
 	void recreateSwapChain();
 	void recordCommandBuffer(int imageIndex);
+	void renderGameObjects(VkCommandBuffer commandBuffer);
 private:
 	void sierpinski(
 		std::vector <Model::Vertex>& vertecies,
@@ -53,7 +54,7 @@ private:
 	std::unique_ptr<Pipeline> m_pipeline;
 	VkPipelineLayout m_pipelineLayout;
 	std::vector<VkCommandBuffer> m_commandBuffers;
-	std::unique_ptr <Model> m_dixModel;
+	std::vector <GameObject> m_gameObjects;
 };
 }
 

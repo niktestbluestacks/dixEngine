@@ -168,6 +168,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Applications\FirstApp\FirstApp.cpp" />
+    <ClCompile Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.cpp" />
+    <ClCompile Include="VulcanEngine\Rendering\Renderer\Renderer.cpp" />
     <ClCompile Include="VulcanEngine\Model\GameObject\GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="VulcanEngine\Model\Model.cpp" />
@@ -179,6 +181,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Applications\FirstApp\FirstApp.hpp" />
+    <ClInclude Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.hpp" />
+    <ClInclude Include="VulcanEngine\Rendering\Renderer\Renderer.hpp" />
     <ClInclude Include="VulcanEngine\Model\GameObject\GameObject.hpp" />
     <ClInclude Include="VulcanEngine\Model\Model.hpp" />
     <ClInclude Include="VulcanEngine\Logger\Logger.hpp" />

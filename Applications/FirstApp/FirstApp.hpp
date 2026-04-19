@@ -4,9 +4,8 @@
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Model/GameObject/GameObject.hpp>
-#include <Pipeline/Pipeline/Pipeline.hpp>
-#include <Pipeline/SwapChain/SwapChain.hpp>
 #include <Window/WindowClass/WindowClass.hpp>
+#include <Rendering/Renderer/Renderer.hpp>
 #include <Logger/Logger.hpp>
 
 // std
@@ -16,15 +15,7 @@
 namespace dix {
 class FirstApp {
 private:
-	void loadGameObjects();
-	void createPipelineLayout();
-	void createPipeline();
-	void createCommandBuffers();
-	void freeCommandBuffers();
-	void drawFrame();
-	void recreateSwapChain();
-	void recordCommandBuffer(int imageIndex);
-	void renderGameObjects(VkCommandBuffer commandBuffer);
+	void loadGameObjects(void);
 private:
 	void sierpinski(
 		std::vector <Model::Vertex>& vertecies,
@@ -39,8 +30,8 @@ public:
 	static constexpr int WIDTH = 1440;
 	static constexpr int HEIGHT = 1080;
 
-	FirstApp();
-	~FirstApp();
+	FirstApp(void);
+	~FirstApp(void);
 
 	FirstApp(const FirstApp&) = delete;
 	FirstApp& operator=(const FirstApp&) = delete;
@@ -50,10 +41,7 @@ public:
 private:
 	Window m_Window{ WIDTH, HEIGHT, static_cast <std::string> ("Vulkan") };
 	EngineDevice m_dixDevice{ m_Window };
-	std::unique_ptr <SwapChain> m_dixSwapChain;
-	std::unique_ptr<Pipeline> m_pipeline;
-	VkPipelineLayout m_pipelineLayout;
-	std::vector<VkCommandBuffer> m_commandBuffers;
+	Renderer m_dixRenderer{ m_Window, m_dixDevice };
 	std::vector <GameObject> m_gameObjects;
 };
 }

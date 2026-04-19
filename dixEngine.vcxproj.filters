@@ -48,6 +48,9 @@
     <ClCompile Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulcanEngine\Camera\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp">
@@ -84,6 +87,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\Camera\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

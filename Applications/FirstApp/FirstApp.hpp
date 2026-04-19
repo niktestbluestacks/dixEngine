@@ -27,8 +27,8 @@ private:
 		glm::vec3 rightColor,
 		glm::vec3 topColor);
 public:
-	static constexpr int WIDTH = 1080;
-	static constexpr int HEIGHT = 1080;
+	static constexpr int WIDTH = 800;
+	static constexpr int HEIGHT = 600;
 
 	FirstApp(void);
 	~FirstApp(void);

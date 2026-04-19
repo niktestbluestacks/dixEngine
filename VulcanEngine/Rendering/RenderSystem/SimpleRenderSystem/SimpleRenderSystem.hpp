@@ -2,6 +2,7 @@
 #define SIMPLE_RENDER_SYSTEM_HPP
 
 // dix
+#include <Camera/Camera.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Model/GameObject/GameObject.hpp>
 #include <Pipeline/Pipeline/Pipeline.hpp>
@@ -23,9 +24,14 @@ public:
 	SimpleRenderSystem(const SimpleRenderSystem&) = delete;
 	SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
 
-	void renderGameObjects(VkCommandBuffer commandBuffer, std::vector <GameObject>& gameObjects);
+	void renderGameObjects(
+		VkCommandBuffer commandBuffer, 
+		std::vector <GameObject>& gameObjects, 
+		const Camera& camera);
+
 private:
 	EngineDevice& m_dixDevice;
+
 	std::unique_ptr<Pipeline> m_pipeline;
 	VkPipelineLayout m_pipelineLayout;
 };

@@ -98,6 +98,9 @@
     <ClInclude Include="VulcanEngine\Input\Keyboard\KeyboardController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VulcanEngine\Utils\Hash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.vert" />

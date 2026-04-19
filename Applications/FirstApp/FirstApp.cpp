@@ -73,92 +73,14 @@ void FirstApp::run(void) {
 	vkDeviceWaitIdle(m_dixDevice.device());
 }
 
-//void FirstApp::sierpinski(
-//		std::vector<Model::Vertex>& vertices,
-//		int depth,
-//		glm::vec2 left,
-//		glm::vec2 right,
-//		glm::vec2 top,
-//		glm::vec3 leftColor,
-//		glm::vec3 rightColor,
-//		glm::vec3 topColor) {
-//	if (depth <= 0) {
-//		vertices.push_back({ top, topColor });
-//		vertices.push_back({ right, rightColor });
-//		vertices.push_back({ left, leftColor });
-//	}
-//	else {
-//		auto leftTop = 0.5f * (left + top);
-//		auto rightTop = 0.5f * (right + top);
-//		auto leftRight = 0.5f * (left + right);
-//
-//		auto leftTopColor = 0.5f * (leftColor + topColor);
-//		auto rightTopColor = 0.5f * (rightColor + topColor);
-//		auto leftRightColor = 0.5f * (leftColor + rightColor);
-//
-//		sierpinski(vertices, depth - 1, left, leftRight, leftTop, leftColor, leftRightColor, leftTopColor);
-//		sierpinski(vertices, depth - 1, leftRight, right, rightTop, leftRightColor, rightColor, rightTopColor);
-//		sierpinski(vertices, depth - 1, leftTop, rightTop, top, leftTopColor, rightTopColor, topColor);
-//	}
-//}
-
-std::unique_ptr<Model> createCubeModel(EngineDevice& device, glm::vec3 offset) {
-    Model::Builder modelBuilder{};
-    modelBuilder.vertices = {
-        // left face (white)
-        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-        {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
-
-        // right face (yellow)
-        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-        {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
-
-        // top face (orange, remember y axis points down)
-        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-        {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-
-        // bottom face (red)
-        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-        {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-
-        // nose face (blue)
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-
-        // tail face (green)
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-    };
-    for (auto& v : modelBuilder.vertices) {
-        v.position += offset;
-    }
-
-    modelBuilder.indices = { 0,  1,  2,  0,  3,  1,  4,  5,  6,  4,  7,  5,  8,  9,  10, 8,  11, 9,
-                            12, 13, 14, 12, 15, 13, 16, 17, 18, 16, 19, 17, 20, 21, 22, 20, 23, 21 };
-
-    return std::make_unique<Model>(device, modelBuilder);
-}
-
 void FirstApp::loadGameObjects() {
-    std::shared_ptr <Model> dixModel = createCubeModel(m_dixDevice, {.0f, .0f, .0f});
+	std::shared_ptr <Model> dixModel = Model::createModelFromFile(m_dixDevice, toModelPath("smooth_vase.obj"));
 
-    auto cube = GameObject::createGameObject();
-    cube.model = dixModel;
-    cube.transform.translation = { .0f, .0f, 2.5f };
-    cube.transform.scale = { .5f, .5f, .5f };
-    m_gameObjects.push_back(std::move(cube));
+    auto gameObj = GameObject::createGameObject();
+    gameObj.model = dixModel;
+    gameObj.transform.translation = { .0f, .0f, 2.5f };
+	gameObj.transform.scale = glm::vec3{ 3.f };
+    m_gameObjects.push_back(std::move(gameObj));
 }
 
 } // namespace dix

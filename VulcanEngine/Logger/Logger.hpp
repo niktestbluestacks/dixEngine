@@ -2,6 +2,7 @@
 #define LOGGER_HPP
 
 #include <string>
+#include <format>
 
 namespace dix {
 

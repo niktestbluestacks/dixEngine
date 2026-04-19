@@ -1,5 +1,6 @@
 // dix
 #include <FirstApp/FirstApp.hpp>
+#include <Input/Keyboard/KeyboardController.hpp>
 #include <Camera/Camera.hpp>
 #include <Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
@@ -11,9 +12,10 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <stdexcept>
-#include <cstdint>
 #include <array>
+#include <cstdint>
+#include <chrono>
+#include <stdexcept>
 
 namespace dix {
 
@@ -33,11 +35,27 @@ FirstApp::~FirstApp() {
 void FirstApp::run(void) {
 	SimpleRenderSystem simpleRenderSystem{ m_dixDevice, m_dixRenderer.getSwapChainRenderPass() };
     Camera camera{};
+
+    camera.setViewTarget(glm::vec3{-1.f, -2.f, 2.f}, glm::vec3{0.f, 0.f, 2.5f});
+
+    auto viewerObject = GameObject::createGameObject();
+    KeyboardController cameraController{};
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+
 	while (!m_Window.shouldClose()) {
 		glfwPollEvents();
 
+        auto newTime = std::chrono::high_resolution_clock::now();
+        float frameTime = std::chrono::duration <float, std::chrono::seconds::period> (newTime - currentTime).count();
+        currentTime = newTime;
+
+        frameTime = glm::min(frameTime, MAX_FRAME_TIME);
+
+        cameraController.modeInPlaneXZ(m_Window.getGLFWwindow(), frameTime, viewerObject);
+        camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+
         float aspect = m_dixRenderer.getAspectRatio();
-        //camera.setOrthographicProjection(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
         camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
         if (auto commandBuffer = m_dixRenderer.beginFrame()) {
 			

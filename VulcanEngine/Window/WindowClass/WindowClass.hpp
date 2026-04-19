@@ -21,9 +21,10 @@ public:
 	~Window(void);
 
 	bool shouldClose(void) const;
-	VkExtent2D getExtent() const;
-	bool wasWindowResized() const;
-	void resetWindowResizedFlag();
+	VkExtent2D getExtent(void) const;
+	bool wasWindowResized(void) const;
+	void resetWindowResizedFlag(void);
+	GLFWwindow* getGLFWwindow(void) const;
 
 	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const;
 

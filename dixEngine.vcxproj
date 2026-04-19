@@ -168,6 +168,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Applications\FirstApp\FirstApp.cpp" />
+    <ClCompile Include="VulcanEngine\Input\Keyboard\KeyboardController.cpp" />
     <ClCompile Include="VulcanEngine\Camera\Camera.cpp" />
     <ClCompile Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.cpp" />
     <ClCompile Include="VulcanEngine\Rendering\Renderer\Renderer.cpp" />
@@ -182,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Applications\FirstApp\FirstApp.hpp" />
+    <ClInclude Include="VulcanEngine\Input\Keyboard\KeyboardController.hpp" />
     <ClInclude Include="VulcanEngine\Camera\Camera.hpp" />
     <ClInclude Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.hpp" />
     <ClInclude Include="VulcanEngine\Rendering\Renderer\Renderer.hpp" />

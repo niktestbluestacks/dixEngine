@@ -21,16 +21,20 @@ bool Window::shouldClose(void) const {
 	return glfwWindowShouldClose(m_window);
 }
 
-VkExtent2D Window::getExtent() const {
+VkExtent2D Window::getExtent(void) const {
 	return VkExtent2D{ static_cast <uint32_t> (m_width), static_cast <uint32_t> (m_height) };
 }
 
-bool Window::wasWindowResized() const {
+bool Window::wasWindowResized(void) const {
 	return m_framebufferResized;
 }
 
-void Window::resetWindowResizedFlag() {
+void Window::resetWindowResizedFlag(void) {
 	m_framebufferResized = false;
+}
+
+GLFWwindow* Window::getGLFWwindow(void) const {
+	return m_window;
 }
 
 void Window::createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const {

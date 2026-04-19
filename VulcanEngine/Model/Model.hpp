@@ -23,7 +23,12 @@ public:
 		static std::vector <VkVertexInputAttributeDescription> getAttributeDescriptions();
 	};
 
-	Model(EngineDevice& dixDevice, const std::vector <Vertex>& verticies);
+	struct Builder {
+		std::vector <Vertex> vertices{};
+		std::vector <uint32_t> indices{};
+	};
+
+	Model(EngineDevice& dixDevice, const Model::Builder& builder);
 	~Model();
 
 	Model(const Model&) = delete;
@@ -33,12 +38,19 @@ public:
 	void draw(VkCommandBuffer commandBuffer);
 
 private:
-	void createVertexBuffers(const std::vector <Vertex>& verticies);
+	void createVertexBuffers(const std::vector <Vertex>& vertices);
+	void createIndexBuffers(const std::vector <uint32_t>& indices);
 private:
 	EngineDevice& m_dixDevice;
+
 	VkBuffer m_vertexBuffer;
 	VkDeviceMemory m_vertexBufferMemory;
 	uint32_t vertexCount;
+
+	bool m_hasIndexBuffer = false;
+	VkBuffer m_indexBuffer;
+	VkDeviceMemory m_indexBufferMemory;
+	uint32_t indexCount;
 };
 }	// namespace dix
 #endif // MODEL_HPP

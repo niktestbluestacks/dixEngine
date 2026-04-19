@@ -1,12 +1,12 @@
 // dix
-#include <Camera/Camera.hpp>
+#include <DixCamera/DixCamera.hpp>
 
 // std
 #include <cassert>
 #include <climits>
 
 namespace dix {
-void Camera::setOrthographicProjection(
+void DixCamera::setOrthographicProjection(
 	float left, float right, float top, float bottom, float near, float far) {
 	m_projectionMatrix = glm::mat4{ 1.0f };
 	m_projectionMatrix[0][0] = 2.f / (right - left);
@@ -17,7 +17,7 @@ void Camera::setOrthographicProjection(
 	m_projectionMatrix[3][2] = -near / (far - near);
 }
 
-void Camera::setPerspectiveProjection(float fovy, float aspect, float near, float far) {
+void DixCamera::setPerspectiveProjection(float fovy, float aspect, float near, float far) {
 	assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
 	const float tanHalfFovy = tan(fovy / 2.f);
 	m_projectionMatrix = glm::mat4{ 0.0f };
@@ -28,7 +28,7 @@ void Camera::setPerspectiveProjection(float fovy, float aspect, float near, floa
 	m_projectionMatrix[3][2] = -(far * near) / (far - near);
 }
 
-void Camera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
+void DixCamera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up) {
 	assert(direction != glm::vec3(0.f, 0.f, 0.f) && "Can not set view direction to zeroth vector.");
 
 	const glm::vec3 w{ glm::normalize(direction) };
@@ -50,11 +50,11 @@ void Camera::setViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3
 	m_viewMatrix[3][2] = -glm::dot(w, position);
 }
 
-void Camera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
+void DixCamera::setViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up) {
 	setViewDirection(position, target - position, up);
 }
 
-void Camera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
+void DixCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
 	const float c3 = glm::cos(rotation.z);
 	const float s3 = glm::sin(rotation.z);
 	const float c2 = glm::cos(rotation.x);

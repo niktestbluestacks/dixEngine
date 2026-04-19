@@ -1,7 +1,9 @@
 // dix
 #include <FirstApp/FirstApp.hpp>
+
+#include <DixCamera/DixCamera.hpp>
+#include <Pipeline/Buffer/DixBuffer.hpp>
 #include <Input/Keyboard/KeyboardController.hpp>
-#include <Camera/Camera.hpp>
 #include <Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
 
@@ -19,10 +21,25 @@
 
 namespace dix {
 
+struct GlobalUbo {
+	alignas(16) glm::mat4 projectionView{ 1.f };
+	alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
+};
+
 FirstApp::FirstApp() {
 	Logger::get().log(Logger::INFO, "Initiating the application...");
 	Logger::get().log(Logger::INFO, "-----------------------------");
+
+
+	globalPool = DixDescriptorPool::Builder(m_dixDevice)
+		.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+		.build();
+
 	loadGameObjects();
+	
+	
+	
 	Logger::get().log(Logger::INFO, "Application initialized succsesfully!");
 }
 
@@ -33,10 +50,41 @@ FirstApp::~FirstApp() {
 }
 
 void FirstApp::run(void) {
-	SimpleRenderSystem simpleRenderSystem{ m_dixDevice, m_dixRenderer.getSwapChainRenderPass() };
-    Camera camera{};
+	std::vector <std::unique_ptr<DixBuffer>> uboBuffers{SwapChain::MAX_FRAMES_IN_FLIGHT};
 
-    camera.setViewTarget(glm::vec3{-1.f, -2.f, 2.f}, glm::vec3{0.f, 0.f, 2.5f});
+	for (auto& uboBuffer : uboBuffers) {
+		uboBuffer = std::make_unique <DixBuffer> (
+			m_dixDevice,
+			sizeof(GlobalUbo),
+			1,
+			VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+			VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
+		);
+
+		uboBuffer->map();
+	}
+
+	auto globalSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
+		.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+		.build();
+
+	std::vector <VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
+	for (size_t i = 0, globalDescriptorSetsSize = globalDescriptorSets.size(); i < globalDescriptorSetsSize; ++i) {
+		auto bufferInfo = uboBuffers[i]->descriptorInfo();
+		DixDescriptorWriter(*globalSetLayout, *globalPool)
+			.writeBuffer(0, &bufferInfo)
+			.build(globalDescriptorSets[i]);
+	}
+
+	SimpleRenderSystem simpleRenderSystem { 
+		m_dixDevice, 
+		m_dixRenderer.getSwapChainRenderPass(), 
+		globalSetLayout->getDescriptorSetLayout()
+	};
+
+    DixCamera dixcamera{};
+
+    dixcamera.setViewTarget(glm::vec3{-1.f, -2.f, 2.f}, glm::vec3{0.f, 0.f, 2.5f});
 
     auto viewerObject = GameObject::createGameObject();
     KeyboardController cameraController{};
@@ -53,18 +101,27 @@ void FirstApp::run(void) {
         frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
         cameraController.modeInPlaneXZ(m_Window.getGLFWwindow(), frameTime, viewerObject);
-        camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+        dixcamera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
         float aspect = m_dixRenderer.getAspectRatio();
-        camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
+        dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
         if (auto commandBuffer = m_dixRenderer.beginFrame()) {
-			
-			// begin offscreen shadow pass
-			// render shadow casting objects
-			// end offscreen shadow pass
-
+			int frameIndex = m_dixRenderer.getFrameIndex();
+			FrameInfo frameInfo{
+				frameIndex,
+				frameTime,
+				commandBuffer,
+				dixcamera,
+				globalDescriptorSets[frameIndex]
+			};
+			// update
+			GlobalUbo ubo{};
+			ubo.projectionView = dixcamera.getProjection() * dixcamera.getView();
+			uboBuffers[frameIndex]->writeToIndex(&ubo, frameIndex);
+			uboBuffers[frameIndex]->flush();
+			// render
 			m_dixRenderer.beginSwapChainRenderPass(commandBuffer);
-			simpleRenderSystem.renderGameObjects(commandBuffer, m_gameObjects, camera);
+			simpleRenderSystem.renderGameObjects(frameInfo, m_gameObjects);
 			m_dixRenderer.endSwapChainRenderPass(commandBuffer);
 			m_dixRenderer.endFrame();
 		}
@@ -74,12 +131,12 @@ void FirstApp::run(void) {
 }
 
 void FirstApp::loadGameObjects() {
-	std::shared_ptr <Model> dixModel = Model::createModelFromFile(m_dixDevice, toModelPath("smooth_vase.obj"));
+	std::shared_ptr <Model> dixModel = Model::createModelFromFile(m_dixDevice, toModelPath("flat_vase.obj"));
 
     auto gameObj = GameObject::createGameObject();
     gameObj.model = dixModel;
-    gameObj.transform.translation = { .0f, .0f, 2.5f };
-	gameObj.transform.scale = glm::vec3{ 3.f };
+    gameObj.transform.translation = { .0f, .5f, 2.5f };
+	gameObj.transform.scale = { 3.f, 1.5f, 3.f };
     m_gameObjects.push_back(std::move(gameObj));
 }
 

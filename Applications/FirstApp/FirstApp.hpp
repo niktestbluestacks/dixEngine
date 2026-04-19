@@ -3,6 +3,7 @@
 
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
+#include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Model/GameObject/GameObject.hpp>
 #include <Window/WindowClass/WindowClass.hpp>
 #include <Rendering/Renderer/Renderer.hpp>
@@ -43,6 +44,9 @@ private:
 	Window m_Window{ WIDTH, HEIGHT, static_cast <std::string> ("Vulkan") };
 	EngineDevice m_dixDevice{ m_Window };
 	Renderer m_dixRenderer{ m_Window, m_dixDevice };
+
+	// note: order of allocation matters
+	std::unique_ptr <DixDescriptorPool> globalPool{};
 	std::vector <GameObject> m_gameObjects;
 };
 }

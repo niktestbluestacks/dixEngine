@@ -48,10 +48,16 @@
     <ClCompile Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VulcanEngine\Camera\Camera.cpp">
+    <ClCompile Include="VulcanEngine\DixCamera\DixCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="VulcanEngine\Input\Keyboard\KeyboardController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VulcanEngine\Pipeline\Buffer\DixBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,13 +98,22 @@
     <ClInclude Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulcanEngine\Camera\Camera.hpp">
+    <ClInclude Include="VulcanEngine\DixCamera\DixCamera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulcanEngine\Input\Keyboard\KeyboardController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulcanEngine\Utils\Hash.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\Pipeline\Buffer\DixBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\Utils\FrameInfo.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

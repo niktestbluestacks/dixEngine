@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 
 namespace dix {
-class Camera {
+class DixCamera {
 public:
 	void setOrthographicProjection(
 		float left, 

@@ -3,6 +3,7 @@
 
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
+#include <Pipeline/Buffer/DixBuffer.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -59,13 +60,11 @@ private:
 private:
 	EngineDevice& m_dixDevice;
 
-	VkBuffer m_vertexBuffer;
-	VkDeviceMemory m_vertexBufferMemory;
+	std::unique_ptr <DixBuffer> m_vertexBuffer;
 	uint32_t vertexCount;
 
 	bool m_hasIndexBuffer = false;
-	VkBuffer m_indexBuffer;
-	VkDeviceMemory m_indexBufferMemory;
+	std::unique_ptr <DixBuffer> m_indexBuffer;
 	uint32_t indexCount;
 };
 }	// namespace dix

@@ -168,8 +168,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Applications\FirstApp\FirstApp.cpp" />
+    <ClCompile Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.cpp" />
+    <ClCompile Include="VulcanEngine\Pipeline\Buffer\DixBuffer.cpp" />
     <ClCompile Include="VulcanEngine\Input\Keyboard\KeyboardController.cpp" />
-    <ClCompile Include="VulcanEngine\Camera\Camera.cpp" />
+    <ClCompile Include="VulcanEngine\DixCamera\DixCamera.cpp" />
     <ClCompile Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.cpp" />
     <ClCompile Include="VulcanEngine\Rendering\Renderer\Renderer.cpp" />
     <ClCompile Include="VulcanEngine\Model\GameObject\GameObject.cpp" />
@@ -183,8 +185,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Applications\FirstApp\FirstApp.hpp" />
+    <ClInclude Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.hpp" />
+    <ClInclude Include="VulcanEngine\Pipeline\Buffer\DixBuffer.hpp" />
     <ClInclude Include="VulcanEngine\Input\Keyboard\KeyboardController.hpp" />
-    <ClInclude Include="VulcanEngine\Camera\Camera.hpp" />
+    <ClInclude Include="VulcanEngine\DixCamera\DixCamera.hpp" />
     <ClInclude Include="VulcanEngine\Rendering\RenderSystem\SimpleRenderSystem\SimpleRenderSystem.hpp" />
     <ClInclude Include="VulcanEngine\Rendering\Renderer\Renderer.hpp" />
     <ClInclude Include="VulcanEngine\Model\GameObject\GameObject.hpp" />
@@ -195,6 +199,7 @@
     <ClInclude Include="VulcanEngine\Pipeline\Pipeline\Pipeline.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\SwapChain\SwapChain.hpp" />
     <ClInclude Include="VulcanEngine\Utils\Converter.hpp" />
+    <ClInclude Include="VulcanEngine\Utils\FrameInfo.hpp" />
     <ClInclude Include="VulcanEngine\Utils\Hash.hpp" />
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp" />
   </ItemGroup>

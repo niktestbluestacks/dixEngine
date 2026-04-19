@@ -4,7 +4,6 @@
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/SwapChain/SwapChain.hpp>
 #include <Window/WindowClass/WindowClass.hpp>
-#include <Logger/Logger.hpp>
 
 // std
 #include <cassert>
@@ -14,9 +13,9 @@
 namespace dix {
 class Renderer {
 private:
-	void createCommandBuffers();
-	void freeCommandBuffers();
-	void recreateSwapChain();
+	void createCommandBuffers(void);
+	void freeCommandBuffers(void);
+	void recreateSwapChain(void);
 public:
 
 	Renderer(Window& window, EngineDevice& engineDevice);
@@ -31,11 +30,13 @@ public:
 
 	VkCommandBuffer getCurrentCommandBuffer() const {
 		assert(m_isFrameStarted && "Cannot get command buffer when frame is not in progress");
-		return  m_commandBuffers[m_currentImageIndex];
+		return m_commandBuffers[m_currentFrameIndex];
 	}
 
-	VkCommandBuffer beginFrame();
-	void endFrame();
+	int getFrameIndex(void) const;
+
+	VkCommandBuffer beginFrame(void);
+	void endFrame(void);
 	void beginSwapChainRenderPass(VkCommandBuffer commandBuffer);
 	void endSwapChainRenderPass(VkCommandBuffer commandBuffer);
 private:
@@ -45,6 +46,7 @@ private:
 	std::vector<VkCommandBuffer> m_commandBuffers;
 
 	uint32_t m_currentImageIndex;
+	int m_currentFrameIndex;
 	bool m_isFrameStarted;
 };	// class Renderer
 }	// namespace dix

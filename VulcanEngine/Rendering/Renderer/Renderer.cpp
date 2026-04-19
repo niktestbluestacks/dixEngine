@@ -21,7 +21,7 @@ Renderer::~Renderer() {
 	freeCommandBuffers();
 }
 
-void Renderer::recreateSwapChain() {
+void Renderer::recreateSwapChain(void) {
 	auto extent = m_Window.getExtent();
 	while (extent.width == 0 || extent.height == 0) {
 		extent = m_Window.getExtent();
@@ -32,19 +32,20 @@ void Renderer::recreateSwapChain() {
 		m_dixSwapChain = std::make_unique <SwapChain>(m_dixDevice, extent);
 	}
 	else {
-		m_dixSwapChain = std::make_unique <SwapChain>(m_dixDevice, extent, std::move(m_dixSwapChain));
-		if (m_dixSwapChain->imageCount() != m_commandBuffers.size()) {
-			freeCommandBuffers();
-			createCommandBuffers();
+		std::shared_ptr <SwapChain>	oldSwapChain = std::move(m_dixSwapChain);
+		m_dixSwapChain = std::make_unique <SwapChain>(m_dixDevice, extent, oldSwapChain);
+
+		if (!oldSwapChain->compareSwapFormats(*m_dixSwapChain.get())) {
+			throw std::runtime_error("Swap chain image / depth format has changed!");
 		}
 	}
 
 	// TODO: if render pass is compatable do nothing else recreate
 }
 
-void Renderer::createCommandBuffers() {
+void Renderer::createCommandBuffers(void) {
 
-	m_commandBuffers.resize(m_dixSwapChain->imageCount());
+	m_commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -61,7 +62,7 @@ void Renderer::createCommandBuffers() {
 	}
 }
 
-void Renderer::freeCommandBuffers() {
+void Renderer::freeCommandBuffers(void) {
 	vkFreeCommandBuffers(
 		m_dixDevice.device(),
 		m_dixDevice.getCommandPool(),
@@ -71,7 +72,12 @@ void Renderer::freeCommandBuffers() {
 	m_commandBuffers.clear();
 }
 
-VkCommandBuffer Renderer::beginFrame() {
+int Renderer::getFrameIndex(void) const {
+	assert(m_isFrameStarted && "Can't call GetFrameIndex when frame is not in progress");
+	return m_currentFrameIndex;
+}
+
+VkCommandBuffer Renderer::beginFrame(void) {
 	assert(!m_isFrameStarted && "Can't call begin frame while already in progress");
 	auto result = m_dixSwapChain->acquireNextImage(&m_currentImageIndex);
 
@@ -102,7 +108,7 @@ VkCommandBuffer Renderer::beginFrame() {
 
 }
 
-void Renderer::endFrame() {
+void Renderer::endFrame(void) {
 	assert(m_isFrameStarted && "Can't call endFrame while frame is not in progress");
 	auto commandBuffer = getCurrentCommandBuffer();
 
@@ -122,6 +128,7 @@ void Renderer::endFrame() {
 	}
 
 	m_isFrameStarted = false;
+	m_currentFrameIndex = (m_currentFrameIndex + 1) % SwapChain::MAX_FRAMES_IN_FLIGHT;
 }
 
 void Renderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {

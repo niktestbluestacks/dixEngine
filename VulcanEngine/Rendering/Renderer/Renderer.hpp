@@ -45,9 +45,9 @@ private:
 	std::unique_ptr <SwapChain> m_dixSwapChain;
 	std::vector<VkCommandBuffer> m_commandBuffers;
 
-	uint32_t m_currentImageIndex;
-	int m_currentFrameIndex;
-	bool m_isFrameStarted;
+	uint32_t m_currentImageIndex = 0;
+	int m_currentFrameIndex = 0;
+	bool m_isFrameStarted = false;
 };	// class Renderer
 }	// namespace dix
 #endif // RENDERER_HPP

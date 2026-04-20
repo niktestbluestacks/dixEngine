@@ -22,8 +22,8 @@
 namespace dix {
 
 struct GlobalUbo {
-	alignas(16) glm::mat4 projectionView{ 1.f };
-	alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
+	glm::mat4 projectionView{ 1.f };
+	glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
 };
 
 FirstApp::FirstApp() {
@@ -117,7 +117,9 @@ void FirstApp::run(void) {
 			// update
 			GlobalUbo ubo{};
 			ubo.projectionView = dixcamera.getProjection() * dixcamera.getView();
-			uboBuffers[frameIndex]->writeToIndex(&ubo, frameIndex);
+            // Each frame uses its own UBO buffer (one instance per buffer),
+			// so always write to index 0 of the buffer for the current frame.
+			uboBuffers[frameIndex]->writeToIndex(&ubo, 0);
 			uboBuffers[frameIndex]->flush();
 			// render
 			m_dixRenderer.beginSwapChainRenderPass(commandBuffer);
@@ -136,7 +138,7 @@ void FirstApp::loadGameObjects() {
     auto gameObj = GameObject::createGameObject();
     gameObj.model = dixModel;
     gameObj.transform.translation = { .0f, .5f, 2.5f };
-	gameObj.transform.scale = { 3.f, 1.5f, 3.f };
+	gameObj.transform.scale = { 3.f, 3.f, 3.f };
     m_gameObjects.push_back(std::move(gameObj));
 }
 

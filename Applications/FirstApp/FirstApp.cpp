@@ -49,7 +49,7 @@ void FirstApp::run(void) {
 		dixcamera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
 		float aspect = m_context.getAspectRatio();
-		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
+		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
 
 		// Delegate rendering details to AppContext to keep FirstApp focused on logic
 		m_context.drawFrame(dixcamera, frameTime, m_gameObjects);
@@ -58,7 +58,7 @@ void FirstApp::run(void) {
 
 void FirstApp::loadGameObjects() {
     // Use the device from AppContext for loading models/resources
-	std::shared_ptr <Model> dixModel = Model::createModelFromFile(m_context.device(), toModelPath("smooth_vase.obj"));
+	std::shared_ptr <Model> dixModel = Model::createModelFromFile(m_context.device(), toModelPath("colored_cube.obj"));
 
     auto gameObj = GameObject::createGameObject();
     gameObj.model = dixModel;

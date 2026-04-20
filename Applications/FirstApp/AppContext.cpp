@@ -1,6 +1,6 @@
-#include "AppContext.hpp"
-
 // dix
+#include <FirstApp/AppContext.hpp>
+
 #include <Utils/Converter.hpp>
 
 // libs
@@ -22,14 +22,31 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     m_Window{ width, height, title },
     m_dixDevice{ m_Window },
     m_dixRenderer{ m_Window, m_dixDevice } {
+    initialize();
+}
 
-    // create descriptor pool
+AppContext::~AppContext() {
+    // resources owned by unique_ptr will be destroyed automatically
+}
+
+void AppContext::initialize() {
+    createDescriptorPool();
+    createUBOs();
+    m_globalSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+        .build();
+    createDescriptorSets();
+    createRenderSystem();
+}
+
+void AppContext::createDescriptorPool() {
     m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
+}
 
-    // create UBO buffers
+void AppContext::createUBOs() {
     m_uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (auto& buf : m_uboBuffers) {
         buf = std::make_unique<DixBuffer>(
@@ -41,13 +58,9 @@ AppContext::AppContext(int width, int height, const std::string& title) :
         );
         buf->map();
     }
+}
 
-    // descriptor set layout
-    m_globalSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
-        .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
-        .build();
-
-    // descriptor sets
+void AppContext::createDescriptorSets() {
     m_globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
     for (size_t i = 0; i < m_globalDescriptorSets.size(); ++i) {
         auto bufferInfo = m_uboBuffers[i]->descriptorInfo();
@@ -55,17 +68,14 @@ AppContext::AppContext(int width, int height, const std::string& title) :
             .writeBuffer(0, &bufferInfo)
             .build(m_globalDescriptorSets[i]);
     }
+}
 
-    // rendering system
+void AppContext::createRenderSystem() {
     m_simpleRenderSystem = std::make_unique<SimpleRenderSystem>(
         m_dixDevice,
         m_dixRenderer.getSwapChainRenderPass(),
         m_globalSetLayout->getDescriptorSetLayout()
     );
-}
-
-AppContext::~AppContext() {
-    // resources owned by unique_ptr will be destroyed automatically
 }
 
 void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector<GameObject>& gameObjects) {

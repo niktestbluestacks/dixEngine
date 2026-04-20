@@ -11,6 +11,8 @@
 #include <Utils/FrameInfo.hpp>
 #include <DixCamera/DixCamera.hpp>
 #include <Model/GameObject/GameObject.hpp>
+#include <UI/UIManager.hpp>
+#include <UI/UIRenderer.hpp>
 
 #include <memory>
 #include <vector>
@@ -55,6 +57,8 @@ private:
 	std::vector<VkDescriptorSet> m_globalDescriptorSets;
 
 	std::unique_ptr<SimpleRenderSystem> m_simpleRenderSystem;
+    std::unique_ptr<dix::UIManager> m_uiManager;
+    std::unique_ptr<dix::UIRenderer> m_uiRenderer;
 	void createDescriptorPool(); // New method to create descriptor pool
 	void createUBOs(); // New method to create UBOs
 	void createDescriptorSets(); // New method to create descriptor sets

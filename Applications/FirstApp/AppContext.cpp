@@ -23,6 +23,8 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     m_dixDevice{ m_Window },
     m_dixRenderer{ m_Window, m_dixDevice } {
     initialize();
+    m_uiManager = std::make_unique<dix::UIManager>();
+    m_uiRenderer = std::make_unique<dix::UIRenderer>(m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
 }
 
 AppContext::~AppContext() {
@@ -98,6 +100,11 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
         // render
         beginSwapChainRenderPass(commandBuffer);
         m_simpleRenderSystem->renderGameObjects(const_cast<FrameInfo&>(frameInfo), const_cast<std::vector<GameObject>&>(gameObjects));
+        // render UI
+        if (m_uiManager && m_uiRenderer) {
+            m_uiRenderer->bindPipeline(commandBuffer);
+            m_uiManager->render(frameInfo);
+        }
         endSwapChainRenderPass(commandBuffer);
         endFrame();
     }

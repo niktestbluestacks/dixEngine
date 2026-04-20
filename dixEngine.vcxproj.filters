@@ -63,6 +63,12 @@
     <ClCompile Include="Applications\FirstApp\AppContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulcanEngine\UI\UiPipeline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VulcanEngine\UI\UIRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp">
@@ -122,10 +128,24 @@
     <ClInclude Include="Applications\FirstApp\AppContext.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VulcanEngine\UI\IUIElement.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\UI\UIManager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\UI\UiPipeline.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\UI\UIRenderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.vert" />
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.frag" />
     <None Include="VulcanEngine\Shaders\compile.bat" />
+    <None Include="VulcanEngine\Shaders\UI\ui.vert" />
+    <None Include="VulcanEngine\Shaders\UI\ui.frag" />
   </ItemGroup>
 </Project>

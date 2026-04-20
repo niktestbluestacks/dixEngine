@@ -182,6 +182,8 @@
     <ClCompile Include="VulcanEngine\Pipeline\EngineDevice\EngineDevice.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\Pipeline\Pipeline.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\SwapChain\SwapChain.cpp" />
+    <ClCompile Include="VulcanEngine\UI\UiPipeline.cpp" />
+    <ClCompile Include="VulcanEngine\UI\UIRenderer.cpp" />
     <ClCompile Include="VulcanEngine\Window\WindowClass\WindowClass.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -200,6 +202,10 @@
     <ClInclude Include="VulcanEngine\Pipeline\PipelineManager\PipelineManadger.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\Pipeline\Pipeline.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\SwapChain\SwapChain.hpp" />
+    <ClInclude Include="VulcanEngine\UI\IUIElement.hpp" />
+    <ClInclude Include="VulcanEngine\UI\UIManager.hpp" />
+    <ClInclude Include="VulcanEngine\UI\UiPipeline.hpp" />
+    <ClInclude Include="VulcanEngine\UI\UIRenderer.hpp" />
     <ClInclude Include="VulcanEngine\Utils\Converter.hpp" />
     <ClInclude Include="VulcanEngine\Utils\FrameInfo.hpp" />
     <ClInclude Include="VulcanEngine\Utils\Hash.hpp" />
@@ -211,6 +217,8 @@
     </None>
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.frag" />
     <None Include="VulcanEngine\Shaders\SimpleShader\simple_shader.vert" />
+    <None Include="VulcanEngine\Shaders\UI\ui.frag" />
+    <None Include="VulcanEngine\Shaders\UI\ui.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,6 +9,7 @@ UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device
     m_descriptorSetLayout = DixDescriptorSetLayout::Builder(m_device)
         .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
         .build();
+    // Yes
 
     m_descriptorPool = DixDescriptorPool::Builder(m_device)
         .setMaxSets(10)

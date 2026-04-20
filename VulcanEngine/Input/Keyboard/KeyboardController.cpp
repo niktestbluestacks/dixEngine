@@ -31,5 +31,45 @@ void KeyboardController::modeInPlaneXZ(GLFWwindow* window, float dt, GameObject&
 	if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
 		gameObject.transform.translation += moveSpeed * dt * glm::normalize(moveDir);
 	}
+
+	// Mouse look: when right mouse button is pressed capture the cursor and use
+	// relative mouse movement to adjust rotation. Release capture when button released.
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+		if (!mouseCaptured) {
+			mouseCaptured = true;
+			firstMouse = true;
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		}
+
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+		if (firstMouse) {
+			lastMouseX = xpos;
+			lastMouseY = ypos;
+			firstMouse = false;
+		}
+
+		float xoffset = static_cast<float>(xpos - lastMouseX);
+		float yoffset = static_cast<float>(lastMouseY - ypos); // reversed: y ranges bottom->top
+		lastMouseX = xpos;
+		lastMouseY = ypos;
+
+		// apply sensitivity and dt
+		float sensitivity = lookSpeed * 0.1f;
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+
+		gameObject.transform.rotation.y += glm::radians(xoffset);
+		gameObject.transform.rotation.x += glm::radians(yoffset);
+
+		gameObject.transform.rotation.x = glm::clamp(gameObject.transform.rotation.x, -1.5f, 1.5f);
+		gameObject.transform.rotation.y = glm::mod(gameObject.transform.rotation.y, glm::two_pi<float>());
+	}
+	else {
+		if (mouseCaptured) {
+			mouseCaptured = false;
+			glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		}
+	}
 }
 }	// namespace dix

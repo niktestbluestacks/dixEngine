@@ -26,6 +26,11 @@ public:
 	KeyMappings keys{};
 	float moveSpeed{ 3.f };
 	float lookSpeed{ 1.5f };
+    // mouse look state
+	bool mouseCaptured{ false };
+	double lastMouseX{ 0.0 };
+	double lastMouseY{ 0.0 };
+	bool firstMouse{ true };
 };
 }	// namespace dix
 #endif // KEYBOARD_CONTROLLER_HPP

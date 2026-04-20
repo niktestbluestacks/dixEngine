@@ -167,6 +167,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Applications\FirstApp\AppContext.cpp" />
     <ClCompile Include="Applications\FirstApp\FirstApp.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\Buffer\DixBuffer.cpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="VulcanEngine\Window\WindowClass\WindowClass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Applications\FirstApp\AppContext.hpp" />
     <ClInclude Include="Applications\FirstApp\FirstApp.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\Buffer\DixBuffer.hpp" />

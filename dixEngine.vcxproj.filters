@@ -60,6 +60,9 @@
     <ClCompile Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Applications\FirstApp\AppContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp">
@@ -114,6 +117,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Applications\FirstApp\AppContext.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

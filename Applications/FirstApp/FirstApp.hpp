@@ -2,12 +2,8 @@
 #define _FIRST_APP_HPP
 
 // dix
-#include <Pipeline/EngineDevice/EngineDevice.hpp>
-#include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Model/GameObject/GameObject.hpp>
-#include <Window/WindowClass/WindowClass.hpp>
-#include <Rendering/Renderer/Renderer.hpp>
-#include <Logger/Logger.hpp>
+#include "AppContext.hpp"
 
 // std
 #include <memory>
@@ -18,15 +14,16 @@ class FirstApp {
 private:
 	void loadGameObjects(void);
 private:
-	void sierpinski(
-		std::vector <Model::Vertex>& vertecies,
-		int depth,
-		glm::vec2 left,
-		glm::vec2 right,
-		glm::vec2 top,
-		glm::vec3 leftColor,
-		glm::vec3 rightColor,
-		glm::vec3 topColor);
+	//void sierpinski(
+	//	std::vector <Model::Vertex>& vertecies,
+	//	int depth,
+	//	glm::vec2 left,
+	//	glm::vec2 right,
+	//	glm::vec2 top,
+	//	glm::vec3 leftColor,
+	//	glm::vec3 rightColor,
+	//	glm::vec3 topColor
+	//);
 public:
 	static constexpr int WIDTH = 800;
 	static constexpr int HEIGHT = 600;
@@ -41,12 +38,8 @@ public:
 	void run(void);
 
 private:
-	Window m_Window{ WIDTH, HEIGHT, static_cast <std::string> ("Vulkan") };
-	EngineDevice m_dixDevice{ m_Window };
-	Renderer m_dixRenderer{ m_Window, m_dixDevice };
-
-	// note: order of allocation matters
-	std::unique_ptr <DixDescriptorPool> globalPool{};
+    // application context encapsulates renderer/device/shader details
+	AppContext m_context{ WIDTH, HEIGHT, static_cast<std::string>("Vulkan") };
 	std::vector <GameObject> m_gameObjects;
 };
 }

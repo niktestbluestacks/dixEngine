@@ -82,14 +82,21 @@ void Pipeline::createGraphicsPipeline(
 	shaderStages[1].pSpecializationInfo = nullptr;
 
 
-	auto bindingDescriptions = Model::Vertex::getBindingDescriptions();
-	auto attributeDescriptions = Model::Vertex::getAttributeDescriptions();
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexAttributeDescriptionCount =
-		static_cast <uint32_t>(attributeDescriptions.size());
-	vertexInputInfo.vertexBindingDescriptionCount =
-		static_cast <uint32_t> (bindingDescriptions.size());
+	// allow custom vertex input descriptions via configInfo; otherwise use Model::Vertex
+	std::vector<VkVertexInputBindingDescription> bindingDescriptions;
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+	if (!configInfo.vertexBindingDescriptions.empty() && !configInfo.vertexAttributeDescriptions.empty()) {
+		bindingDescriptions = configInfo.vertexBindingDescriptions;
+		attributeDescriptions = configInfo.vertexAttributeDescriptions;
+	}
+	else {
+		bindingDescriptions = Model::Vertex::getBindingDescriptions();
+		attributeDescriptions = Model::Vertex::getAttributeDescriptions();
+	}
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
 	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 	vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 

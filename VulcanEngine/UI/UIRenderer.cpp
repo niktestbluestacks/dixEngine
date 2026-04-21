@@ -21,17 +21,44 @@ UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device
     Pipeline::defaultPipelineConfigInfo(config);
     config.depthStencilInfo.depthTestEnable = VK_FALSE;
     config.depthStencilInfo.depthWriteEnable = VK_FALSE;
-    // create pipeline layout from descriptor set layout
+    // create pipeline layout from descriptor set layout and push constant for screen size
     VkDescriptorSetLayout descLayout = m_descriptorSetLayout->getDescriptorSetLayout();
+    VkPushConstantRange pushRange{};
+    pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    pushRange.offset = 0;
+    pushRange.size = sizeof(float) * 2; // vec2 screenSize
+
     VkPipelineLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layoutInfo.setLayoutCount = 1;
     layoutInfo.pSetLayouts = &descLayout;
-    layoutInfo.pushConstantRangeCount = 0;
-    layoutInfo.pPushConstantRanges = nullptr;
+    layoutInfo.pushConstantRangeCount = 1;
+    layoutInfo.pPushConstantRanges = &pushRange;
     if (vkCreatePipelineLayout(m_device.device(), &layoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create UI pipeline layout");
     }
+
+    // configure pipeline to accept UI vertex format: vec2 pos, vec2 uv
+    VkVertexInputBindingDescription binding{};
+    binding.binding = 0;
+    binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    binding.stride = sizeof(float) * 4;
+    config.vertexBindingDescriptions = { binding };
+
+    VkVertexInputAttributeDescription attrPos{};
+    attrPos.binding = 0; attrPos.location = 0; attrPos.format = VK_FORMAT_R32G32_SFLOAT; attrPos.offset = 0;
+    VkVertexInputAttributeDescription attrUV{};
+    attrUV.binding = 0; attrUV.location = 1; attrUV.format = VK_FORMAT_R32G32_SFLOAT; attrUV.offset = sizeof(float) * 2;
+    config.vertexAttributeDescriptions = { attrPos, attrUV };
+
+    // enable alpha blending for UI
+    config.colorBlendAttachment.blendEnable = VK_TRUE;
+    config.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    config.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    config.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;
+    config.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    config.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    config.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;
 
     config.pipelineLayout = m_pipelineLayout;
     config.renderPass = renderPass;

@@ -5,5 +5,6 @@ layout(set=0, binding=0) uniform sampler2D fontSampler;
 
 void main() {
     vec4 c = texture(fontSampler, fragUV);
+    // premultiplied alpha handling not required, just output sampled color
     outColor = c;
 }

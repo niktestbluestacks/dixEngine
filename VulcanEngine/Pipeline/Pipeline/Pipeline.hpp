@@ -7,7 +7,13 @@
 #include <vector>
 #include <cstdint>
 #include <vulkan/vulkan.h>
+
+// optional custom vertex input descriptions
 #include <vector>
+#include <vulkan/vulkan.h>
+#include <vector>
+#include <cstdint>
+
 
 namespace dix {
 
@@ -28,6 +34,10 @@ struct PipelineConfigInfo {
 	VkPipelineLayout pipelineLayout = nullptr;
 	VkRenderPass renderPass = nullptr;
 	uint32_t subpass = 0;
+
+	// optional custom vertex input descriptions
+	std::vector<VkVertexInputBindingDescription> vertexBindingDescriptions;
+	std::vector<VkVertexInputAttributeDescription> vertexAttributeDescriptions;
 };
 
 class Pipeline {

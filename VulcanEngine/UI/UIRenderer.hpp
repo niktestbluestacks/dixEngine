@@ -34,6 +34,8 @@ public:
     VkPipelineLayout getPipelineLayout() const { return m_pipelineLayout; }
     DixDescriptorPool& getDescriptorPool() { return *m_descriptorPool; }
     DixDescriptorSetLayout& getDescriptorSetLayout() { return *m_descriptorSetLayout; }
+    EngineDevice& getDevice() { return m_device; }
+
 
 private:
     EngineDevice& m_device;
@@ -43,4 +45,5 @@ private:
     VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 };
 
+// Additional comment for clarity
 }

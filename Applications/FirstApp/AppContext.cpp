@@ -2,6 +2,7 @@
 #include <FirstApp/AppContext.hpp>
 
 #include <Utils/Converter.hpp>
+#include <DixCamera/FpsCounter/FpsCounter.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -25,6 +26,9 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     initialize();
     m_uiManager = std::make_unique<dix::UIManager>();
     m_uiRenderer = std::make_unique<dix::UIRenderer>(m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
+    // add fps counter UI element
+    auto fps = std::make_unique<dix::FpsCounter>(*m_uiRenderer, m_Window.getExtent(), "../dixEngine/VulcanEngine/DixCamera/FpsCounter/font.txt", "../dixEngine/VulcanEngine/DixCamera/FpsCounter/font.tga");
+    m_uiManager->addElement(std::move(fps));
 }
 
 AppContext::~AppContext() {
@@ -103,6 +107,15 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
         // render UI
         if (m_uiManager && m_uiRenderer) {
             m_uiRenderer->bindPipeline(commandBuffer);
+            // push screen size to UI vertex shader (vec2)
+            float screenSize[2] = { static_cast<float>(m_Window.getExtent().width), static_cast<float>(m_Window.getExtent().height) };
+            vkCmdPushConstants(
+                commandBuffer,
+                m_uiRenderer->getPipelineLayout(),
+                VK_SHADER_STAGE_VERTEX_BIT,
+                0,
+                sizeof(screenSize),
+                &screenSize);
             m_uiManager->render(frameInfo);
         }
         endSwapChainRenderPass(commandBuffer);

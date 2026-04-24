@@ -78,4 +78,4 @@ void DixCamera::setViewYXZ(glm::vec3 position, glm::vec3 rotation) {
 	m_viewMatrix[3][1] = -glm::dot(v, position);
 	m_viewMatrix[3][2] = -glm::dot(w, position);
 }
-}
+}	// namespace dix

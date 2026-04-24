@@ -1,4 +1,5 @@
-#include "UiPipeline.hpp"
+// dix
+#include <UI/UiPipeline.hpp>
 #include <Utils/Converter.hpp>
 #include <stdexcept>
 
@@ -38,4 +39,4 @@ UiPipeline::~UiPipeline() {
     // Pipeline destructor cleans up
 }
 
-}
+}   // namespace dix

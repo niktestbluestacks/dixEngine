@@ -1,5 +1,7 @@
+// dix
 #include <Logger/Logger.hpp>
 
+// std
 #include <iostream>
 
 namespace dix {
@@ -21,5 +23,4 @@ void Logger::log(LogLevel level, const std::string& message) {
 	std::clog << levelStr << message << std::endl;
 }
 
-
-}
+}	// namespace dix

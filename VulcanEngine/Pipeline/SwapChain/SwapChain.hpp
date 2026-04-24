@@ -1,11 +1,13 @@
 #ifndef SWAP_CHAIN_HPP
 #define SWAP_CHAIN_HPP
 
+// dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
-// vulkan headers
+// libs
 #include <vulkan/vulkan.h>
 
+// std
 #include <string>
 #include <vector>
 #include <memory>

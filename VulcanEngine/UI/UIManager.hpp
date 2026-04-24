@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UI_MANAGER_HPP
+#define UI_MANAGER_HPP
 
 #include <UI/IUIElement.hpp>
 #include <vector>
@@ -14,4 +15,6 @@ public:
 private:
     std::vector<std::unique_ptr<IUIElement>> m_elements;
 };
-}
+}   // namespace dix
+
+#endif // UI_MANAGER_HPP

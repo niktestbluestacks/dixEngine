@@ -1,8 +1,10 @@
 #ifndef DEVICE_HPP
 #define DEVICE_HPP
 
+// dix
 #include <Window/WindowClass/WindowClass.hpp>
 
+// std
 #include <string>
 #include <vector>
 

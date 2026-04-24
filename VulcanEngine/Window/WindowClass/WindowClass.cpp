@@ -1,5 +1,7 @@
+// dix
 #include <Window/WindowClass/WindowClass.hpp>
 
+// std
 #include <stdexcept>
 
 namespace dix {
@@ -61,4 +63,4 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height
 	dixWindow->m_height = height;
 }
 
-}
+}	// namespace dix

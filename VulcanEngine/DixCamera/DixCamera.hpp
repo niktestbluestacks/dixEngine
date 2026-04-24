@@ -49,5 +49,5 @@ private:
 	glm::mat4 m_projectionMatrix{ 1.f };
 	glm::mat4 m_viewMatrix{ 1.f };
 };
-}
+}	// namespace dix
 #endif // CAMERA_HPP

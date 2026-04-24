@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UI_PIPELINE_HPP
+#define UI_PIPELINE_HPP
 
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/Pipeline/Pipeline.hpp>
@@ -20,4 +21,6 @@ private:
     VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 };
 
-}
+}   // namespace dix
+
+#endif // UI_PIPELINE_HPP

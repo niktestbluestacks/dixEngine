@@ -1,5 +1,6 @@
 #ifndef RENDERER_HPP
 #define RENDERER_HPP
+
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/SwapChain/SwapChain.hpp>

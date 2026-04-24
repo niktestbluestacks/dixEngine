@@ -1,11 +1,14 @@
-#pragma once
+#ifndef UI_RENDERER_HPP
+#define UI_RENDERER_HPP
 
+// dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
 #include <Pipeline/Pipeline/Pipeline.hpp>
 #include <Rendering/Renderer/Renderer.hpp>
 
+// std
 #include <string>
 #include <vector>
 #include <memory>
@@ -46,4 +49,5 @@ private:
 };
 
 // Additional comment for clarity
-}
+} // namespace dix
+#endif // UI_RENDERER_HPP

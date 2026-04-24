@@ -1,5 +1,8 @@
+// dix
 #include <UI/UiRenderer.hpp>
 #include <Utils/Converter.hpp>
+
+// std
 #include <stdexcept>
 
 namespace dix {
@@ -156,4 +159,4 @@ void UIRenderer::bindPipeline(VkCommandBuffer cb) {
     if (m_pipeline) m_pipeline->bind(cb);
 }
 
-}
+}   // namespace dix

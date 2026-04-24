@@ -1,6 +1,8 @@
-#include "FpsCounter.hpp"
+// dix
+#include <DixCamera/FpsCounter/FpsCounter.hpp>
 #include <Utils/Converter.hpp>
 
+// std
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
@@ -24,7 +26,13 @@ FpsCounter::FpsCounter(UIRenderer& uiRenderer, VkExtent2D screenExtent, const st
     const size_t kFramesInFlight = 2; // match renderer swapchain frames in flight
     m_vertexBuffers.resize(kFramesInFlight);
     for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
-        m_vertexBuffers[i] = std::make_unique<DixBuffer>(m_uiRenderer.getDevice(), sizeof(UiVert), m_vertexCapacity, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+        m_vertexBuffers[i] = std::make_unique<DixBuffer>(
+            m_uiRenderer.getDevice(), 
+            sizeof(UiVert), 
+            m_vertexCapacity, 
+            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        );
         m_vertexBuffers[i]->map();
     }
     m_vertexStaging.reserve(initialCapacity * sizeof(UiVert));
@@ -132,7 +140,13 @@ void FpsCounter::buildVerticesForText(const std::string& text) {
         m_vertexCapacity = m_vertexCount;
         vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
         for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
-            m_vertexBuffers[i] = std::make_unique<DixBuffer>(m_uiRenderer.getDevice(), sizeof(UiVert), m_vertexCapacity, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+            m_vertexBuffers[i] = std::make_unique<DixBuffer>(
+                m_uiRenderer.getDevice(), 
+                sizeof(UiVert), 
+                m_vertexCapacity, 
+                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+            );
             m_vertexBuffers[i]->map();
         }
     }
@@ -151,15 +165,30 @@ void FpsCounter::render(FrameInfo& fi) {
     if (m_vertexBuffers.empty()) return;
     // bind descriptor set for font
     VkPipelineLayout layout = m_uiRenderer.getPipelineLayout();
-    vkCmdBindDescriptorSets(fi.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, layout, 0, 1, &m_fontTexture.descriptorSet, 0, nullptr);
+    vkCmdBindDescriptorSets(
+        fi.commandBuffer, 
+        VK_PIPELINE_BIND_POINT_GRAPHICS, 
+        layout, 
+        0, 
+        1, 
+        &m_fontTexture.descriptorSet, 
+        0, 
+        nullptr
+    );
 
     int idx = fi.frameIndex % static_cast<int>(m_vertexBuffers.size());
     VkBuffer b = m_vertexBuffers[idx]->getBuffer();
     VkDeviceSize off = 0;
     vkCmdBindVertexBuffers(fi.commandBuffer, 0, 1, &b, &off);
+
     // set viewport to screen size so vertex positions in pixels map correctly
     VkViewport vp{};
-    vp.x = 0.0f; vp.y = 0.0f; vp.width = static_cast<float>(fi.screenExtent.width); vp.height = static_cast<float>(fi.screenExtent.height); vp.minDepth = 0.0f; vp.maxDepth = 1.0f;
+    vp.x = 0.0f; vp.y = 0.0f;
+    vp.width = static_cast<float>(fi.screenExtent.width);
+    vp.height = static_cast<float>(fi.screenExtent.height);
+    vp.minDepth = 0.0f;
+    vp.maxDepth = 1.0f;
+    
     vkCmdSetViewport(fi.commandBuffer, 0, 1, &vp);
     VkRect2D scissor{{0,0}, fi.screenExtent};
     vkCmdSetScissor(fi.commandBuffer, 0, 1, &scissor);

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FPS_COUNTER_HPP
+#define FPG_COUNTER_HPP
 
 #include <UI/IUIElement.hpp>
 #include <UI/UIRenderer.hpp>
@@ -48,4 +49,6 @@ private:
     std::string m_lastText;
 };
 
-}
+}   // namespace dix
+
+#endif // FPS_COUNTER_HPP

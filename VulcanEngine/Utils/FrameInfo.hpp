@@ -18,4 +18,4 @@ struct FrameInfo {
 };
 }	// namespace dix
 
-#endif // FRIEND_INFO_HPP
+#endif // FRAME_INFO_HPP

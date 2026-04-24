@@ -1,11 +1,15 @@
 #ifndef PIPELINE_HPP
 #define PIPELINE_HPP
 
+// dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
+// std
 #include <string>
 #include <vector>
 #include <cstdint>
+
+// libs
 #include <vulkan/vulkan.h>
 
 // optional custom vertex input descriptions

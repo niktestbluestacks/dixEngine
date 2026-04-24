@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IUI_ELEMENT_HPP
+#define IUI_ELEMENT_HPP
 
 #include <Utils/FrameInfo.hpp>
 
@@ -12,4 +13,6 @@ public:
     // upload GPU resources for the upcoming frame (called after beginFrame)
     virtual void upload(FrameInfo& fi) { (void)fi; }
 };
-}
+}   // namespace dix
+
+#endif // IUI_ELEMENT_HPP

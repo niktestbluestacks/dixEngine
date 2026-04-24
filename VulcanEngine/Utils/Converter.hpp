@@ -1,6 +1,7 @@
 #ifndef CONVERTER_HPP
 #define CONVERTER_HPP
 
+// std
 #include <string>
 
 namespace dix {
@@ -11,6 +12,6 @@ namespace dix {
 	constexpr std::string toModelPath(const std::string& modelFilepath) {
 		return static_cast <std::string> ("../dixEngine/Applications/models/") + modelFilepath;
 	}
-}
+}	// dix
 
 #endif // CONVERTER_HPP

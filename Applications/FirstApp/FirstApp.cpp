@@ -16,6 +16,7 @@
 #include <array>
 #include <cstdint>
 #include <chrono>
+#include <iostream>
 #include <stdexcept>
 
 namespace dix {
@@ -51,8 +52,14 @@ void FirstApp::run(void) {
 		float aspect = m_context.getAspectRatio();
 		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
 
-		// Delegate rendering details to AppContext to keep FirstApp focused on logic
-		m_context.drawFrame(dixcamera, frameTime, m_gameObjects);
+        // Delegate rendering details to AppContext to keep FirstApp focused on logic
+		try {
+			m_context.drawFrame(dixcamera, frameTime, m_gameObjects);
+		}
+		catch (const std::exception& e) {
+			std::cerr << "Render error: " << e.what() << std::endl;
+			break; // exit run loop on fatal render errors
+		}
 	}
 }
 

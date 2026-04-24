@@ -27,7 +27,12 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     m_uiManager = std::make_unique<dix::UIManager>();
     m_uiRenderer = std::make_unique<dix::UIRenderer>(m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
     // add fps counter UI element
-    auto fps = std::make_unique<dix::FpsCounter>(*m_uiRenderer, m_Window.getExtent(), "../dixEngine/VulcanEngine/DixCamera/FpsCounter/font.txt", "../dixEngine/VulcanEngine/DixCamera/FpsCounter/font.tga");
+    auto fps = std::make_unique<dix::FpsCounter>(
+        *m_uiRenderer, 
+        m_Window.getExtent(), 
+        dix::toModelPath("Fps/font.txt"), 
+        dix::toModelPath("Fps/font02.tga")
+    );
     m_uiManager->addElement(std::move(fps));
 }
 
@@ -85,6 +90,16 @@ void AppContext::createRenderSystem() {
 }
 
 void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector<GameObject>& gameObjects) {
+    // if window is minimized or has zero area, skip rendering to avoid Vulkan errors
+    auto extent = m_Window.getExtent();
+    if (extent.width == 0 || extent.height == 0) return;
+
+    // always update UI (do this before acquiring swapchain image) so UI logic
+    // runs even when swapchain recreation causes beginFrame() to return null
+    if (m_uiManager) {
+        m_uiManager->update(frameTime);
+    }
+
     if (auto commandBuffer = beginFrame()) {
         int frameIndex = getFrameIndex();
         FrameInfo frameInfo{
@@ -92,14 +107,21 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
             frameTime,
             commandBuffer,
             camera,
-            m_globalDescriptorSets[frameIndex]
+            m_globalDescriptorSets[frameIndex],
+            m_Window.getExtent()
         };
+        // allow UI elements to upload per-frame resources now that a frame and command buffer exist
+        if (m_uiManager) {
+            m_uiManager->upload(frameInfo);
+        }
 
         // update global ubo for this frame
         GlobalUbo ubo{};
         ubo.projectionView = camera.getProjection() * camera.getView();
         m_uboBuffers[frameIndex]->writeToIndex(&ubo, 0);
         m_uboBuffers[frameIndex]->flush();
+
+        // UI was already updated before acquiring the swapchain image
 
         // render
         beginSwapChainRenderPass(commandBuffer);

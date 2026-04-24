@@ -14,6 +14,7 @@ struct FrameInfo {
 	VkCommandBuffer commandBuffer;
 	DixCamera& dixcamera;
 	VkDescriptorSet globalDescriptorSet;
+    VkExtent2D screenExtent;
 };
 }	// namespace dix
 

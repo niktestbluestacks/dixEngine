@@ -19,6 +19,7 @@ public:
 
     void update(float dt) override;
     void render(FrameInfo& fi) override;
+    void upload(FrameInfo& fi) override;
 
 private:
     void loadFontTxt(const std::string& path);
@@ -31,8 +32,10 @@ private:
     UITexture m_fontTexture;
     std::unordered_map<char, GlyphInfo> m_glyphs;
 
-    std::unique_ptr<DixBuffer> m_vertexBuffer;
+    std::vector<std::unique_ptr<DixBuffer>> m_vertexBuffers;
     uint32_t m_vertexCount = 0;
+    uint32_t m_vertexCapacity = 0;
+    std::vector<char> m_vertexStaging; // CPU-side copy of vertex data
 
     // font atlas pixels
     std::vector<unsigned char> m_fontPixels;

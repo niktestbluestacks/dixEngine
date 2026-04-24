@@ -116,15 +116,17 @@ void Renderer::endFrame(void) {
 		throw std::runtime_error("failed to record command buffer!");
 	}
 
-	auto result = m_dixSwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex);
+    auto result = m_dixSwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex);
 	if (result == VK_ERROR_OUT_OF_DATE_KHR ||
 		result == VK_SUBOPTIMAL_KHR ||
 		m_Window.wasWindowResized()) {
 		m_Window.resetWindowResizedFlag();
 		recreateSwapChain();
 	}
-	else if (result != VK_SUCCESS) {
-		throw std::runtime_error("failed to present swap chain image!");
+    else if (result != VK_SUCCESS) {
+		// try to recover by recreating the swapchain for any non-success result
+		m_Window.resetWindowResizedFlag();
+		recreateSwapChain();
 	}
 
 	m_isFrameStarted = false;

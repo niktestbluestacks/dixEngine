@@ -1,22 +1,16 @@
 {
 	"abstract" : true,
-	"artifacts" : 
-	[
-		{
-			"path" : "C:/VulkanSDK/1.4.341.1/Bin/glslc.exe"
-		}
-	],
 	"backtrace" : 3,
 	"backtraceGraph" : 
 	{
 		"commands" : 
 		[
-			"add_executable",
+			"add_library",
 			"find_package"
 		],
 		"files" : 
 		[
-			"C:/msys64/ucrt64/share/cmake/Modules/FindVulkan.cmake",
+			"C:/msys64/ucrt64/share/glm/glmConfig.cmake",
 			"CMakeLists.txt"
 		],
 		"nodes" : 
@@ -27,7 +21,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 8,
+				"line" : 15,
 				"parent" : 0
 			},
 			{
@@ -37,7 +31,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 717,
+				"line" : 58,
 				"parent" : 2
 			}
 		]
@@ -47,16 +41,15 @@
 		"major" : 2,
 		"minor" : 9
 	},
-	"id" : "Vulkan::glslc::@6890427a1f51a3e7e1df",
+	"id" : "glm::glm-header-only::@6890427a1f51a3e7e1df",
 	"imported" : true,
 	"local" : true,
-	"name" : "Vulkan::glslc",
-	"nameOnDisk" : "glslc.exe",
+	"name" : "glm::glm-header-only",
 	"paths" : 
 	{
 		"build" : ".",
 		"source" : "."
 	},
 	"sources" : [],
-	"type" : "EXECUTABLE"
+	"type" : "INTERFACE_LIBRARY"
 }

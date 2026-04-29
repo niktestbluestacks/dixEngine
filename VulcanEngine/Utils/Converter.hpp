@@ -6,7 +6,7 @@
 
 namespace dix {
 	constexpr std::string toShaderPath(const std::string& shaderName) {
-		return static_cast <std::string> ("../dixEngine/VulcanEngine/Shaders/") + shaderName;
+		return static_cast <std::string> ("../dixEngine/build/shaders/") + shaderName;
 	}
 
 	constexpr std::string toModelPath(const std::string& modelFilepath) {

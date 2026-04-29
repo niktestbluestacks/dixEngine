@@ -7,56 +7,56 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "Threads::Threads::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Threads__Threads-Debug-677f0caac0f1ec2d04ac.json",
+					"jsonFile" : "target-Threads__Threads-Debug-a4c2080e21cf351c6141.json",
 					"name" : "Threads::Threads",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "Vulkan::Headers::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Vulkan__Headers-Debug-2ffb28e84c0974c76d84.json",
+					"jsonFile" : "target-Vulkan__Headers-Debug-6c661f3588b7292307df.json",
 					"name" : "Vulkan::Headers",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "Vulkan::Vulkan::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Vulkan__Vulkan-Debug-fd6c2f6a158cf145475a.json",
+					"jsonFile" : "target-Vulkan__Vulkan-Debug-facbec44f017d4c9cedb.json",
 					"name" : "Vulkan::Vulkan",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "Vulkan::glslangValidator::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Vulkan__glslangValidator-Debug-544d456d9970e20f7ef8.json",
+					"jsonFile" : "target-Vulkan__glslangValidator-Debug-56901f4619d6113b8bd9.json",
 					"name" : "Vulkan::glslangValidator",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "Vulkan::glslc::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Vulkan__glslc-Debug-f32f988c59a6cdc0c4e2.json",
+					"jsonFile" : "target-Vulkan__glslc-Debug-a09e5aa9964789cfc44f.json",
 					"name" : "Vulkan::glslc",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "glfw::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-glfw-Debug-08d096a76ea0a9bb72eb.json",
+					"jsonFile" : "target-glfw-Debug-cc1566301c182ed29408.json",
 					"name" : "glfw",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "glm::glm::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-glm__glm-Debug-f8466eb66b675db816a8.json",
+					"jsonFile" : "target-glm__glm-Debug-720cbebca067b38ac999.json",
 					"name" : "glm::glm",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "glm::glm-header-only::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-glm__glm-header-only-Debug-e6d99d1f11d2aefbbb7f.json",
+					"jsonFile" : "target-glm__glm-header-only-Debug-1dfe90c00c53ef7e79dd.json",
 					"name" : "glm::glm-header-only",
 					"projectIndex" : 0
 				}
@@ -85,7 +85,8 @@
 					"source" : ".",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -111,7 +112,8 @@
 					"name" : "VulcanEngine",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -119,8 +121,15 @@
 			[
 				{
 					"directoryIndex" : 0,
+					"id" : "Shaders::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Shaders-Debug-7f39f43216c6503af1e3.json",
+					"name" : "Shaders",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
 					"id" : "VulcanApp::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-VulcanApp-Debug-0f2ed8d70a6313a9f707.json",
+					"jsonFile" : "target-VulcanApp-Debug-b4a788f77073d9a4f6ec.json",
 					"name" : "VulcanApp",
 					"projectIndex" : 0
 				}

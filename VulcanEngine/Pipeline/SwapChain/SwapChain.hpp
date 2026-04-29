@@ -90,4 +90,4 @@ private:
 };
 
 }  // namespace dix
-#endif SWAP_CHAIN_HPP
+#endif // SWAP_CHAIN_HPP

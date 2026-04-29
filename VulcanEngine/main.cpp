@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 
-auto main(void) -> signed {
+int main() {
 	dix::FirstApp app {};
 
 	try {

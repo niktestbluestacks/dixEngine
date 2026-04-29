@@ -21,12 +21,12 @@
 
 namespace dix {
 
-FirstApp::FirstApp() {
+FirstApp::FirstApp(void) {
 	// FirstApp focuses on game objects and game logic only.
 	loadGameObjects();
 }
 
-FirstApp::~FirstApp() = default;
+FirstApp::~FirstApp(void) = default;
 
 void FirstApp::run(void) {
 	DixCamera dixcamera{};

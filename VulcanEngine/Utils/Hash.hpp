@@ -7,7 +7,7 @@
 namespace dix {
 
 template <typename T, typename ...Rest>
-constexpr void hashCombine(std::size_t& seed, const T& v, const Rest&... rest) {
+void hashCombine(std::size_t& seed, const T& v, const Rest&... rest) {
 	seed ^= std::hash <T>{}(v) + 0x9e3779b9u + (seed << 6) + (seed >> 2);
 	(hashCombine(seed, rest), ...);
 }

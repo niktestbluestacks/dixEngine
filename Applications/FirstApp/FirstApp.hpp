@@ -39,7 +39,7 @@ public:
 
 private:
     // application context encapsulates renderer/device/shader details
-	AppContext m_context{ WIDTH, HEIGHT, static_cast<std::string>("Vulkan") };
+	AppContext m_context{ WIDTH, HEIGHT, static_cast<std::string>("First Application") };
 	std::vector <GameObject> m_gameObjects;
 };
 }

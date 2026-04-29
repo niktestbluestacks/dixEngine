@@ -5,6 +5,7 @@
 #include <DixCamera/DixCamera.hpp>
 #include <Input/Keyboard/KeyboardController.hpp>
 #include <Utils/Converter.hpp>
+#include <Logger/Logger.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -18,15 +19,21 @@
 #include <chrono>
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 namespace dix {
 
 FirstApp::FirstApp(void) {
+	DixLogInfo("Initializing FirstApp...");
+	DixLogInfo("Loading Game Objects");
 	// FirstApp focuses on game objects and game logic only.
 	loadGameObjects();
+	DixLogInfo("FirstApp initialized successfully!");
 }
 
-FirstApp::~FirstApp(void) = default;
+FirstApp::~FirstApp(void) {
+	DixLogInfo("Closing FirstApp...");
+}
 
 void FirstApp::run(void) {
 	DixCamera dixcamera{};
@@ -57,7 +64,7 @@ void FirstApp::run(void) {
 			m_context.drawFrame(dixcamera, frameTime, m_gameObjects);
 		}
 		catch (const std::exception& e) {
-			std::cerr << "Render error: " << e.what() << std::endl;
+			DixLogErr("Render error: " + static_cast <std::string> (e.what()));
 			break; // exit run loop on fatal render errors
 		}
 	}

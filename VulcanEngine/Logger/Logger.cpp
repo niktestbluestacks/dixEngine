@@ -3,6 +3,7 @@
 
 // std
 #include <iostream>
+#include <sstream>
 
 namespace dix {
 
@@ -12,15 +13,26 @@ Logger& Logger::get() {
 }
 
 void Logger::log(LogLevel level, const std::string& message) {
-	std::string levelStr = "[DIX ";
+    std::ostringstream oss;
+	oss << "[DIX ";
     switch (level) {
-    case DEBUG: levelStr += "DEBUG]: "; break;
-    case INFO:  levelStr += "INFO]: "; break;
-    case WARN:  levelStr += "WARN]: "; break;
-    case ERR: levelStr += "ERROR]: "; break;
+    case DEBUG: oss << "DEBUG]: "; break;
+    case INFO: oss << "INFO]: "; break;
+    case WARN:  oss << "WARN]: "; break;
+    case ERR: oss << "ERROR]: "; break;
     }
+    oss << message;
 
-	std::clog << levelStr << message << std::endl;
+    switch(level) {
+        case DEBUG:
+        case INFO:
+            std::clog << oss.str() << std::endl;
+            break;
+        case WARN:
+        case ERR:
+            std::cerr << oss.str() << std::endl;
+            break;
+    }
 }
 
 }	// namespace dix

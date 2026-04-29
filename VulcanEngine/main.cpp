@@ -1,4 +1,5 @@
 // dix
+#include "Logger/Logger.hpp"
 #include <FirstApp/FirstApp.hpp>
 
 // std
@@ -13,7 +14,7 @@ int main() {
 		app.run();
 	}
 	catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
+		DixLogErr(e.what());
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;

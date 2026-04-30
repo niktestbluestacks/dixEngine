@@ -3,7 +3,6 @@
 
 // std
 #include <string>
-#include <format>
 
 namespace dix {
 

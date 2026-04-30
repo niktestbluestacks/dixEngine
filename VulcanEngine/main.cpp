@@ -1,10 +1,9 @@
 // dix
-#include "Logger/Logger.hpp"
+#include <Logger/Logger.hpp>
 #include <FirstApp/FirstApp.hpp>
 
 // std
 #include <cstdlib>
-#include <iostream>
 #include <exception>
 
 int main() {

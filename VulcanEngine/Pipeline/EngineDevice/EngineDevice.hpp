@@ -5,7 +5,6 @@
 #include <Window/WindowClass/WindowClass.hpp>
 
 // std
-#include <string>
 #include <vector>
 
 namespace dix {

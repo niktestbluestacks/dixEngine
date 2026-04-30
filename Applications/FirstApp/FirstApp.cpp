@@ -14,11 +14,7 @@
 #include <glm/gtc/constants.hpp>
 
 // std
-#include <array>
-#include <cstdint>
 #include <chrono>
-#include <iostream>
-#include <stdexcept>
 #include <string>
 
 namespace dix {

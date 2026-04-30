@@ -195,4 +195,4 @@ void FpsCounter::render(FrameInfo& fi) {
     vkCmdDraw(fi.commandBuffer, m_vertexCount, 1, 0, 0);
 }
 
-}
+}   // namespace dix

@@ -11,7 +11,6 @@
 // std
 #include <stdexcept>
 #include <cstdint>
-#include <array>
 
 namespace dix {
 

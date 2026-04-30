@@ -3,6 +3,7 @@
 
 // std
 #include <stdexcept>
+#include <cstdint>
 
 namespace dix {
 Window::Window(int width, int height, std::string title) :

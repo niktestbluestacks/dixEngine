@@ -9,8 +9,6 @@
 #include <Rendering/Renderer/Renderer.hpp>
 
 // std
-#include <string>
-#include <vector>
 #include <memory>
 
 namespace dix {

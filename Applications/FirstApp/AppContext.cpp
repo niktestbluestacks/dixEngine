@@ -10,9 +10,6 @@
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
 
-// std
-#include <stdexcept>
-
 namespace dix {
 
 struct GlobalUbo {

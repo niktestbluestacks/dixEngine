@@ -129,10 +129,10 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Window/WindowClass/WindowClass.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/15.2.0/tuple \
- C:/msys64/ucrt64/include/c++/15.2.0/cstdint \
  C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
  C:/msys64/ucrt64/include/c++/15.2.0/exception \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
  C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/cstdint

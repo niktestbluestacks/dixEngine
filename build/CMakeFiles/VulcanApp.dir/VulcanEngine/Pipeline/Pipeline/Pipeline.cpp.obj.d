@@ -131,73 +131,14 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/15.2.0/tuple \
- C:/msys64/ucrt64/include/c++/15.2.0/cstdint \
  C:/msys64/ucrt64/include/c++/15.2.0/vector \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_uninitialized.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_vector.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/vector.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/formatfwd.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/cstdint \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
- C:/msys64/ucrt64/include/c++/15.2.0/format \
- C:/msys64/ucrt64/include/c++/15.2.0/array \
- C:/msys64/ucrt64/include/c++/15.2.0/charconv \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
- C:/msys64/ucrt64/include/c++/15.2.0/limits \
- C:/msys64/ucrt64/include/c++/15.2.0/locale \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.h \
- C:/msys64/ucrt64/include/c++/15.2.0/ext/atomicity.h \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
- C:/msys64/ucrt64/include/pthread.h C:/msys64/ucrt64/include/sys/types.h \
- C:/msys64/ucrt64/include/process.h \
- C:/msys64/ucrt64/include/corecrt_startup.h \
- C:/msys64/ucrt64/include/signal.h \
- C:/msys64/ucrt64/include/pthread_signal.h \
- C:/msys64/ucrt64/include/time.h C:/msys64/ucrt64/include/sys/timeb.h \
- C:/msys64/ucrt64/include/sec_api/sys/timeb_s.h \
- C:/msys64/ucrt64/include/_timeval.h \
- C:/msys64/ucrt64/include/pthread_time.h \
- C:/msys64/ucrt64/include/pthread_compat.h \
- C:/msys64/ucrt64/include/sched.h \
- C:/msys64/ucrt64/include/pthread_unistd.h \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.tcc \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets.h \
- C:/msys64/ucrt64/include/c++/15.2.0/cwctype \
- C:/msys64/ucrt64/include/wctype.h \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h \
- C:/msys64/ucrt64/include/c++/15.2.0/system_error \
- C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
- C:/msys64/ucrt64/include/c++/15.2.0/exception \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf_iterator.h \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets.tcc \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.h \
- C:/msys64/ucrt64/include/c++/15.2.0/ctime \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/time_members.h \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/messages_members.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/codecvt.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.tcc \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_conv.h \
- C:/msys64/ucrt64/include/c++/15.2.0/optional \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/enable_special_members.h \
- C:/msys64/ucrt64/include/c++/15.2.0/span \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/monostate.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/unicode.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algo.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/algorithmfwd.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_heap.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/uniform_int_dist.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_tempbuf.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/unicode-data.h \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/glm.hpp \
@@ -205,6 +146,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/cmath \
  C:/msys64/ucrt64/include/math.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/specfun.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/limits \
  C:/msys64/ucrt64/include/c++/15.2.0/tr1/gamma.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/tr1/special_function_util.h \
  C:/msys64/ucrt64/include/c++/15.2.0/tr1/bessel_function.tcc \
@@ -252,13 +194,16 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/compute_vector_decl.hpp \
  C:/msys64/ucrt64/include/c++/15.2.0/functional \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/std_function.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
  C:/msys64/ucrt64/include/c++/15.2.0/unordered_map \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/unordered_map.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/hashtable.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/hashtable_policy.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ext/aligned_buffer.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/enable_special_members.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/node_handle.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/erase_if.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/array \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/move_only_function.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/mofunc_impl.h \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/_vectorize.hpp \
@@ -369,12 +314,48 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/integer.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/func_integer.inl \
  C:/msys64/ucrt64/include/c++/15.2.0/memory \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_tempbuf.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_raw_storage_iter.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/align.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ios \
+ C:/msys64/ucrt64/include/c++/15.2.0/exception \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/ext/atomicity.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
+ C:/msys64/ucrt64/include/pthread.h C:/msys64/ucrt64/include/sys/types.h \
+ C:/msys64/ucrt64/include/process.h \
+ C:/msys64/ucrt64/include/corecrt_startup.h \
+ C:/msys64/ucrt64/include/signal.h \
+ C:/msys64/ucrt64/include/pthread_signal.h \
+ C:/msys64/ucrt64/include/time.h C:/msys64/ucrt64/include/sys/timeb.h \
+ C:/msys64/ucrt64/include/sec_api/sys/timeb_s.h \
+ C:/msys64/ucrt64/include/_timeval.h \
+ C:/msys64/ucrt64/include/pthread_time.h \
+ C:/msys64/ucrt64/include/pthread_compat.h \
+ C:/msys64/ucrt64/include/sched.h \
+ C:/msys64/ucrt64/include/pthread_unistd.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/system_error \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/cwctype \
+ C:/msys64/ucrt64/include/wctype.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf_iterator.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/shared_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/shared_ptr_base.h \
@@ -393,6 +374,25 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/fstream \
  C:/msys64/ucrt64/include/c++/15.2.0/istream \
  C:/msys64/ucrt64/include/c++/15.2.0/ostream \
+ C:/msys64/ucrt64/include/c++/15.2.0/format \
+ C:/msys64/ucrt64/include/c++/15.2.0/charconv \
+ C:/msys64/ucrt64/include/c++/15.2.0/locale \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/ctime \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/time_members.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/messages_members.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/codecvt.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_conv.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/optional \
+ C:/msys64/ucrt64/include/c++/15.2.0/span \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/monostate.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/unicode.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algo.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/algorithmfwd.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_heap.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/uniform_int_dist.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/unicode-data.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/istream.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/basic_file.h \

@@ -1947,6 +1947,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: C:/Big_projects/Gam
   C:/msys64/ucrt64/include/c++/15.2.0/bits/ranges_util.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/refwrap.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/std_abs.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algo.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algobase.h \
@@ -2004,6 +2005,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: C:/Big_projects/Gam
   C:/msys64/ucrt64/include/c++/15.2.0/ostream \
   C:/msys64/ucrt64/include/c++/15.2.0/pstl/pstl_config.h \
   C:/msys64/ucrt64/include/c++/15.2.0/span \
+  C:/msys64/ucrt64/include/c++/15.2.0/sstream \
   C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
   C:/msys64/ucrt64/include/c++/15.2.0/stdlib.h \
   C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
@@ -5896,7 +5898,8 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/main.cpp.obj: C:/Big_projects/Game_project
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mm_malloc.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stddef.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdint.h \
-  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/syslimits.h
+  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/syslimits.h \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp
 
 
 C:/Big_projects/Game_project/dixEngine/VulcanEngine/main.cpp:

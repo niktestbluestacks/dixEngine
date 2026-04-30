@@ -6,7 +6,6 @@
 #include <FirstApp/AppContext.hpp>
 
 // std
-#include <memory>
 #include <vector>
 
 namespace dix {

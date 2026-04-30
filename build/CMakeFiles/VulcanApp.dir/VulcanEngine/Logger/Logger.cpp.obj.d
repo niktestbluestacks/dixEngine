@@ -106,13 +106,16 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/15.2.0/tuple \
- C:/msys64/ucrt64/include/c++/15.2.0/format \
- C:/msys64/ucrt64/include/c++/15.2.0/array \
- C:/msys64/ucrt64/include/c++/15.2.0/charconv \
- C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
- C:/msys64/ucrt64/include/c++/15.2.0/limits \
- C:/msys64/ucrt64/include/c++/15.2.0/locale \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/iostream \
+ C:/msys64/ucrt64/include/c++/15.2.0/ostream \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/ios \
+ C:/msys64/ucrt64/include/c++/15.2.0/exception \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ext/atomicity.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
@@ -129,24 +132,27 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/sched.h \
  C:/msys64/ucrt64/include/pthread_unistd.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/system_error \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets.h \
  C:/msys64/ucrt64/include/c++/15.2.0/cwctype \
  C:/msys64/ucrt64/include/wctype.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_base.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h \
- C:/msys64/ucrt64/include/c++/15.2.0/system_error \
- C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
- C:/msys64/ucrt64/include/c++/15.2.0/exception \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf_iterator.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_inline.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/format \
+ C:/msys64/ucrt64/include/c++/15.2.0/array \
+ C:/msys64/ucrt64/include/c++/15.2.0/charconv \
+ C:/msys64/ucrt64/include/c++/15.2.0/limits \
+ C:/msys64/ucrt64/include/c++/15.2.0/locale \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_facets_nonio.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ctime \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/time_members.h \
@@ -169,12 +175,6 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uniform_int_dist.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_tempbuf.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/unicode-data.h \
- C:/msys64/ucrt64/include/c++/15.2.0/iostream \
- C:/msys64/ucrt64/include/c++/15.2.0/ostream \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h \
- C:/msys64/ucrt64/include/c++/15.2.0/ios \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/istream \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/istream.tcc \

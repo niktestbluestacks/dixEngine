@@ -56,14 +56,13 @@ void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLay
 
 void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
 	assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
-
 	PipelineConfigInfo pipelineConfig{};
 	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
 
 	pipelineConfig.renderPass = renderPass;
 	pipelineConfig.pipelineLayout = m_pipelineLayout;
 
-	m_pipeline = std::make_unique <Pipeline>(
+	m_pipeline = std::make_unique<Pipeline>(
 		m_dixDevice,
 		// simple shaders are really simple XD
 		toShaderPath("SimpleShader/simple_shader.vert.spv"),
@@ -74,6 +73,7 @@ void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
 void SimpleRenderSystem::renderGameObjects(
 		FrameInfo& frameInfo,
 		std::vector <GameObject>& gameObjects) {
+    // bind pipeline
 	m_pipeline->bind(frameInfo.commandBuffer);
 
 	vkCmdBindDescriptorSets (

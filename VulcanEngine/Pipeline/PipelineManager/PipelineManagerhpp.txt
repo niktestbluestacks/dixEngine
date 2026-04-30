@@ -3,17 +3,17 @@
 
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
-
+#include <Pipeline/PipelineConfigInfo/PipelineConfigInfo.hpp>
 #include <vector>
 
 namespace dix {
 
-// Forward declarations for Vulkan structures
+// Forward declarations
 struct PipelineConfigInfo;
 class ShaderModule;
 
-// Helper function to create a VkPipelineShaderStageCreateInfo from a shader module
-VkPipelineShaderStageCreateInfo createShaderStage(VkShaderStageFlagBits stage, const ShaderModule& shaderModule);
+// Helper function to create a VkPipelineShaderStageCreateInfo from a ShaderModule
+VkPipelineShaderStageCreateInfo createShaderStage(VkShaderStageFlagBits stage, VkShaderModule module);
 
 // Helper function to create a VkPipelineVertexInputStateCreateInfo
 VkPipelineVertexInputStateCreateInfo createVertexInputState(const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions);
@@ -71,22 +71,6 @@ private:
     VkPipelineColorBlendStateCreateInfo colorBlendingInfo;
 
     void createGraphicsPipeline(const PipelineConfigInfo& config);
-};
-
-struct PipelineConfigInfo {
-    VkDevice device;
-    VkRenderPass renderPass;
-    std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo;
-    VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
-    VkViewport viewport;
-    VkRect2D scissor;
-    VkPipelineViewportStateCreateInfo viewportStateInfo;
-    VkPipelineRasterizationStateCreateInfo rasterizerInfo;
-    VkPipelineMultisampleStateCreateInfo multisampleInfo;
-    VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
-    VkPipelineColorBlendAttachmentState colorBlendAttachment;
-    VkPipelineColorBlendStateCreateInfo colorBlendingInfo;
 };
 
 }  // namespace dix

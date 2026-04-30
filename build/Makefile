@@ -429,6 +429,54 @@ VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.s
 .PHONY : VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.s
 
+VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.obj: VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.obj
+.PHONY : VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.obj
+
+# target to build an object file
+VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.obj
+.PHONY : VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.obj
+
+VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.i: VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.i
+.PHONY : VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.i
+
+# target to preprocess a source file
+VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.i
+.PHONY : VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.i
+
+VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.s: VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.s
+.PHONY : VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.s
+
+# target to generate assembly for a file
+VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.s
+.PHONY : VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.s
+
+VulcanEngine/Pipeline/ShaderModule/ShaderModule.obj: VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.obj
+.PHONY : VulcanEngine/Pipeline/ShaderModule/ShaderModule.obj
+
+# target to build an object file
+VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.obj
+.PHONY : VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.obj
+
+VulcanEngine/Pipeline/ShaderModule/ShaderModule.i: VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.i
+.PHONY : VulcanEngine/Pipeline/ShaderModule/ShaderModule.i
+
+# target to preprocess a source file
+VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.i
+.PHONY : VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.i
+
+VulcanEngine/Pipeline/ShaderModule/ShaderModule.s: VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.s
+.PHONY : VulcanEngine/Pipeline/ShaderModule/ShaderModule.s
+
+# target to generate assembly for a file
+VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.s
+.PHONY : VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.s
+
 VulcanEngine/Pipeline/SwapChain/SwapChain.obj: VulcanEngine/Pipeline/SwapChain/SwapChain.cpp.obj
 .PHONY : VulcanEngine/Pipeline/SwapChain/SwapChain.obj
 
@@ -643,6 +691,12 @@ help:
 	@echo ... VulcanEngine/Pipeline/Pipeline/Pipeline.obj
 	@echo ... VulcanEngine/Pipeline/Pipeline/Pipeline.i
 	@echo ... VulcanEngine/Pipeline/Pipeline/Pipeline.s
+	@echo ... VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.obj
+	@echo ... VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.i
+	@echo ... VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.s
+	@echo ... VulcanEngine/Pipeline/ShaderModule/ShaderModule.obj
+	@echo ... VulcanEngine/Pipeline/ShaderModule/ShaderModule.i
+	@echo ... VulcanEngine/Pipeline/ShaderModule/ShaderModule.s
 	@echo ... VulcanEngine/Pipeline/SwapChain/SwapChain.obj
 	@echo ... VulcanEngine/Pipeline/SwapChain/SwapChain.i
 	@echo ... VulcanEngine/Pipeline/SwapChain/SwapChain.s

@@ -37,7 +37,7 @@ public:
 private:
 	EngineDevice& m_dixDevice;
 
-	std::unique_ptr<Pipeline> m_pipeline;
+    std::unique_ptr<Pipeline> m_pipeline;
 	VkPipelineLayout m_pipelineLayout;
 };
 }

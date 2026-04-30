@@ -131,7 +131,9 @@
 				15,
 				16,
 				17,
-				18
+				18,
+				19,
+				20
 			]
 		}
 	],
@@ -207,7 +209,9 @@
 				15,
 				16,
 				17,
-				18
+				18,
+				19,
+				20
 			]
 		}
 	],
@@ -283,6 +287,18 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "VulcanEngine/Pipeline/Pipeline/Pipeline.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

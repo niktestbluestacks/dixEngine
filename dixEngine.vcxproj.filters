@@ -72,6 +72,9 @@
     <ClCompile Include="VulcanEngine\DixCamera\FpsCounter\FpsCounter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulcanEngine\Pipeline\ShaderModule\ShaderModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp">
@@ -80,7 +83,7 @@
     <ClInclude Include="Applications\FirstApp\FirstApp.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulcanEngine\Pipeline\PipelineManager\PipelineManadger.hpp">
+    <ClInclude Include="VulcanEngine\Pipeline\PipelineManager\PipelineManager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulcanEngine\Pipeline\Pipeline\Pipeline.hpp">
@@ -147,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Dependecies\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\Pipeline\ShaderModule\ShaderModule.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

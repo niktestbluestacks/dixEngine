@@ -73,6 +73,18 @@
 },
 {
   "directory": "C:/Big_projects/Game_project/dixEngine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DGLFW_DLL @CMakeFiles/VulcanApp.dir/includes_CXX.rsp -g -std=gnu++23 -o CMakeFiles\\VulcanApp.dir\\VulcanEngine\\Pipeline\\PipelineConfigInfo\\PipelineConfigInfo.cpp.obj -c C:\\Big_projects\\Game_project\\dixEngine\\VulcanEngine\\Pipeline\\PipelineConfigInfo\\PipelineConfigInfo.cpp",
+  "file": "C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp",
+  "output": "CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/PipelineConfigInfo/PipelineConfigInfo.cpp.obj"
+},
+{
+  "directory": "C:/Big_projects/Game_project/dixEngine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DGLFW_DLL @CMakeFiles/VulcanApp.dir/includes_CXX.rsp -g -std=gnu++23 -o CMakeFiles\\VulcanApp.dir\\VulcanEngine\\Pipeline\\ShaderModule\\ShaderModule.cpp.obj -c C:\\Big_projects\\Game_project\\dixEngine\\VulcanEngine\\Pipeline\\ShaderModule\\ShaderModule.cpp",
+  "file": "C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp",
+  "output": "CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.obj"
+},
+{
+  "directory": "C:/Big_projects/Game_project/dixEngine/build",
   "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DGLFW_DLL @CMakeFiles/VulcanApp.dir/includes_CXX.rsp -g -std=gnu++23 -o CMakeFiles\\VulcanApp.dir\\VulcanEngine\\Pipeline\\SwapChain\\SwapChain.cpp.obj -c C:\\Big_projects\\Game_project\\dixEngine\\VulcanEngine\\Pipeline\\SwapChain\\SwapChain.cpp",
   "file": "C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/SwapChain/SwapChain.cpp",
   "output": "CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/SwapChain/SwapChain.cpp.obj"

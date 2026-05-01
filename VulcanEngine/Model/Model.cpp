@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cstring>
 #include <unordered_map>
+#include <fstream>
 
 namespace std {
 template <>
@@ -152,8 +153,31 @@ void Model::Builder::loadModel(const std::string& filepath) {
 	std::string warn;
 	std::string err;
 
-	if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-		throw std::runtime_error(warn + err);
+	std::ifstream file (filepath);
+
+	std::string line;
+
+	bool loaded_with_texture = false;
+
+	while (std::getline(file, line)) {
+		if (line.front() == 'm') {
+			std::string texture_filepath;
+			texture_filepath = filepath.substr(0, filepath.find_last_of('\\') + 1);
+			texture_filepath += line.substr(line.find_last_of(' ') + 1, line.size() - 1);
+			file.close();
+			if (!tinyobj::LoadObj(
+					&attrib, &shapes, &materials, &warn, &err, 
+					filepath.c_str(), texture_filepath.c_str()
+					)) {
+				throw std::runtime_error(warn + err);
+			}
+			loaded_with_texture = true;
+		}
+	}
+	if (!loaded_with_texture) {
+		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
+			throw std::runtime_error(warn + err);
+		}
 	}
 
 	vertices.clear();

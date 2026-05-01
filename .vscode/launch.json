@@ -5,14 +5,14 @@
       "name": "C/C++: g++.exe build and debug active file",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${fileDirname}\\${fileBasenameNoExtension}.exe",
+      "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${fileDirname}",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
-      "miDebuggerPath": "C:\\msys64\\ucrt64\\bin\\gdb.exe", // Path to your gdb.exe
+      "miDebuggerPath": "C:/msys64/ucrt64/bin/gdb.exe", // Path to your gdb.exe
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",

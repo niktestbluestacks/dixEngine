@@ -1,6 +1,5 @@
 CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:\Big_projects\Game_project\dixEngine\Applications\FirstApp\FirstApp.cpp \
- C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/FirstApp.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
@@ -383,6 +382,7 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_transform.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_transform.inl \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/matrix_transform.inl \
+ C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/FirstApp.hpp \
  C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/AppContext.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Rendering/Renderer/Renderer.hpp \
@@ -394,8 +394,8 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/UIManager.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/IUIElement.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/UIRenderer.hpp \
- C:/Big_projects/Game_project/dixEngine/VulcanEngine/Input/Keyboard/KeyboardController.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Utils/Converter.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Input/Keyboard/KeyboardController.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
  C:/msys64/ucrt64/include/c++/15.2.0/chrono \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/chrono.h \
@@ -428,4 +428,22 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/chrono_io.h \
  C:/msys64/ucrt64/include/c++/15.2.0/iomanip \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/quoted_string.h
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/quoted_string.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/filesystem \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_fwd.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_path.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/codecvt \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_dir.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_ops.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/random \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/random.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/opt_random.h \
+ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/pmmintrin.h \
+ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/emmintrin.h \
+ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xmmintrin.h \
+ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mmintrin.h \
+ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mwaitintrin.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/random.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/numeric \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_numeric.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/pstl/glue_numeric_defs.h

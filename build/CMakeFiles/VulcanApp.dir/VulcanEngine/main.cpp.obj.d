@@ -394,4 +394,5 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/main.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Utils/FrameInfo.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/UIManager.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/IUIElement.hpp \
- C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/UIRenderer.hpp
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/UIRenderer.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Utils/Converter.hpp

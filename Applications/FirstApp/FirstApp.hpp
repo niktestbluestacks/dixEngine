@@ -1,12 +1,14 @@
 #ifndef _FIRST_APP_HPP
 #define _FIRST_APP_HPP
-
+ 
 // dix
 #include <Model/GameObject/GameObject.hpp>
 #include <FirstApp/AppContext.hpp>
-
+#include <Utils/Converter.hpp>
 // std
+#include <string>
 #include <vector>
+#include <string_view>
 
 namespace dix {
 class FirstApp {
@@ -27,6 +29,8 @@ public:
 	static constexpr int WIDTH = 800;
 	static constexpr int HEIGHT = 600;
 	static constexpr float MAX_FRAME_TIME = 0.05f;
+	static constexpr std::string_view MODEL_FILEPATH_RELATIVE = "../dixEngine/Applications/models";
+
 
 	FirstApp(void);
 	~FirstApp(void);
@@ -41,6 +45,6 @@ private:
 	AppContext m_context{ WIDTH, HEIGHT, static_cast<std::string>("First Application") };
 	std::vector <GameObject> m_gameObjects;
 };
-}
+}	// namespace dix
 
 #endif // _FIRST_APP_HPP

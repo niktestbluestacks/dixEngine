@@ -12,6 +12,7 @@ namespace dix {
 	constexpr std::string toModelPath(const std::string& modelFilepath) {
 		return std::string(static_cast <std::string> ("../dixEngine/Applications/models/") + modelFilepath);
 	}
+	
 }	// dix
 
 #endif // CONVERTER_HPP

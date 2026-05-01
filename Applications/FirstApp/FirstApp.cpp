@@ -1,4 +1,5 @@
 // dix
+#include "Model/GameObject/GameObject.hpp"
 #include <FirstApp/FirstApp.hpp>
 
 #include <FirstApp/AppContext.hpp>
@@ -16,6 +17,8 @@
 // std
 #include <chrono>
 #include <string>
+#include <filesystem>
+#include <random>
 
 namespace dix {
 
@@ -68,13 +71,35 @@ void FirstApp::run(void) {
 
 void FirstApp::loadGameObjects() {
     // Use the device from AppContext for loading models/resources
-	std::shared_ptr <Model> dixModel = Model::createModelFromFile(m_context.device(), toModelPath("colored_cube.obj"));
+	std::random_device rd;
+    
+    // 2. Initialize the Mersenne Twister engine
+    std::mt19937 gen(rd());
+    
+    // 3. Define the distribution range [min, max)
+    // For floats, use std::uniform_real_distribution<float>
+    std::uniform_real_distribution<float> dist(0.0f, 10.0f);
 
-    auto gameObj = GameObject::createGameObject();
-    gameObj.model = dixModel;
-    gameObj.transform.translation = { .0f, .5f, 2.5f };
-	gameObj.transform.scale = { 3.f, 3.f, 3.f };
-    m_gameObjects.push_back(std::move(gameObj));
+
+
+	for (const auto& entry : std::filesystem::directory_iterator(MODEL_FILEPATH_RELATIVE)) {
+
+		if (std::filesystem::is_directory(entry.path()) ||
+		  std::filesystem::absolute(entry.path()).string().back() == 'l') {
+			continue;
+		}
+		DixLogDebug("Loading model in file: " + std::filesystem::absolute(entry).string());
+		std::shared_ptr <Model> dixModel = Model::createModelFromFile(
+				m_context.device(), 
+				std::filesystem::absolute(entry).string()
+		);
+
+		auto gameObj = GameObject::createGameObject();
+		gameObj.model = dixModel;
+		gameObj.transform.translation = { dist(gen), dist(gen), dist(gen) };
+		gameObj.transform.scale = { 1.f, 1.f, 1.f };
+		m_gameObjects.push_back(std::move(gameObj));
+	}
 }
 
 } // namespace dix

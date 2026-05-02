@@ -93,6 +93,13 @@ public:
     DixDescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
     DixDescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
 
+    DixDescriptorWriter& writeImageSampler(
+        uint32_t binding,
+        VkImageView imageView,
+        VkSampler sampler,
+        VkImageLayout imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    );
+
     bool build(VkDescriptorSet& set);
     void overwrite(VkDescriptorSet& set);
 
@@ -100,6 +107,8 @@ private:
     DixDescriptorSetLayout& setLayout;
     DixDescriptorPool& pool;
     std::vector<VkWriteDescriptorSet> writes;
+    std::vector<VkDescriptorImageInfo> imageInfos;
+    std::vector<VkDescriptorBufferInfo> bufferInfos;
 };
 
 }  // namespace dix

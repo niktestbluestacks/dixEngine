@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "C:/Big_projects/Game_project/dixEngine"
+    "cmake.sourceDirectory": "C:/Big_projects/Game_project/dixEngine",
+    "makefile.configureOnOpen": false
 }

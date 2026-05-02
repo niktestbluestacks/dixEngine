@@ -63,7 +63,7 @@ public:
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
     void copyBufferToImage(
-        VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount);
+        VkBuffer buffer, VkImage image, uint32_t width, uint32_t height, uint32_t layerCount = 1);
 
     void createImageWithInfo(
         const VkImageCreateInfo& imageInfo,
@@ -72,6 +72,8 @@ public:
         VkDeviceMemory& imageMemory);
 
     VkPhysicalDeviceProperties properties;
+
+    void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
 
 private:
     void createInstance();

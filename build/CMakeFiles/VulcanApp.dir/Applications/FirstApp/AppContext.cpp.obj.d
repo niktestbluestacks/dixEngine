@@ -376,6 +376,8 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/func_integer.inl \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/matrix_transform.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_projection.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/constants.hpp \

@@ -13,6 +13,7 @@
 #include <Model/GameObject/GameObject.hpp>
 #include <UI/UIManager.hpp>
 #include <UI/UIRenderer.hpp>
+#include <Model/DixTexture/DixTexture.hpp>
 
 // std
 #include <memory>
@@ -60,6 +61,8 @@ private:
 	std::unique_ptr<SimpleRenderSystem> m_simpleRenderSystem;
     std::unique_ptr<dix::UIManager> m_uiManager;
     std::unique_ptr<dix::UIRenderer> m_uiRenderer;
+    // default fallback texture used for models when a mesh has no texture
+	dix::DixTexture m_defaultTexture;
 	void createDescriptorPool(); // New method to create descriptor pool
 	void createUBOs(); // New method to create UBOs
 	void createDescriptorSets(); // New method to create descriptor sets

@@ -43,15 +43,21 @@ void AppContext::initialize() {
     createUBOs();
     m_globalSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
         .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+        .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
         .build();
     createDescriptorSets();
     createRenderSystem();
 }
 
 void AppContext::createDescriptorPool() {
+    // m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
+    //     .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+    //     .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+    //     .build();
     m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
 }
 
@@ -71,10 +77,20 @@ void AppContext::createUBOs() {
 
 void AppContext::createDescriptorSets() {
     m_globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+
+    // Ensure we have a valid default texture to bind for models that don't provide one.
+    m_defaultTexture = createDefaultTexture(m_dixDevice);
+
+    VkDescriptorImageInfo imageInfo{};
+    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfo.imageView = m_defaultTexture.getImageView();
+    imageInfo.sampler = m_defaultTexture.getSampler();
+
     for (size_t i = 0; i < m_globalDescriptorSets.size(); ++i) {
         auto bufferInfo = m_uboBuffers[i]->descriptorInfo();
         DixDescriptorWriter(*m_globalSetLayout, *m_globalPool)
             .writeBuffer(0, &bufferInfo)
+            .writeImage(1, &imageInfo)
             .build(m_globalDescriptorSets[i]);
     }
 }

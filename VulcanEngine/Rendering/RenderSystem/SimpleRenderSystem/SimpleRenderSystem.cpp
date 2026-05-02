@@ -73,21 +73,34 @@ void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
 void SimpleRenderSystem::renderGameObjects(
 		FrameInfo& frameInfo,
 		std::vector <GameObject>& gameObjects) {
-    // bind pipeline
+	// bind pipeline
 	m_pipeline->bind(frameInfo.commandBuffer);
 
-	vkCmdBindDescriptorSets (
-		frameInfo.commandBuffer,
-		VK_PIPELINE_BIND_POINT_GRAPHICS,
-		m_pipelineLayout,
-		0,
-		1,
-		&frameInfo.globalDescriptorSet,
-		0,
-		nullptr
-	);
-
 	for (auto& obj : gameObjects) {
+		// If the object has a texture, update the global descriptor set's
+		// combined image sampler binding so the fragment shader samples the
+		// correct texture for this object.
+		if (obj.model) {
+			const auto& tex = obj.model->getTextureInfo();
+			if (tex.view != VK_NULL_HANDLE && tex.sampler != VK_NULL_HANDLE) {
+				VkDescriptorImageInfo imageInfo{};
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				imageInfo.imageView = tex.view;
+				imageInfo.sampler = tex.sampler;
+
+				VkWriteDescriptorSet write{};
+				write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				write.dstSet = frameInfo.globalDescriptorSet;
+				write.dstBinding = 1;
+				write.dstArrayElement = 0;
+				write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				write.descriptorCount = 1;
+				write.pImageInfo = &imageInfo;
+
+				vkUpdateDescriptorSets(m_dixDevice.device(), 1, &write, 0, nullptr);
+			}
+		}
+
 		SimplePushConstantData push{};
 		push.modelMatrix = obj.transform.mat4();
 		push.normalMatrix = obj.transform.normalMatrix();
@@ -99,6 +112,19 @@ void SimpleRenderSystem::renderGameObjects(
 			0,
 			sizeof(SimplePushConstantData),
 			&push);
+
+		// bind descriptor set for this object
+		vkCmdBindDescriptorSets (
+			frameInfo.commandBuffer,
+			VK_PIPELINE_BIND_POINT_GRAPHICS,
+			m_pipelineLayout,
+			0,
+			1,
+			&frameInfo.globalDescriptorSet,
+			0,
+			nullptr
+		);
+
 		obj.model->bind(frameInfo.commandBuffer);
 		obj.model->draw(frameInfo.commandBuffer);
 	}

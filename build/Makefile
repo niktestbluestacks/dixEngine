@@ -285,6 +285,54 @@ VulcanEngine/Logger/Logger.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.s
 .PHONY : VulcanEngine/Logger/Logger.cpp.s
 
+VulcanEngine/Model/DixImage/DixImage.obj: VulcanEngine/Model/DixImage/DixImage.cpp.obj
+.PHONY : VulcanEngine/Model/DixImage/DixImage.obj
+
+# target to build an object file
+VulcanEngine/Model/DixImage/DixImage.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixImage/DixImage.cpp.obj
+.PHONY : VulcanEngine/Model/DixImage/DixImage.cpp.obj
+
+VulcanEngine/Model/DixImage/DixImage.i: VulcanEngine/Model/DixImage/DixImage.cpp.i
+.PHONY : VulcanEngine/Model/DixImage/DixImage.i
+
+# target to preprocess a source file
+VulcanEngine/Model/DixImage/DixImage.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixImage/DixImage.cpp.i
+.PHONY : VulcanEngine/Model/DixImage/DixImage.cpp.i
+
+VulcanEngine/Model/DixImage/DixImage.s: VulcanEngine/Model/DixImage/DixImage.cpp.s
+.PHONY : VulcanEngine/Model/DixImage/DixImage.s
+
+# target to generate assembly for a file
+VulcanEngine/Model/DixImage/DixImage.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixImage/DixImage.cpp.s
+.PHONY : VulcanEngine/Model/DixImage/DixImage.cpp.s
+
+VulcanEngine/Model/DixTexture/DixTexture.obj: VulcanEngine/Model/DixTexture/DixTexture.cpp.obj
+.PHONY : VulcanEngine/Model/DixTexture/DixTexture.obj
+
+# target to build an object file
+VulcanEngine/Model/DixTexture/DixTexture.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixTexture/DixTexture.cpp.obj
+.PHONY : VulcanEngine/Model/DixTexture/DixTexture.cpp.obj
+
+VulcanEngine/Model/DixTexture/DixTexture.i: VulcanEngine/Model/DixTexture/DixTexture.cpp.i
+.PHONY : VulcanEngine/Model/DixTexture/DixTexture.i
+
+# target to preprocess a source file
+VulcanEngine/Model/DixTexture/DixTexture.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixTexture/DixTexture.cpp.i
+.PHONY : VulcanEngine/Model/DixTexture/DixTexture.cpp.i
+
+VulcanEngine/Model/DixTexture/DixTexture.s: VulcanEngine/Model/DixTexture/DixTexture.cpp.s
+.PHONY : VulcanEngine/Model/DixTexture/DixTexture.s
+
+# target to generate assembly for a file
+VulcanEngine/Model/DixTexture/DixTexture.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixTexture/DixTexture.cpp.s
+.PHONY : VulcanEngine/Model/DixTexture/DixTexture.cpp.s
+
 VulcanEngine/Model/GameObject/GameObject.obj: VulcanEngine/Model/GameObject/GameObject.cpp.obj
 .PHONY : VulcanEngine/Model/GameObject/GameObject.obj
 
@@ -673,6 +721,12 @@ help:
 	@echo ... VulcanEngine/Logger/Logger.obj
 	@echo ... VulcanEngine/Logger/Logger.i
 	@echo ... VulcanEngine/Logger/Logger.s
+	@echo ... VulcanEngine/Model/DixImage/DixImage.obj
+	@echo ... VulcanEngine/Model/DixImage/DixImage.i
+	@echo ... VulcanEngine/Model/DixImage/DixImage.s
+	@echo ... VulcanEngine/Model/DixTexture/DixTexture.obj
+	@echo ... VulcanEngine/Model/DixTexture/DixTexture.i
+	@echo ... VulcanEngine/Model/DixTexture/DixTexture.s
 	@echo ... VulcanEngine/Model/GameObject/GameObject.obj
 	@echo ... VulcanEngine/Model/GameObject/GameObject.i
 	@echo ... VulcanEngine/Model/GameObject/GameObject.s

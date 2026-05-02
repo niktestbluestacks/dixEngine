@@ -136,13 +136,17 @@ DixDescriptorWriter& DixDescriptorWriter::writeBuffer(
 
     assert(
         bindingDescription.descriptorCount == 1 &&
-        "Binding single descriptor info, but binding expects multiple");
+        "Binding single descriptor info, but binding expects multiple"
+    );
+
+    // store a copy owned by the writer and point the write entry to that storage
+    bufferInfos.push_back(*bufferInfo);
 
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     write.descriptorType = bindingDescription.descriptorType;
     write.dstBinding = binding;
-    write.pBufferInfo = bufferInfo;
+    write.pBufferInfo = &bufferInfos.back();
     write.descriptorCount = 1;
 
     writes.push_back(write);
@@ -157,17 +161,33 @@ DixDescriptorWriter& DixDescriptorWriter::writeImage(
 
     assert(
         bindingDescription.descriptorCount == 1 &&
-        "Binding single descriptor info, but binding expects multiple");
+        "Binding single descriptor info, but binding expects multiple"
+    );
+
+    // store a copy owned by the writer and point the write entry to that storage
+    imageInfos.push_back(*imageInfo);
 
     VkWriteDescriptorSet write{};
     write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     write.descriptorType = bindingDescription.descriptorType;
     write.dstBinding = binding;
-    write.pImageInfo = imageInfo;
+    write.pImageInfo = &imageInfos.back();
     write.descriptorCount = 1;
 
     writes.push_back(write);
     return *this;
+}
+
+DixDescriptorWriter& DixDescriptorWriter::writeImageSampler(
+    uint32_t binding,
+    VkImageView imageView,
+    VkSampler sampler,
+    VkImageLayout imageLayout) {
+    VkDescriptorImageInfo imageInfo{};
+    imageInfo.imageLayout = imageLayout;
+    imageInfo.imageView = imageView;
+    imageInfo.sampler = sampler;
+    return writeImage(binding, &imageInfo);
 }
 
 bool DixDescriptorWriter::build(VkDescriptorSet& set) {
@@ -183,7 +203,13 @@ void DixDescriptorWriter::overwrite(VkDescriptorSet& set) {
     for (auto& write : writes) {
         write.dstSet = set;
     }
-    vkUpdateDescriptorSets(pool.engineDevice.device(), writes.size(), writes.data(), 0, nullptr);
+    vkUpdateDescriptorSets(
+        pool.engineDevice.device(),
+        writes.size(), 
+        writes.data(), 
+        0, 
+        nullptr
+    );
 }
 
 }  // namespace dix

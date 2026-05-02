@@ -2,6 +2,7 @@
 #define MODEL_HPP
 
 // dix
+#include <Model/DixTexture/DixTexture.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
 
@@ -34,11 +35,18 @@ public:
 		}
 	};
 
+	struct TextureInfo {
+		VkImageView view;
+		VkSampler sampler;
+	};
+
 	struct Builder {
 		std::vector <Vertex> vertices{};
 		std::vector <uint32_t> indices{};
 
-		void loadModel(const std::string& filepath);
+		void loadModel(const std::string& filepath, EngineDevice& device);
+
+		DixTexture texture{};
 	};
 
 	Model(EngineDevice& dixDevice, const Model::Builder& builder);
@@ -58,7 +66,7 @@ private:
 	void createVertexBuffers(const std::vector <Vertex>& vertices);
 	void createIndexBuffers(const std::vector <uint32_t>& indices);
 private:
-	EngineDevice& m_dixDevice;
+	EngineDevice& m_dixDevice;	// static?
 
 	std::unique_ptr <DixBuffer> m_vertexBuffer;
 	uint32_t vertexCount;
@@ -66,6 +74,11 @@ private:
 	bool m_hasIndexBuffer = false;
 	std::unique_ptr <DixBuffer> m_indexBuffer;
 	uint32_t indexCount;
+
+	TextureInfo m_textureInfo{};
+
+public:
+	const TextureInfo& getTextureInfo() const { return m_textureInfo; }
 };
 }	// namespace dix
 #endif // MODEL_HPP

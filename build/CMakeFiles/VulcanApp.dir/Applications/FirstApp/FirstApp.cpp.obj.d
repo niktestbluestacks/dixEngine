@@ -2,6 +2,8 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:\Big_projects\Game_project\dixEngine\Applications\FirstApp\FirstApp.cpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowClass.hpp \
  C:/msys64/ucrt64/include/GLFW/glfw3.h \
@@ -138,7 +140,13 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/vector.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/formatfwd.h \
- C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.hpp \
+ C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/15.2.0/exception \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/glm.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/_fixes.hpp \
  C:/msys64/ucrt64/include/c++/15.2.0/cmath \
@@ -193,7 +201,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/compute_vector_decl.hpp \
  C:/msys64/ucrt64/include/c++/15.2.0/functional \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/std_function.h \
- C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
  C:/msys64/ucrt64/include/c++/15.2.0/unordered_map \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/unordered_map.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/hashtable.h \
@@ -319,10 +326,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ios \
- C:/msys64/ucrt64/include/c++/15.2.0/exception \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ext/atomicity.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
@@ -344,7 +347,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/system_error \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
- C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
  C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.h \

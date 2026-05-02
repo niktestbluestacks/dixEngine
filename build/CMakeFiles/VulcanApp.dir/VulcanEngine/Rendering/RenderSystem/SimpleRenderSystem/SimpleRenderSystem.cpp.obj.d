@@ -313,7 +313,14 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Rendering/RenderSystem/SimpleRenderSystem/
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.tcc \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.hpp \
+ C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/15.2.0/exception \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
  C:/msys64/ucrt64/include/c++/15.2.0/memory \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_tempbuf.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_raw_storage_iter.h \
@@ -321,10 +328,6 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Rendering/RenderSystem/SimpleRenderSystem/
  C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ios \
- C:/msys64/ucrt64/include/c++/15.2.0/exception \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ios_base.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ext/atomicity.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
@@ -346,7 +349,6 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Rendering/RenderSystem/SimpleRenderSystem/
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_classes.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/system_error \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
- C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
  C:/msys64/ucrt64/include/c++/15.2.0/streambuf \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_ios.h \

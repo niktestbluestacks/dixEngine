@@ -1,7 +1,9 @@
 // dix
+#include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Model/Model.hpp>
 #include <Logger/Logger.hpp>
 #include <Utils/Hash.hpp>
+#include <Model/DixTexture/DixTexture.hpp>
 
 // libs
 #define TINYOBJLOADER_IMPLEMENTATION
@@ -32,6 +34,12 @@ Model::Model(EngineDevice& dixDevice, const Model::Builder& builder) :
 		m_dixDevice{ dixDevice } {
 	createVertexBuffers(builder.vertices);
 	createIndexBuffers(builder.indices);
+
+	// copy texture handles from builder into the model so renderer can access them
+	if (builder.texture.getImageView() != VK_NULL_HANDLE && builder.texture.getSampler() != VK_NULL_HANDLE) {
+		m_textureInfo.view = builder.texture.getImageView();
+		m_textureInfo.sampler = builder.texture.getSampler();
+	}
 }
 
 Model::~Model() {}
@@ -108,12 +116,12 @@ void Model::draw(VkCommandBuffer commandBuffer) {
 }
 
 std::unique_ptr<Model> Model::createModelFromFile(
-		EngineDevice& engineDevice, 
+		EngineDevice& dixDevice, 
 		const std::string& filepath) {
 	Builder builder{};
-	builder.loadModel(filepath);
+	builder.loadModel(filepath, dixDevice);
 
-	return std::make_unique <Model>(engineDevice, builder);
+	return std::make_unique <Model>(dixDevice, builder);
 }
 
 void Model::bind(VkCommandBuffer commandBuffer) {
@@ -146,12 +154,12 @@ std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescri
 	return attributeDescriptions;
 }
 
-void Model::Builder::loadModel(const std::string& filepath) {
-	tinyobj::attrib_t attrib;
-	std::vector <tinyobj::shape_t> shapes;
-	std::vector <tinyobj::material_t> materials;
-	std::string warn;
-	std::string err;
+void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDevice) {
+	tinyobj::attrib_t attrib{};
+	std::vector <tinyobj::shape_t> shapes{};
+	std::vector <tinyobj::material_t> materials{};
+	std::string warn{};
+	std::string err{};
 
 	std::ifstream file (filepath);
 
@@ -163,7 +171,7 @@ void Model::Builder::loadModel(const std::string& filepath) {
 		if (line.front() == 'm') {
 			std::string texture_filepath;
 			texture_filepath = filepath.substr(0, filepath.find_last_of('\\') + 1);
-			texture_filepath += line.substr(line.find_last_of(' ') + 1, line.size() - 1);
+			// texture_filepath += line.substr(line.find_last_of(' ') + 1, line.size() - 1);
 			file.close();
 			if (!tinyobj::LoadObj(
 					&attrib, &shapes, &materials, &warn, &err, 
@@ -172,6 +180,7 @@ void Model::Builder::loadModel(const std::string& filepath) {
 				throw std::runtime_error(warn + err);
 			}
 			loaded_with_texture = true;
+			break;
 		}
 	}
 	if (!loaded_with_texture) {
@@ -223,6 +232,35 @@ void Model::Builder::loadModel(const std::string& filepath) {
 			indices.push_back(uniqueVertices[vertex]);
 		}
 	}
+
+    if (loaded_with_texture && !materials.empty()) {
+        const tinyobj::material_t& mat = materials[0];
+		if (!mat.diffuse_texname.empty()) {
+			// Resolve texture path relative to the OBJ file directory unless
+			// the material already supplies an absolute path.
+			std::string texName = mat.diffuse_texname;
+			std::string dir;
+			size_t pos = filepath.find_last_of("/\\");
+			if (pos != std::string::npos) dir = filepath.substr(0, pos + 1);
+
+			bool isAbsolute = false;
+			if (!texName.empty()) {
+				if (texName.size() > 1 && texName[1] == ':') isAbsolute = true; // Windows drive letter
+				if (!texName.empty() && (texName[0] == '/' || texName[0] == '\\')) isAbsolute = true; // Unix or root
+			}
+
+			std::string texPath = isAbsolute ? texName : (dir + texName);
+
+			texture = createTextureFromFile(texPath, dixDevice);
+
+		} else {
+            // no texture file – use the white fallback
+            texture = createDefaultTexture(dixDevice);
+        }
+    } else {
+        // no material – use the white fallback
+        texture = createDefaultTexture(dixDevice);
+    }
 }
 
 }	// namespace dix

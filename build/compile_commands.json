@@ -37,6 +37,18 @@
 },
 {
   "directory": "C:/Big_projects/Game_project/dixEngine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DGLFW_DLL @CMakeFiles/VulcanApp.dir/includes_CXX.rsp -g -std=gnu++23 -o CMakeFiles\\VulcanApp.dir\\VulcanEngine\\Model\\DixImage\\DixImage.cpp.obj -c C:\\Big_projects\\Game_project\\dixEngine\\VulcanEngine\\Model\\DixImage\\DixImage.cpp",
+  "file": "C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.cpp",
+  "output": "CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixImage/DixImage.cpp.obj"
+},
+{
+  "directory": "C:/Big_projects/Game_project/dixEngine/build",
+  "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DGLFW_DLL @CMakeFiles/VulcanApp.dir/includes_CXX.rsp -g -std=gnu++23 -o CMakeFiles\\VulcanApp.dir\\VulcanEngine\\Model\\DixTexture\\DixTexture.cpp.obj -c C:\\Big_projects\\Game_project\\dixEngine\\VulcanEngine\\Model\\DixTexture\\DixTexture.cpp",
+  "file": "C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.cpp",
+  "output": "CMakeFiles/VulcanApp.dir/VulcanEngine/Model/DixTexture/DixTexture.cpp.obj"
+},
+{
+  "directory": "C:/Big_projects/Game_project/dixEngine/build",
   "command": "C:\\msys64\\ucrt64\\bin\\g++.exe -DGLFW_DLL @CMakeFiles/VulcanApp.dir/includes_CXX.rsp -g -std=gnu++23 -o CMakeFiles\\VulcanApp.dir\\VulcanEngine\\Model\\GameObject\\GameObject.cpp.obj -c C:\\Big_projects\\Game_project\\dixEngine\\VulcanEngine\\Model\\GameObject\\GameObject.cpp",
   "file": "C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.cpp",
   "output": "CMakeFiles/VulcanApp.dir/VulcanEngine/Model/GameObject/GameObject.cpp.obj"

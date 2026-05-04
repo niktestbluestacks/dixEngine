@@ -1,5 +1,6 @@
 // dix
 #include <UI/DixUIElement.hpp>
+#include <Utils/Converter.hpp>
 
 // std
 #include <fstream>
@@ -38,7 +39,7 @@ DixUIElement::DixUIElement(const DixUIInfo& info) :
 DixUIElement::~DixUIElement() = default;
 
 void DixUIElement::loadFontTxt(const std::string& path) {
-    std::ifstream in(path);
+    std::ifstream in(toModelPath(path));
     if (!in.is_open()) throw std::runtime_error("failed to open font txt");
     std::string line;
     while (std::getline(in,line)) {
@@ -55,7 +56,7 @@ void DixUIElement::loadFontTxt(const std::string& path) {
 
 void DixUIElement::loadFontAtlas(const std::string& path) {
     // Minimal uncompressed TGA loader (assumes type 2, true-color)
-    std::ifstream in(path, std::ios::binary);
+    std::ifstream in(toModelPath(path), std::ios::binary);
     if (!in.is_open()) throw std::runtime_error("failed to open font tga");
     unsigned char header[18];
     in.read(reinterpret_cast<char*>(header), 18);

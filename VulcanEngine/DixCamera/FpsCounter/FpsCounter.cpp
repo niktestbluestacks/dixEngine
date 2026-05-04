@@ -1,199 +1,199 @@
-// dix
-#include <DixCamera/FpsCounter/FpsCounter.hpp>
-#include <Utils/Converter.hpp>
+// // dix
+// #include <DixCamera/FpsCounter/FpsCounter.hpp>
+// #include <Utils/Converter.hpp>
 
-// std
-#include <fstream>
-#include <sstream>
-#include <stdexcept>
-#include <cstring>
+// // std
+// #include <fstream>
+// #include <sstream>
+// #include <stdexcept>
+// #include <cstring>
 
-namespace dix {
+// namespace dix {
 
-struct UiVert { float x,y,u,v; };
+// struct UiVert { float x,y,u,v; };
 
-FpsCounter::FpsCounter(UIRenderer& uiRenderer, VkExtent2D screenExtent, const std::string& fontTxtPath, const std::string& fontTgaPath) :
-    m_uiRenderer(uiRenderer), m_screenExtent(screenExtent) {
-    loadFontTxt(fontTxtPath);
-    loadFontAtlas(fontTgaPath);
-    // create texture in ui renderer
-    m_fontTexture = m_uiRenderer.createTextureFromPixels(m_fontPixels.data(), m_fontWidth, m_fontHeight);
-    // preallocate a reasonably large host-visible vertex buffer to avoid reallocations
-    // during runtime (which can collide with GPU usage and cause submit failures).
-    const uint32_t initialCapacity = 2048; // number of vertices
-    m_vertexCapacity = initialCapacity;
-    // create one host-visible buffer per frame in flight to avoid CPU/GPU races
-    const size_t kFramesInFlight = 2; // match renderer swapchain frames in flight
-    m_vertexBuffers.resize(kFramesInFlight);
-    for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
-        m_vertexBuffers[i] = std::make_unique<DixBuffer>(
-            m_uiRenderer.getDevice(), 
-            sizeof(UiVert), 
-            m_vertexCapacity, 
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-        );
-        m_vertexBuffers[i]->map();
-    }
-    m_vertexStaging.reserve(initialCapacity * sizeof(UiVert));
-}
-
-
-// No i am not
-
-FpsCounter::~FpsCounter() {
-    // texture cleanup left to UIRenderer (currently nothing)
-}
-
-void FpsCounter::loadFontTxt(const std::string& path) {
-    std::ifstream in(path);
-    if (!in.is_open()) throw std::runtime_error("failed to open font txt");
-    std::string line;
-    while (std::getline(in,line)) {
-        std::istringstream ss(line);
-        int code; std::string sym; float u0,u1; int px;
-        ss >> code >> sym >> u0 >> u1 >> px;
-        char c = sym[0];
-        m_glyphs[c] = GlyphInfo{u0,u1,px};
-    }
-}
-
-void FpsCounter::loadFontAtlas(const std::string& path) {
-    // Minimal uncompressed TGA loader (assumes type 2, true-color)
-    std::ifstream in(path, std::ios::binary);
-    if (!in.is_open()) throw std::runtime_error("failed to open font tga");
-    unsigned char header[18];
-    in.read(reinterpret_cast<char*>(header), 18);
-    if (!in) throw std::runtime_error("failed to read tga header");
-    unsigned short width = header[12] | (header[13] << 8);
-    unsigned short height = header[14] | (header[15] << 8);
-    unsigned char depth = header[16];
-    unsigned char type = header[2];
-    if (type != 2) throw std::runtime_error("unsupported tga type");
-    int channels = depth / 8;
-    size_t rawSize = static_cast<size_t>(width) * height * channels;
-    std::vector<unsigned char> raw(rawSize);
-    in.read(reinterpret_cast<char*>(raw.data()), rawSize);
-    if (!in) throw std::runtime_error("failed to read tga image data");
-
-    // convert to RGBA
-    m_fontWidth = width; m_fontHeight = height;
-    m_fontPixels.resize(static_cast<size_t>(width) * height * 4);
-    for (size_t i = 0; i < static_cast<size_t>(width) * height; ++i) {
-        unsigned char b = raw[i * channels + 0];
-        unsigned char g = raw[i * channels + 1];
-        unsigned char r = raw[i * channels + 2];
-        unsigned char a = (channels >= 4) ? raw[i * channels + 3] : 255;
-        m_fontPixels[i * 4 + 0] = r;
-        m_fontPixels[i * 4 + 1] = g;
-        m_fontPixels[i * 4 + 2] = b;
-        m_fontPixels[i * 4 + 3] = a;
-    }
-}
-
-void FpsCounter::update(float dt) {
-    m_acc += dt; ++m_frames;
-    if (m_acc >= 1.0f) {
-        m_fps = static_cast<int>(std::round((float)m_frames / m_acc));
-        m_frames = 0; m_acc = 0.f;
-    }
-    // rebuild vertex buffer when text changes. Do this during update so any staging
-    // buffer uploads / copies happen outside of an active render pass.
-    std::string text = std::to_string(m_fps) + " FPS";
-    if (text != m_lastText) {
-        buildVerticesForText(text);
-        m_lastText = text;
-    }
-}
+// FpsCounter::FpsCounter(UIRenderer& uiRenderer, VkExtent2D screenExtent, const std::string& fontTxtPath, const std::string& fontTgaPath) :
+//     m_uiRenderer(uiRenderer), m_screenExtent(screenExtent) {
+//     loadFontTxt(fontTxtPath);
+//     loadFontAtlas(fontTgaPath);
+//     // create texture in ui renderer
+//     m_fontTexture = m_uiRenderer.createTextureFromPixels(m_fontPixels.data(), m_fontWidth, m_fontHeight);
+//     // preallocate a reasonably large host-visible vertex buffer to avoid reallocations
+//     // during runtime (which can collide with GPU usage and cause submit failures).
+//     const uint32_t initialCapacity = 2048; // number of vertices
+//     m_vertexCapacity = initialCapacity;
+//     // create one host-visible buffer per frame in flight to avoid CPU/GPU races
+//     const size_t kFramesInFlight = 2; // match renderer swapchain frames in flight
+//     m_vertexBuffers.resize(kFramesInFlight);
+//     for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
+//         m_vertexBuffers[i] = std::make_unique<DixBuffer>(
+//             m_uiRenderer.getDevice(), 
+//             sizeof(UiVert), 
+//             m_vertexCapacity, 
+//             VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+//             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+//         );
+//         m_vertexBuffers[i]->map();
+//     }
+//     m_vertexStaging.reserve(initialCapacity * sizeof(UiVert));
+// }
 
 
-void FpsCounter::buildVerticesForText(const std::string& text) {
-    std::vector<UiVert> verts;
-    float x = 8.f;
-    float y = 8.f;
-    for (char c : text) {
-        auto it = m_glyphs.find(c);
-        if (it == m_glyphs.end()) continue;
-        GlyphInfo g = it->second;
-        float gw = static_cast<float>(g.px);
-        float gh = static_cast<float>(m_fontHeight);
-        float u0 = g.u0;
-        float u1 = g.u1;
-        float v0 = 0.f, v1 = 1.f;
-        // two tris
-        verts.push_back({ x,y,u0,v0 });
-        verts.push_back({ x + gw,y,u1,v0 });
-        verts.push_back({ x + gw,y + gh,u1,v1 });
-        verts.push_back({ x,y,u0,v0 });
-        verts.push_back({ x + gw,y + gh,u1,v1 });
-        verts.push_back({ x,y + gh,u0,v1 });
-        x += gw + 1.f;
-    }
+// // No i am not
 
-    if (verts.empty()) return;
-    m_vertexCount = static_cast<uint32_t>(verts.size());
-    // serialize CPU copy into staging vector
-    m_vertexStaging.resize(sizeof(UiVert) * verts.size());
-    memcpy(m_vertexStaging.data(), verts.data(), m_vertexStaging.size());
-    if (m_vertexCapacity < m_vertexCount) {
-        // grow existing per-frame buffers
-        m_vertexCapacity = m_vertexCount;
-        vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
-        for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
-            m_vertexBuffers[i] = std::make_unique<DixBuffer>(
-                m_uiRenderer.getDevice(), 
-                sizeof(UiVert), 
-                m_vertexCapacity, 
-                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-            );
-            m_vertexBuffers[i]->map();
-        }
-    }
-}
+// FpsCounter::~FpsCounter() {
+//     // texture cleanup left to UIRenderer (currently nothing)
+// }
 
-void FpsCounter::upload(FrameInfo& fi) {
-    // copy CPU staging into the per-frame mapped buffer for this frame index
-    if (m_vertexStaging.empty()) return;
-    int idx = fi.frameIndex % static_cast<int>(m_vertexBuffers.size());
-    auto &buf = m_vertexBuffers[idx];
-    if (!buf) return;
-    buf->writeToBuffer(m_vertexStaging.data(), m_vertexStaging.size(), 0);
-    buf->flush();
-}
+// void FpsCounter::loadFontTxt(const std::string& path) {
+//     std::ifstream in(path);
+//     if (!in.is_open()) throw std::runtime_error("failed to open font txt");
+//     std::string line;
+//     while (std::getline(in,line)) {
+//         std::istringstream ss(line);
+//         int code; std::string sym; float u0,u1; int px;
+//         ss >> code >> sym >> u0 >> u1 >> px;
+//         char c = sym[0];
+//         m_glyphs[c] = GlyphInfo{u0,u1,px};
+//     }
+// }
 
-void FpsCounter::render(FrameInfo& fi) {
-    if (m_vertexBuffers.empty()) return;
-    // bind descriptor set for font
-    VkPipelineLayout layout = m_uiRenderer.getPipelineLayout();
-    vkCmdBindDescriptorSets(
-        fi.commandBuffer, 
-        VK_PIPELINE_BIND_POINT_GRAPHICS, 
-        layout, 
-        0, 
-        1, 
-        &m_fontTexture.descriptorSet, 
-        0, 
-        nullptr
-    );
+// void FpsCounter::loadFontAtlas(const std::string& path) {
+//     // Minimal uncompressed TGA loader (assumes type 2, true-color)
+//     std::ifstream in(path, std::ios::binary);
+//     if (!in.is_open()) throw std::runtime_error("failed to open font tga");
+//     unsigned char header[18];
+//     in.read(reinterpret_cast<char*>(header), 18);
+//     if (!in) throw std::runtime_error("failed to read tga header");
+//     unsigned short width = header[12] | (header[13] << 8);
+//     unsigned short height = header[14] | (header[15] << 8);
+//     unsigned char depth = header[16];
+//     unsigned char type = header[2];
+//     if (type != 2) throw std::runtime_error("unsupported tga type");
+//     int channels = depth / 8;
+//     size_t rawSize = static_cast<size_t>(width) * height * channels;
+//     std::vector<unsigned char> raw(rawSize);
+//     in.read(reinterpret_cast<char*>(raw.data()), rawSize);
+//     if (!in) throw std::runtime_error("failed to read tga image data");
 
-    int idx = fi.frameIndex % static_cast<int>(m_vertexBuffers.size());
-    VkBuffer b = m_vertexBuffers[idx]->getBuffer();
-    VkDeviceSize off = 0;
-    vkCmdBindVertexBuffers(fi.commandBuffer, 0, 1, &b, &off);
+//     // convert to RGBA
+//     m_fontWidth = width; m_fontHeight = height;
+//     m_fontPixels.resize(static_cast<size_t>(width) * height * 4);
+//     for (size_t i = 0; i < static_cast<size_t>(width) * height; ++i) {
+//         unsigned char b = raw[i * channels + 0];
+//         unsigned char g = raw[i * channels + 1];
+//         unsigned char r = raw[i * channels + 2];
+//         unsigned char a = (channels >= 4) ? raw[i * channels + 3] : 255;
+//         m_fontPixels[i * 4 + 0] = r;
+//         m_fontPixels[i * 4 + 1] = g;
+//         m_fontPixels[i * 4 + 2] = b;
+//         m_fontPixels[i * 4 + 3] = a;
+//     }
+// }
 
-    // set viewport to screen size so vertex positions in pixels map correctly
-    VkViewport vp{};
-    vp.x = 0.0f; vp.y = 0.0f;
-    vp.width = static_cast<float>(fi.screenExtent.width);
-    vp.height = static_cast<float>(fi.screenExtent.height);
-    vp.minDepth = 0.0f;
-    vp.maxDepth = 1.0f;
+// void FpsCounter::update(float dt) {
+//     m_acc += dt; ++m_frames;
+//     if (m_acc >= 1.0f) {
+//         m_fps = static_cast<int>(std::round((float)m_frames / m_acc));
+//         m_frames = 0; m_acc = 0.f;
+//     }
+//     // rebuild vertex buffer when text changes. Do this during update so any staging
+//     // buffer uploads / copies happen outside of an active render pass.
+//     std::string text = std::to_string(m_fps) + " FPS";
+//     if (text != m_lastText) {
+//         buildVerticesForText(text);
+//         m_lastText = text;
+//     }
+// }
+
+
+// void FpsCounter::buildVerticesForText(const std::string& text) {
+//     std::vector<UiVert> verts;
+//     float x = 8.f;
+//     float y = 8.f;
+//     for (char c : text) {
+//         auto it = m_glyphs.find(c);
+//         if (it == m_glyphs.end()) continue;
+//         GlyphInfo g = it->second;
+//         float gw = static_cast<float>(g.px);
+//         float gh = static_cast<float>(m_fontHeight);
+//         float u0 = g.u0;
+//         float u1 = g.u1;
+//         float v0 = 0.f, v1 = 1.f;
+//         // two tris
+//         verts.push_back({ x,y,u0,v0 });
+//         verts.push_back({ x + gw,y,u1,v0 });
+//         verts.push_back({ x + gw,y + gh,u1,v1 });
+//         verts.push_back({ x,y,u0,v0 });
+//         verts.push_back({ x + gw,y + gh,u1,v1 });
+//         verts.push_back({ x,y + gh,u0,v1 });
+//         x += gw + 1.f;
+//     }
+
+//     if (verts.empty()) return;
+//     m_vertexCount = static_cast<uint32_t>(verts.size());
+//     // serialize CPU copy into staging vector
+//     m_vertexStaging.resize(sizeof(UiVert) * verts.size());
+//     memcpy(m_vertexStaging.data(), verts.data(), m_vertexStaging.size());
+//     if (m_vertexCapacity < m_vertexCount) {
+//         // grow existing per-frame buffers
+//         m_vertexCapacity = m_vertexCount;
+//         vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
+//         for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
+//             m_vertexBuffers[i] = std::make_unique<DixBuffer>(
+//                 m_uiRenderer.getDevice(), 
+//                 sizeof(UiVert), 
+//                 m_vertexCapacity, 
+//                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+//                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+//             );
+//             m_vertexBuffers[i]->map();
+//         }
+//     }
+// }
+
+// void FpsCounter::upload(FrameInfo& fi) {
+//     // copy CPU staging into the per-frame mapped buffer for this frame index
+//     if (m_vertexStaging.empty()) return;
+//     int idx = fi.frameIndex % static_cast<int>(m_vertexBuffers.size());
+//     auto &buf = m_vertexBuffers[idx];
+//     if (!buf) return;
+//     buf->writeToBuffer(m_vertexStaging.data(), m_vertexStaging.size(), 0);
+//     buf->flush();
+// }
+
+// void FpsCounter::render(FrameInfo& fi) {
+//     if (m_vertexBuffers.empty()) return;
+//     // bind descriptor set for font
+//     VkPipelineLayout layout = m_uiRenderer.getPipelineLayout();
+//     vkCmdBindDescriptorSets(
+//         fi.commandBuffer, 
+//         VK_PIPELINE_BIND_POINT_GRAPHICS, 
+//         layout, 
+//         0, 
+//         1, 
+//         &m_fontTexture.descriptorSet, 
+//         0, 
+//         nullptr
+//     );
+
+//     int idx = fi.frameIndex % static_cast<int>(m_vertexBuffers.size());
+//     VkBuffer b = m_vertexBuffers[idx]->getBuffer();
+//     VkDeviceSize off = 0;
+//     vkCmdBindVertexBuffers(fi.commandBuffer, 0, 1, &b, &off);
+
+//     // set viewport to screen size so vertex positions in pixels map correctly
+//     VkViewport vp{};
+//     vp.x = 0.0f; vp.y = 0.0f;
+//     vp.width = static_cast<float>(fi.screenExtent.width);
+//     vp.height = static_cast<float>(fi.screenExtent.height);
+//     vp.minDepth = 0.0f;
+//     vp.maxDepth = 1.0f;
     
-    vkCmdSetViewport(fi.commandBuffer, 0, 1, &vp);
-    VkRect2D scissor{{0,0}, fi.screenExtent};
-    vkCmdSetScissor(fi.commandBuffer, 0, 1, &scissor);
-    vkCmdDraw(fi.commandBuffer, m_vertexCount, 1, 0, 0);
-}
+//     vkCmdSetViewport(fi.commandBuffer, 0, 1, &vp);
+//     VkRect2D scissor{{0,0}, fi.screenExtent};
+//     vkCmdSetScissor(fi.commandBuffer, 0, 1, &scissor);
+//     vkCmdDraw(fi.commandBuffer, m_vertexCount, 1, 0, 0);
+// }
 
-}   // namespace dix
+// }   // namespace dix

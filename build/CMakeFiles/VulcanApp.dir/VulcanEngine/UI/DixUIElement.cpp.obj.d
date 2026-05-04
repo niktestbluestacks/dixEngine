@@ -386,6 +386,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/UI/DixUIElement.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Pipeline/Pipeline.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Rendering/Renderer/Renderer.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/SwapChain/SwapChain.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Utils/Converter.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/fstream \
  C:/msys64/ucrt64/include/c++/16.1.0/istream \
  C:/msys64/ucrt64/include/c++/16.1.0/ostream \

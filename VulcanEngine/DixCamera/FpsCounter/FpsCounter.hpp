@@ -1,54 +1,58 @@
-#ifndef FPS_COUNTER_HPP
-#define FPG_COUNTER_HPP
 
-#include <UI/IUIElement.hpp>
-#include <UI/UIRenderer.hpp>
-#include <Pipeline/Buffer/DixBuffer.hpp>
+// retarted fpr counter, use DixFpsCounter instead
 
-#include <string>
-#include <vector>
-#include <unordered_map>
 
-namespace dix {
+// #ifndef FPS_COUNTER_HPP
+// #define FPG_COUNTER_HPP
 
-struct GlyphInfo { float u0, u1; int px; };
+// #include <UI/IUIElement.hpp>
+// #include <UI/UIRenderer.hpp>
+// #include <Pipeline/Buffer/DixBuffer.hpp>
 
-class FpsCounter : public IUIElement {
-public:
-    FpsCounter(UIRenderer& uiRenderer, VkExtent2D screenExtent, const std::string& fontTxtPath, const std::string& fontTgaPath);
-    ~FpsCounter();
+// #include <string>
+// #include <vector>
+// #include <unordered_map>
 
-    void update(float dt) override;
-    void render(FrameInfo& fi) override;
-    void upload(FrameInfo& fi) override;
+// namespace dix {
 
-private:
-    void loadFontTxt(const std::string& path);
-    void loadFontAtlas(const std::string& path);
-    void buildVerticesForText(const std::string& text);
+// struct GlyphInfo { float u0, u1; int px; };
 
-private:
-    UIRenderer& m_uiRenderer;
-    VkExtent2D m_screenExtent;
-    UITexture m_fontTexture;
-    std::unordered_map<char, GlyphInfo> m_glyphs;
+// class FpsCounter : public IUIElement {
+// public:
+//     FpsCounter(UIRenderer& uiRenderer, VkExtent2D screenExtent, const std::string& fontTxtPath, const std::string& fontTgaPath);
+//     ~FpsCounter();
 
-    std::vector<std::unique_ptr<DixBuffer>> m_vertexBuffers;
-    uint32_t m_vertexCount = 0;
-    uint32_t m_vertexCapacity = 0;
-    std::vector<char> m_vertexStaging; // CPU-side copy of vertex data
+//     void update(float dt) override;
+//     void render(FrameInfo& fi) override;
+//     void upload(FrameInfo& fi) override;
 
-    // font atlas pixels
-    std::vector<unsigned char> m_fontPixels;
-    int m_fontWidth = 0;
-    int m_fontHeight = 0;
+// private:
+//     void loadFontTxt(const std::string& path);
+//     void loadFontAtlas(const std::string& path);
+//     void buildVerticesForText(const std::string& text);
 
-    float m_acc = 0.f;
-    int m_frames = 0;
-    int m_fps = 0;
-    std::string m_lastText;
-};
+// private:
+//     UIRenderer& m_uiRenderer;
+//     VkExtent2D m_screenExtent;
+//     UITexture m_fontTexture;
+//     std::unordered_map<char, GlyphInfo> m_glyphs;
 
-}   // namespace dix
+//     std::vector<std::unique_ptr<DixBuffer>> m_vertexBuffers;
+//     uint32_t m_vertexCount = 0;
+//     uint32_t m_vertexCapacity = 0;
+//     std::vector<char> m_vertexStaging; // CPU-side copy of vertex data
 
-#endif // FPS_COUNTER_HPP
+//     // font atlas pixels
+//     std::vector<unsigned char> m_fontPixels;
+//     int m_fontWidth = 0;
+//     int m_fontHeight = 0;
+
+//     float m_acc = 0.f;
+//     int m_frames = 0;
+//     int m_fps = 0;
+//     std::string m_lastText;
+// };
+
+// }   // namespace dix
+
+// #endif // FPS_COUNTER_HPP

@@ -13,8 +13,9 @@ void DixFpsCounter::update(float dt) {
     m_acc += dt; 
     ++m_frames;
     if (m_acc >= 1.0f) {
-        m_fps = static_cast<int>(std::round((float)m_frames / m_acc));
-        m_frames = 0; m_acc = 0.f;
+        m_fps = static_cast<int>(std::round(static_cast<float>(m_frames) / m_acc));
+        m_frames = 0; 
+        m_acc = 0.f;
     }
     // rebuild vertex buffer when text changes. Do this during update so any staging
     // buffer uploads / copies happen outside of an active render pass.

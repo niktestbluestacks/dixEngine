@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -fdiagnostics-color=always -g -std=c++2b -mconsole
+CXXFLAGS := -fdiagnostics-color=always -g -std=c++26 -mconsole -freflection
 LDFLAGS := -lglfw3 -lvulkan-1 -lgdi32 -lole32 -lshell32 -luser32
 
 # Directories

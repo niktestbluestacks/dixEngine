@@ -1,15 +1,16 @@
 // dix
+#include "UI/DixUIElement.hpp"
 #include <FirstApp/AppContext.hpp>
 
 #include <Utils/Converter.hpp>
-#include <DixCamera/FpsCounter/FpsCounter.hpp>
+#include <DixUI/DixFpsCounter.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <vulkan/vulkan.h>
- 
+
 namespace dix {
 
 struct GlobalUbo {
@@ -25,11 +26,14 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     m_uiManager = std::make_unique<dix::UIManager>();
     m_uiRenderer = std::make_unique<dix::UIRenderer>(m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
     // add fps counter UI element
-    auto fps = std::make_unique<dix::FpsCounter>(
-        *m_uiRenderer, 
-        m_Window.getExtent(), 
-        dix::toModelPath("Fps/font.txt"), 
-        dix::toModelPath("Fps/font02.tga")
+    auto fps = std::make_unique<DixFpsCounter>(
+        DixUIInfo {
+            *m_uiRenderer,
+            m_Window.getExtent()
+            // "",
+            // "UI/font.txt",
+            // "UI/font02.tga"
+        }
     );
     m_uiManager->addElement(std::move(fps));
 }

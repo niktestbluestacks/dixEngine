@@ -161,6 +161,7 @@ void FpsCounter::upload(FrameInfo& fi) {
     buf->writeToBuffer(m_vertexStaging.data(), m_vertexStaging.size(), 0);
     buf->flush();
 }
+
 void FpsCounter::render(FrameInfo& fi) {
     if (m_vertexBuffers.empty()) return;
     // bind descriptor set for font

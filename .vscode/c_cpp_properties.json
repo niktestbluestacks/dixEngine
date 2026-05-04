@@ -5,9 +5,9 @@
       "includePath": ["${workspaceFolder}/**"],
       "defines": ["_DEBUG", "UNICODE", "_UNICODE"],
       "compilerPath": "C:\\msys64\\ucrt64\\bin\\g++.exe", 
-      "cStandard": "c17",
-      "cppStandard": "c++23", 
-      "intelliSenseMode": "windows-gcc-x64"
+      "compilerArgs": ["-freflection", "-std=c++26"],
+      "cStandard": "c23",
+      "cppStandard": "c++26"
     }
   ],
   "version": 4

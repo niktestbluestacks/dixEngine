@@ -6,5 +6,5 @@ CXX_DEFINES = -DGLFW_DLL
 
 CXX_INCLUDES = @CMakeFiles/VulcanApp.dir/includes_CXX.rsp
 
-CXX_FLAGS = -g -std=gnu++23
+CXX_FLAGS = -g -std=gnu++26
 

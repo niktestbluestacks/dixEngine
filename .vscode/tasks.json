@@ -33,5 +33,17 @@
         "isDefault": true
       }
     },
+    {
+      "label": "C/C++: g++.exe build active file",
+      "type": "cppbuild",
+      "command": "C:/mingw64/bin/g++.exe",
+      "args": [
+        "-g",
+        "${file}",
+        "-o",
+        "${fileDirname}/${fileBasenameNoExtension}.exe",
+        "-std=c++23"
+      ],
+    }
   ]
 }

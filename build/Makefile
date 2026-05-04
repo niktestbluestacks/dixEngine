@@ -237,6 +237,30 @@ VulcanEngine/DixCamera/FpsCounter/FpsCounter.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/DixCamera/FpsCounter/FpsCounter.cpp.s
 .PHONY : VulcanEngine/DixCamera/FpsCounter/FpsCounter.cpp.s
 
+VulcanEngine/DixUI/DixFpsCounter.obj: VulcanEngine/DixUI/DixFpsCounter.cpp.obj
+.PHONY : VulcanEngine/DixUI/DixFpsCounter.obj
+
+# target to build an object file
+VulcanEngine/DixUI/DixFpsCounter.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/DixUI/DixFpsCounter.cpp.obj
+.PHONY : VulcanEngine/DixUI/DixFpsCounter.cpp.obj
+
+VulcanEngine/DixUI/DixFpsCounter.i: VulcanEngine/DixUI/DixFpsCounter.cpp.i
+.PHONY : VulcanEngine/DixUI/DixFpsCounter.i
+
+# target to preprocess a source file
+VulcanEngine/DixUI/DixFpsCounter.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/DixUI/DixFpsCounter.cpp.i
+.PHONY : VulcanEngine/DixUI/DixFpsCounter.cpp.i
+
+VulcanEngine/DixUI/DixFpsCounter.s: VulcanEngine/DixUI/DixFpsCounter.cpp.s
+.PHONY : VulcanEngine/DixUI/DixFpsCounter.s
+
+# target to generate assembly for a file
+VulcanEngine/DixUI/DixFpsCounter.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/DixUI/DixFpsCounter.cpp.s
+.PHONY : VulcanEngine/DixUI/DixFpsCounter.cpp.s
+
 VulcanEngine/Input/Keyboard/KeyboardController.obj: VulcanEngine/Input/Keyboard/KeyboardController.cpp.obj
 .PHONY : VulcanEngine/Input/Keyboard/KeyboardController.obj
 
@@ -597,6 +621,30 @@ VulcanEngine/Rendering/Renderer/Renderer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/Rendering/Renderer/Renderer.cpp.s
 .PHONY : VulcanEngine/Rendering/Renderer/Renderer.cpp.s
 
+VulcanEngine/UI/DixUIElement.obj: VulcanEngine/UI/DixUIElement.cpp.obj
+.PHONY : VulcanEngine/UI/DixUIElement.obj
+
+# target to build an object file
+VulcanEngine/UI/DixUIElement.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/UI/DixUIElement.cpp.obj
+.PHONY : VulcanEngine/UI/DixUIElement.cpp.obj
+
+VulcanEngine/UI/DixUIElement.i: VulcanEngine/UI/DixUIElement.cpp.i
+.PHONY : VulcanEngine/UI/DixUIElement.i
+
+# target to preprocess a source file
+VulcanEngine/UI/DixUIElement.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/UI/DixUIElement.cpp.i
+.PHONY : VulcanEngine/UI/DixUIElement.cpp.i
+
+VulcanEngine/UI/DixUIElement.s: VulcanEngine/UI/DixUIElement.cpp.s
+.PHONY : VulcanEngine/UI/DixUIElement.s
+
+# target to generate assembly for a file
+VulcanEngine/UI/DixUIElement.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\VulcanApp.dir\build.make CMakeFiles/VulcanApp.dir/VulcanEngine/UI/DixUIElement.cpp.s
+.PHONY : VulcanEngine/UI/DixUIElement.cpp.s
+
 VulcanEngine/UI/UIRenderer.obj: VulcanEngine/UI/UIRenderer.cpp.obj
 .PHONY : VulcanEngine/UI/UIRenderer.obj
 
@@ -715,6 +763,9 @@ help:
 	@echo ... VulcanEngine/DixCamera/FpsCounter/FpsCounter.obj
 	@echo ... VulcanEngine/DixCamera/FpsCounter/FpsCounter.i
 	@echo ... VulcanEngine/DixCamera/FpsCounter/FpsCounter.s
+	@echo ... VulcanEngine/DixUI/DixFpsCounter.obj
+	@echo ... VulcanEngine/DixUI/DixFpsCounter.i
+	@echo ... VulcanEngine/DixUI/DixFpsCounter.s
 	@echo ... VulcanEngine/Input/Keyboard/KeyboardController.obj
 	@echo ... VulcanEngine/Input/Keyboard/KeyboardController.i
 	@echo ... VulcanEngine/Input/Keyboard/KeyboardController.s
@@ -760,6 +811,9 @@ help:
 	@echo ... VulcanEngine/Rendering/Renderer/Renderer.obj
 	@echo ... VulcanEngine/Rendering/Renderer/Renderer.i
 	@echo ... VulcanEngine/Rendering/Renderer/Renderer.s
+	@echo ... VulcanEngine/UI/DixUIElement.obj
+	@echo ... VulcanEngine/UI/DixUIElement.i
+	@echo ... VulcanEngine/UI/DixUIElement.s
 	@echo ... VulcanEngine/UI/UIRenderer.obj
 	@echo ... VulcanEngine/UI/UIRenderer.i
 	@echo ... VulcanEngine/UI/UIRenderer.s

@@ -162,7 +162,6 @@ void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDev
 	std::string err{};
 
 	std::ifstream file (filepath);
-
 	std::string line;
 
 	bool loaded_with_texture = false;
@@ -172,17 +171,18 @@ void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDev
 			std::string texture_filepath;
 			texture_filepath = filepath.substr(0, filepath.find_last_of('\\') + 1);
 			// texture_filepath += line.substr(line.find_last_of(' ') + 1, line.size() - 1);
-			file.close();
 			if (!tinyobj::LoadObj(
 					&attrib, &shapes, &materials, &warn, &err, 
 					filepath.c_str(), texture_filepath.c_str()
-					)) {
+				)) {
 				throw std::runtime_error(warn + err);
 			}
 			loaded_with_texture = true;
-			break;
 		}
 	}
+
+	file.close();
+
 	if (!loaded_with_texture) {
 		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
 			throw std::runtime_error(warn + err);

@@ -150,8 +150,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/Big_projects/Game_project/dixEngine/Dependecies/glm/vec4.hpp \
   C:/Big_projects/Game_project/dixEngine/Dependecies/glm/vector_relational.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixCamera/DixCamera.hpp \
-  C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixUI/DixFpsCounter.hpp \
-  C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixUI/DixTimeCounter.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
@@ -197,7 +195,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/backward/auto_ptr.h \
   C:/msys64/ucrt64/include/c++/16.1.0/backward/binders.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bit \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/algorithmfwd.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/align.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/alloc_traits.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/allocated_ptr.h \
@@ -212,9 +209,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/bits/binders.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/char_traits.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/charconv.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono_io.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/codecvt.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/concept_check.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/cpp_type_traits.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/cpyfunc_impl.h \
@@ -236,21 +230,16 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/bits/indirect.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/invoke.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/ios_base.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/istream.tcc \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/iterator_concepts.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.tcc \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_conv.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets.tcc \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.tcc \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/localefwd.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/max_size_type.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/memory_resource.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/memoryfwd.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/mofunc_impl.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/monostate.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/move.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/nested_exception.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/new_allocator.h \
@@ -258,11 +247,8 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/bits/new_throw.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/node_handle.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.tcc \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_insert.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_print.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/out_ptr.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/parse_numbers.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/postypes.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/predefined_ops.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/ptr_traits.h \
@@ -278,19 +264,16 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_atomic.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_base.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/specfun.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/sstream.tcc \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/std_abs.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/std_function.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_except.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throw.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throwdef.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throwfwd.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_algo.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_algobase.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_bvector.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_construct.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_function.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_heap.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_iterator.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_iterator_base_funcs.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_iterator_base_types.h \
@@ -303,9 +286,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf_iterator.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/string_view.tcc \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/stringfwd.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode-data.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/bits/uniform_int_dist.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/unique_ptr.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/unordered_map.h \
   C:/msys64/ucrt64/include/c++/16.1.0/bits/uses_allocator.h \
@@ -318,7 +298,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/cerrno \
   C:/msys64/ucrt64/include/c++/16.1.0/cfloat \
   C:/msys64/ucrt64/include/c++/16.1.0/charconv \
-  C:/msys64/ucrt64/include/c++/16.1.0/chrono \
   C:/msys64/ucrt64/include/c++/16.1.0/climits \
   C:/msys64/ucrt64/include/c++/16.1.0/clocale \
   C:/msys64/ucrt64/include/c++/16.1.0/cmath \
@@ -328,7 +307,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/cstdint \
   C:/msys64/ucrt64/include/c++/16.1.0/cstdio \
   C:/msys64/ucrt64/include/c++/16.1.0/cstdlib \
-  C:/msys64/ucrt64/include/c++/16.1.0/ctime \
   C:/msys64/ucrt64/include/c++/16.1.0/cwchar \
   C:/msys64/ucrt64/include/c++/16.1.0/cwctype \
   C:/msys64/ucrt64/include/c++/16.1.0/debug/assertions.h \
@@ -341,25 +319,17 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/ext/numeric_traits.h \
   C:/msys64/ucrt64/include/c++/16.1.0/ext/string_conversions.h \
   C:/msys64/ucrt64/include/c++/16.1.0/ext/type_traits.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/format \
   C:/msys64/ucrt64/include/c++/16.1.0/functional \
   C:/msys64/ucrt64/include/c++/16.1.0/initializer_list \
   C:/msys64/ucrt64/include/c++/16.1.0/ios \
   C:/msys64/ucrt64/include/c++/16.1.0/iosfwd \
-  C:/msys64/ucrt64/include/c++/16.1.0/istream \
   C:/msys64/ucrt64/include/c++/16.1.0/limits \
-  C:/msys64/ucrt64/include/c++/16.1.0/locale \
   C:/msys64/ucrt64/include/c++/16.1.0/memory \
   C:/msys64/ucrt64/include/c++/16.1.0/new \
   C:/msys64/ucrt64/include/c++/16.1.0/numbers \
-  C:/msys64/ucrt64/include/c++/16.1.0/optional \
-  C:/msys64/ucrt64/include/c++/16.1.0/ostream \
   C:/msys64/ucrt64/include/c++/16.1.0/pstl/execution_defs.h \
   C:/msys64/ucrt64/include/c++/16.1.0/pstl/glue_memory_defs.h \
   C:/msys64/ucrt64/include/c++/16.1.0/pstl/pstl_config.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/ratio \
-  C:/msys64/ucrt64/include/c++/16.1.0/span \
-  C:/msys64/ucrt64/include/c++/16.1.0/sstream \
   C:/msys64/ucrt64/include/c++/16.1.0/stdexcept \
   C:/msys64/ucrt64/include/c++/16.1.0/stdlib.h \
   C:/msys64/ucrt64/include/c++/16.1.0/streambuf \
@@ -393,9 +363,7 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: C:/Big_projec
   C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/error_constants.h \
   C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/gthr-default.h \
   C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/gthr.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/messages_members.h \
   C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/os_defines.h \
-  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/time_members.h \
   C:/msys64/ucrt64/include/corecrt.h \
   C:/msys64/ucrt64/include/corecrt_startup.h \
   C:/msys64/ucrt64/include/corecrt_stdio_config.h \
@@ -591,6 +559,8 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: C:/Big_projects
   C:/Big_projects/Game_project/dixEngine/Dependecies/glm/vec4.hpp \
   C:/Big_projects/Game_project/dixEngine/Dependecies/glm/vector_relational.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixCamera/DixCamera.hpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixUI/DixFpsCounter.hpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixUI/DixTimeCounter.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Input/Keyboard/KeyboardController.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.hpp \
@@ -8023,6 +7993,38 @@ C:/msys64/ucrt64/include/securityappcontainer.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/basic_file.h:
 
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_util.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_cmp.h:
+
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double2x2.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_base.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx10_2copyintrin.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/cstddef:
+
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtx/hash.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/predefined_ops.h:
+
+C:/msys64/ucrt64/include/stdio.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/hash_bytes.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx512bitalgintrin.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/out_ptr.h:
+
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/quaternion_transform.hpp:
+
+C:/msys64/ucrt64/include/imm.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_insert.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/concept_check.h:
+
 C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/new_throw.h:
@@ -8033,17 +8035,7 @@ C:/msys64/ucrt64/include/c++/16.1.0/bits/move.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.h:
 
-C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.tcc:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx512vlintrin.h:
-
-C:/msys64/ucrt64/include/winnls.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/stdint.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/quoted_string.h:
+C:/msys64/ucrt64/include/c++/16.1.0/bits/localefwd.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.h:
 
@@ -8051,17 +8043,9 @@ C:/msys64/ucrt64/include/c++/16.1.0/bits/iterator_concepts.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/cpp_type_traits.h:
 
-C:/msys64/ucrt64/include/c++/16.1.0/bits/localefwd.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/istream.tcc:
-
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double2x3_precision.hpp:
-
 C:/msys64/ucrt64/include/c++/16.1.0/bits/hashtable_policy.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/cxxabi_init_exception.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/hash_bytes.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx512vp2intersectintrin.h:
 
@@ -8098,16 +8082,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/exception:
 C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/c++io.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/erase_if.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/concept_check.h:
-
-C:/msys64/ucrt64/include/imm.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_insert.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/std_function.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/hashtable.h:
 
@@ -8255,8 +8229,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/codecvt:
 
 C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.hpp:
 
-C:/msys64/ucrt64/include/c++/16.1.0/ext/concurrence.h:
-
 C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/vec3.hpp:
@@ -8292,6 +8264,8 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/cpuid.h:
 C:/msys64/ucrt64/include/datetimeapi.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/mat3x3.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ptr_traits.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bit:
 
@@ -8355,21 +8329,13 @@ C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_uint3_sized.hp
 
 C:/msys64/ucrt64/include/process.h:
 
-C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono_io.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/emmintrin.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/range_access.h:
-
-C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.cpp:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/clzerointrin.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_float2x2_precision.hpp:
 
-C:/msys64/ucrt64/include/c++/16.1.0/bits/uniform_int_dist.h:
-
 C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/FirstApp.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/uniform_int_dist.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_uint4_sized.hpp:
 
@@ -8384,12 +8350,6 @@ C:/msys64/ucrt64/include/GL/gl.h:
 C:/msys64/ucrt64/include/c++/16.1.0/bits/node_handle.h:
 
 C:/msys64/ucrt64/include/corecrt_wstdlib.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/bmiintrin.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avxifmaintrin.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_conv.h:
 
 C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/SwapChain/SwapChain.hpp:
 
@@ -8503,8 +8463,6 @@ C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_uint2.hpp:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/quaternion_relational.hpp:
 
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_double2.hpp:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/fxsrintrin.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/mat2x3.hpp:
@@ -8514,8 +8472,6 @@ C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/qualifier.hpp:
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double2x2_precision.hpp:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_bool3_precision.hpp:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_cmp.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/opt_random.h:
 
@@ -8530,6 +8486,12 @@ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowCla
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/func_matrix.inl:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_int2.hpp:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/waitpkgintrin.h:
+
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_uint1.hpp:
+
+C:/msys64/ucrt64/include/_mingw_stat64.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/mat3x2.hpp:
 
@@ -8553,17 +8515,17 @@ C:/msys64/ucrt64/include/memoryapi.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_transform.inl:
 
-C:/msys64/ucrt64/include/excpt.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/algorithmfwd.h:
-
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/scalar_uint_sized.hpp:
-
 C:/msys64/ucrt64/include/interlockedapi.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_float4x2.hpp:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/stb_image.h:
+
+C:/msys64/ucrt64/include/excpt.h:
+
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/scalar_uint_sized.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/algorithmfwd.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/align.h:
 
@@ -8665,6 +8627,10 @@ C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/type_mat2x4.inl:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/stringfwd.h:
 
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double2x3_precision.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/istream.tcc:
+
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/scalar_constants.inl:
 
 C:/msys64/ucrt64/include/c++/16.1.0/ostream:
@@ -8685,11 +8651,17 @@ C:/msys64/ucrt64/include/c++/16.1.0/streambuf:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_float2_precision.hpp:
 
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_double2.hpp:
+
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/matrix.hpp:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/parse_numbers.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double2x4_precision.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_uninitialized.h:
+
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_int4_sized.hpp:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double2x3.hpp:
 
@@ -8713,51 +8685,13 @@ C:/Big_projects/Game_project/dixEngine/Dependecies/tiny_obj_loader.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/glm.hpp:
 
-C:/msys64/ucrt64/include/c++/16.1.0/bits/memoryfwd.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.tcc:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/monostate.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_print.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx512bitalgintrin.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/out_ptr.h:
-
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/quaternion_transform.hpp:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/predefined_ops.h:
-
-C:/msys64/ucrt64/include/stdio.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ptr_traits.h:
-
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double2x2.hpp:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_base.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx10_2copyintrin.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/cstddef:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/waitpkgintrin.h:
-
-C:/msys64/ucrt64/include/_mingw_stat64.h:
-
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_uint1.hpp:
-
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtx/hash.hpp:
-
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/vector_int4_sized.hpp:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_uninitialized.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_util.h:
-
 C:/msys64/ucrt64/include/c++/16.1.0/bits/refwrap.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_base.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/std_function.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_except.h:
 
@@ -8768,10 +8702,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throw.h:
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_projection.hpp:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throwfwd.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/concepts:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_algo.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/stddef.h:
 
@@ -8793,12 +8723,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx10_2minmaxintrin.h
 
 C:/msys64/ucrt64/include/c++/16.1.0/cfloat:
 
-C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_float3x2_precision.hpp:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_heap.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/tr1/hypergeometric.tcc:
-
 C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_iterator_base_funcs.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_pair.h:
@@ -8816,8 +8740,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf.tcc:
 C:/msys64/ucrt64/include/c++/16.1.0/bits/string_view.tcc:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_multiset.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode-data.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.tcc:
 
@@ -8845,8 +8767,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/cerrno:
 
 C:/msys64/ucrt64/include/c++/16.1.0/charconv:
 
-C:/msys64/ucrt64/include/c++/16.1.0/chrono:
-
 C:/msys64/ucrt64/include/c++/16.1.0/climits:
 
 C:/msys64/ucrt64/include/c++/16.1.0/clocale:
@@ -8862,6 +8782,12 @@ C:/msys64/ucrt64/include/c++/16.1.0/bits/sat_arith.h:
 C:/msys64/ucrt64/include/c++/16.1.0/cwchar:
 
 C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/c++allocator.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/tr1/hypergeometric.tcc:
+
+C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_float3x2_precision.hpp:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_heap.h:
 
 C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/UiPipeline.hpp:
 
@@ -8879,6 +8805,8 @@ C:/msys64/ucrt64/include/wincon.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/ext/atomicity.h:
 
+C:/msys64/ucrt64/include/c++/16.1.0/ext/concurrence.h:
+
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/mmintrin.h:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/quaternion.inl:
@@ -8888,8 +8816,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/ext/numeric_traits.h:
 C:/msys64/ucrt64/include/c++/16.1.0/ext/string_conversions.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/ext/type_traits.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/format:
 
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_double3x3_precision.hpp:
 
@@ -8904,10 +8830,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/initializer_list:
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/matrix_transform.hpp:
 
 C:/msys64/ucrt64/include/c++/16.1.0/iosfwd:
-
-C:/msys64/ucrt64/include/c++/16.1.0/bits/ios_base.h:
-
-C:/msys64/ucrt64/include/c++/16.1.0/istream:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf_iterator.h:
 
@@ -8944,10 +8866,6 @@ C:/msys64/ucrt64/include/c++/16.1.0/pstl/pstl_config.h:
 C:/msys64/ucrt64/include/consoleapi3.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/map:
-
-C:/msys64/ucrt64/include/c++/16.1.0/span:
-
-C:/msys64/ucrt64/include/c++/16.1.0/sstream:
 
 C:/msys64/ucrt64/include/c++/16.1.0/string:
 
@@ -9085,6 +9003,16 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx512vbmi2vlintrin.h
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/float.h:
 
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avx512vlintrin.h:
+
+C:/msys64/ucrt64/include/winnls.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/stdint.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/quoted_string.h:
+
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/syslimits.h:
 
 C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/FirstApp.cpp:
@@ -9101,11 +9029,49 @@ C:/msys64/ucrt64/include/c++/16.1.0/bits/random.tcc:
 
 C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp:
 
+C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono_io.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/emmintrin.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/range_access.h:
+
+C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixImage/DixImage.cpp:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/bmiintrin.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/avxifmaintrin.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_conv.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.tcc:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/memoryfwd.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.tcc:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/monostate.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_print.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/concepts:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_algo.h:
+
 C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/constants.hpp:
 
 C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_numeric.h:
 
+C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode-data.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/chrono:
+
 C:/msys64/ucrt64/include/c++/16.1.0/filesystem:
+
+C:/msys64/ucrt64/include/c++/16.1.0/format:
+
+C:/msys64/ucrt64/include/c++/16.1.0/bits/ios_base.h:
+
+C:/msys64/ucrt64/include/c++/16.1.0/istream:
 
 C:/Big_projects/Game_project/dixEngine/VulcanEngine/UI/DixUIElement.cpp:
 
@@ -9116,6 +9082,10 @@ C:/msys64/ucrt64/include/c++/16.1.0/pstl/glue_numeric_defs.h:
 C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/cpu_defines.h:
 
 C:/msys64/ucrt64/include/c++/16.1.0/random:
+
+C:/msys64/ucrt64/include/c++/16.1.0/span:
+
+C:/msys64/ucrt64/include/c++/16.1.0/sstream:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/mwaitintrin.h:
 

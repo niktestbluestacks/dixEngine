@@ -1,5 +1,4 @@
 // dix
-#include "Model/GameObject/GameObject.hpp"
 #include <FirstApp/FirstApp.hpp>
 
 #include <FirstApp/AppContext.hpp>
@@ -7,6 +6,8 @@
 #include <Input/Keyboard/KeyboardController.hpp>
 #include <Utils/Converter.hpp>
 #include <Logger/Logger.hpp>
+#include <DixUI/DixFpsCounter.hpp>
+#include <DixUI/DixTimeCounter.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -27,6 +28,7 @@ FirstApp::FirstApp(void) {
 	DixLogInfo("Loading Game Objects");
 	// FirstApp focuses on game objects and game logic only.
 	loadGameObjects();
+	loadUIElements();
 	DixLogInfo("FirstApp initialized successfully!");
 }
 
@@ -100,6 +102,29 @@ void FirstApp::loadGameObjects() {
 		gameObj.transform.scale = { 1.f, 1.f, 1.f };
 		m_gameObjects.push_back(std::move(gameObj));
 	}
+}
+
+void FirstApp::loadUIElements(void) {
+	auto fps = std::make_unique<DixFpsCounter>(
+		DixUIInfo {
+		*m_context.getUIRenderer(),
+		m_context.getExtent()
+		// "",
+		// "UI/font.txt",
+		// "UI/font02.tga"
+        }
+    );
+	m_context.addUIElement(std::move(fps));
+    auto timeCounter = std::make_unique<DixTimeCounter>(
+        DixUIInfo {
+            *m_context.getUIRenderer(),
+			m_context.getExtent(),
+			// "",
+			// "UI/font.txt",
+			// "UI/font02.tga" 
+		}
+    );
+    m_context.addUIElement(std::move(timeCounter));
 }
 
 } // namespace dix

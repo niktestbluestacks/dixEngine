@@ -14,6 +14,7 @@ namespace dix {
 class FirstApp {
 private:
 	void loadGameObjects(void);
+	void loadUIElements(void);
 private:
 	//void sierpinski(
 	//	std::vector <Model::Vertex>& vertecies,

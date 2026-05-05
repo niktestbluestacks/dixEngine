@@ -46,7 +46,7 @@ public:
 
 		void loadModel(const std::string& filepath, EngineDevice& device);
 
-		DixTexture texture{};
+		DixTexture texture;
 	};
 
 	Model(EngineDevice& dixDevice, const Model::Builder& builder);

@@ -1,5 +1,6 @@
 CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:\Big_projects\Game_project\dixEngine\Applications\FirstApp\FirstApp.cpp \
+ C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/FirstApp.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.hpp \
@@ -395,7 +396,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_transform.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_transform.inl \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/matrix_transform.inl \
- C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/FirstApp.hpp \
  C:/Big_projects/Game_project/dixEngine/Applications/FirstApp/AppContext.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Rendering/Renderer/Renderer.hpp \
@@ -410,6 +410,8 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/FirstApp.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Utils/Converter.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Input/Keyboard/KeyboardController.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixUI/DixFpsCounter.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixUI/DixTimeCounter.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/chrono \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono.h \
  C:/msys64/ucrt64/include/c++/16.1.0/ratio \

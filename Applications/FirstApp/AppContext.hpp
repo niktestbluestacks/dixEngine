@@ -31,7 +31,7 @@ public:
 	bool shouldClose() { return m_Window.shouldClose(); }
 	void pollEvents() { glfwPollEvents(); }
 	GLFWwindow* getGLFWwindow() { return m_Window.getGLFWwindow(); }
-
+	std::unique_ptr<UIRenderer>& getUIRenderer() { return m_uiRenderer; }
 	// renderer helpers
 	float getAspectRatio() { return m_dixRenderer.getAspectRatio(); }
 	VkRenderPass getSwapChainRenderPass() { return m_dixRenderer.getSwapChainRenderPass(); }
@@ -40,12 +40,16 @@ public:
 	void beginSwapChainRenderPass(VkCommandBuffer cb) { m_dixRenderer.beginSwapChainRenderPass(cb); }
 	void endSwapChainRenderPass(VkCommandBuffer cb) { m_dixRenderer.endSwapChainRenderPass(cb); }
 	int getFrameIndex() { return m_dixRenderer.getFrameIndex(); }
-
+	VkExtent2D getExtent() { return m_Window.getExtent(); }
 	// device access for resource creation
 	EngineDevice& device() { return m_dixDevice; }
 
 	// draw helper which hides rendering/shader details from the app
 	void drawFrame(DixCamera& camera, float frameTime, const std::vector<GameObject>& gameObjects);
+
+	// 
+	void addUIElement(std::unique_ptr<DixUIElement> element);
+	// void addGameObject(std::unique_ptr<GameObject> object);
 
 private:
 	Window m_Window;

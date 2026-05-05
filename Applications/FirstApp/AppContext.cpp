@@ -3,8 +3,7 @@
 
 #include <UI/DixUIElement.hpp>
 #include <Utils/Converter.hpp>
-#include <DixUI/DixFpsCounter.hpp>
-#include <DixUI/DixTimeCounter.hpp>
+#include <memory>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -27,23 +26,23 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     m_uiManager = std::make_unique<dix::UIManager>();
     m_uiRenderer = std::make_unique<dix::UIRenderer>(m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
     // add fps counter UI element
-    auto fps = std::make_unique<DixFpsCounter>(
-        DixUIInfo {
-            *m_uiRenderer,
-            m_Window.getExtent()
-            // "",
-            // "UI/font.txt",
-            // "UI/font02.tga"
-        }
-    );
-    m_uiManager->addElement(std::move(fps));
-    auto timeCounter = std::make_unique<DixTimeCounter>(
-        DixUIInfo {
-            *m_uiRenderer,
-            m_Window.getExtent()
-        }
-    );
-    m_uiManager->addElement(std::move(timeCounter));
+    // auto fps = std::make_unique<DixFpsCounter>(
+    //     DixUIInfo {
+    //         *m_uiRenderer,
+    //         m_Window.getExtent()
+    //         // "",
+    //         // "UI/font.txt",
+    //         // "UI/font02.tga"
+    //     }
+    // );
+    // m_uiManager->addElement(std::move(fps));
+    // auto timeCounter = std::make_unique<DixTimeCounter>(
+    //     DixUIInfo {
+    //         *m_uiRenderer,
+    //         m_Window.getExtent()
+    //     }
+    // );
+    // m_uiManager->addElement(std::move(timeCounter));
 }
 
 AppContext::~AppContext() {
@@ -170,5 +169,17 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
         endFrame();
     }
 }
+
+void AppContext::addUIElement(std::unique_ptr<DixUIElement> element) {
+    if (m_uiManager) {
+        m_uiManager->addElement(std::move(element));
+    }
+}
+
+// void AppContext::addGameObject(std::unique_ptr<GameObject>) {
+//     if (m_gameObjects) {
+//         m_gameObjects->addObject(std::move(object));
+//     }
+// }
 
 } // namespace dix

@@ -1,9 +1,10 @@
 // dix
-#include "UI/DixUIElement.hpp"
 #include <FirstApp/AppContext.hpp>
 
+#include <UI/DixUIElement.hpp>
 #include <Utils/Converter.hpp>
 #include <DixUI/DixFpsCounter.hpp>
+#include <DixUI/DixTimeCounter.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -36,6 +37,13 @@ AppContext::AppContext(int width, int height, const std::string& title) :
         }
     );
     m_uiManager->addElement(std::move(fps));
+    auto timeCounter = std::make_unique<DixTimeCounter>(
+        DixUIInfo {
+            *m_uiRenderer,
+            m_Window.getExtent()
+        }
+    );
+    m_uiManager->addElement(std::move(timeCounter));
 }
 
 AppContext::~AppContext() {

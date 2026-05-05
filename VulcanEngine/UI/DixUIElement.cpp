@@ -180,4 +180,47 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
     }
 }
 
+void DixUIElement::buildVerticesForText(const std::string& text, float x, float y) {
+    std::vector<DixUIVert> verts;
+    for (char c : text) {
+        auto it = m_glyphs.find(c);
+        if (it == m_glyphs.end()) continue;
+        DixGlyphInfo g = it->second;
+        float gw = static_cast<float>(g.px);
+        float gh = static_cast<float>(m_fontHeight);
+        float u0 = g.u0;
+        float u1 = g.u1;
+        float v0 = 0.f, v1 = 1.f;
+        // two tris
+        verts.push_back({ x,y,u0,v0 });
+        verts.push_back({ x + gw,y,u1,v0 });
+        verts.push_back({ x + gw,y + gh,u1,v1 });
+        verts.push_back({ x,y,u0,v0 });
+        verts.push_back({ x + gw,y + gh,u1,v1 });
+        verts.push_back({ x,y + gh,u0,v1 });
+        x += gw + 1.f;
+    }
+
+    if (verts.empty()) return;
+    m_vertexCount = static_cast<uint32_t>(verts.size());
+    // serialize CPU copy into staging vector
+    m_vertexStaging.resize(sizeof(DixUIVert) * verts.size());
+    memcpy(m_vertexStaging.data(), verts.data(), m_vertexStaging.size());
+    if (m_vertexCapacity < m_vertexCount) {
+        // grow existing per-frame buffers
+        m_vertexCapacity = m_vertexCount;
+        vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
+        for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
+            m_vertexBuffers[i] = std::make_unique<DixBuffer>(
+                m_uiRenderer.getDevice(), 
+                sizeof(DixUIVert), 
+                m_vertexCapacity, 
+                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+            );
+            m_vertexBuffers[i]->map();
+        }
+    }
+}
+
 }   // namespace dix

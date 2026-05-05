@@ -21,8 +21,8 @@ void DixFpsCounter::update(float dt) {
     // buffer uploads / copies happen outside of an active render pass.
     std::string text = std::to_string(m_fps) + " FPS";
     if (text != m_lastText) {
-        buildVerticesForText(text);
+        buildVerticesForText(text, 8.f, 28.f);
         m_lastText = text;
     }
 }
-}   // namwspace dix
+}   // namespace dix

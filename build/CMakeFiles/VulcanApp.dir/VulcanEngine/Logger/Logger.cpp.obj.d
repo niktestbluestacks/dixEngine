@@ -186,4 +186,22 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.1.0/istream \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/istream.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/sstream \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/sstream.tcc
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/sstream.tcc \
+ C:/msys64/ucrt64/include/c++/16.1.0/chrono \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ratio \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/parse_numbers.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/vector \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_uninitialized.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_vector.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_bvector.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/vector.tcc \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/allocated_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/refwrap.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/unique_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ext/aligned_buffer.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ext/concurrence.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/align.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/chrono_io.h

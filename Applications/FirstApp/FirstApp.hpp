@@ -29,7 +29,7 @@ public:
 	static constexpr int WIDTH = 800;
 	static constexpr int HEIGHT = 600;
 	static constexpr float MAX_FRAME_TIME = 0.05f;
-	static constexpr std::string_view MODEL_FILEPATH_RELATIVE = "../dixEngine/Applications/models";
+	static constexpr std::string_view MODEL_FILEPATH_RELATIVE = "Applications/models";
 
 
 	FirstApp(void);

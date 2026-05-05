@@ -3,7 +3,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "C:/VulkanSDK/1.4.341.1/Bin/glslc.exe"
+			"path" : "C:/VulkanSDK/1.4.341.1/Bin/glslangValidator.exe"
 		}
 	],
 	"backtrace" : 3,
@@ -37,7 +37,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 717,
+				"line" : 739,
 				"parent" : 2
 			}
 		]
@@ -45,13 +45,13 @@
 	"codemodelVersion" : 
 	{
 		"major" : 2,
-		"minor" : 9
+		"minor" : 10
 	},
-	"id" : "Vulkan::glslc::@6890427a1f51a3e7e1df",
+	"id" : "Vulkan::glslangValidator::@6890427a1f51a3e7e1df",
 	"imported" : true,
 	"local" : true,
-	"name" : "Vulkan::glslc",
-	"nameOnDisk" : "glslc.exe",
+	"name" : "Vulkan::glslangValidator",
+	"nameOnDisk" : "glslangValidator.exe",
 	"paths" : 
 	{
 		"build" : ".",

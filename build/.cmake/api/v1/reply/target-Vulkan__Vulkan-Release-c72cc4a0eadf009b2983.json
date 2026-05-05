@@ -1,17 +1,11 @@
 {
 	"abstract" : true,
-	"artifacts" : 
-	[
-		{
-			"path" : "C:/VulkanSDK/1.4.341.1/Bin/glslangValidator.exe"
-		}
-	],
 	"backtrace" : 3,
 	"backtraceGraph" : 
 	{
 		"commands" : 
 		[
-			"add_executable",
+			"add_library",
 			"find_package"
 		],
 		"files" : 
@@ -37,7 +31,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 722,
+				"line" : 721,
 				"parent" : 2
 			}
 		]
@@ -45,18 +39,17 @@
 	"codemodelVersion" : 
 	{
 		"major" : 2,
-		"minor" : 9
+		"minor" : 10
 	},
-	"id" : "Vulkan::glslangValidator::@6890427a1f51a3e7e1df",
+	"id" : "Vulkan::Vulkan::@6890427a1f51a3e7e1df",
 	"imported" : true,
 	"local" : true,
-	"name" : "Vulkan::glslangValidator",
-	"nameOnDisk" : "glslangValidator.exe",
+	"name" : "Vulkan::Vulkan",
 	"paths" : 
 	{
 		"build" : ".",
 		"source" : "."
 	},
 	"sources" : [],
-	"type" : "EXECUTABLE"
+	"type" : "UNKNOWN_LIBRARY"
 }

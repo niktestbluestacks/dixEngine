@@ -12,6 +12,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/VulcanApp.dir/VulcanEngine/DixCamera/FpsCounter/FpsCounter.cpp.obj.d"
   "CMakeFiles/VulcanApp.dir/VulcanEngine/DixUI/DixFpsCounter.cpp.obj"
   "CMakeFiles/VulcanApp.dir/VulcanEngine/DixUI/DixFpsCounter.cpp.obj.d"
+  "CMakeFiles/VulcanApp.dir/VulcanEngine/DixUI/DixTimeCounter.cpp.obj"
+  "CMakeFiles/VulcanApp.dir/VulcanEngine/DixUI/DixTimeCounter.cpp.obj.d"
   "CMakeFiles/VulcanApp.dir/VulcanEngine/Input/Keyboard/KeyboardController.cpp.obj"
   "CMakeFiles/VulcanApp.dir/VulcanEngine/Input/Keyboard/KeyboardController.cpp.obj.d"
   "CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj"

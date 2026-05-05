@@ -234,6 +234,7 @@ void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDev
 	}
 
     if (loaded_with_texture && !materials.empty()) {
+		DixLogDebug("Number of materials: " + std::to_string(static_cast<int>(materials.size())));
         const tinyobj::material_t& mat = materials[0];
 		if (!mat.diffuse_texname.empty()) {
 			// Resolve texture path relative to the OBJ file directory unless

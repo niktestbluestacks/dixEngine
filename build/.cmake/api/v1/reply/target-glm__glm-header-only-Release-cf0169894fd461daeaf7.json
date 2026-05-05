@@ -10,7 +10,7 @@
 		],
 		"files" : 
 		[
-			"C:/msys64/ucrt64/share/cmake/Modules/FindVulkan.cmake",
+			"C:/msys64/ucrt64/share/glm/glmConfig.cmake",
 			"CMakeLists.txt"
 		],
 		"nodes" : 
@@ -21,7 +21,7 @@
 			{
 				"command" : 1,
 				"file" : 1,
-				"line" : 13,
+				"line" : 15,
 				"parent" : 0
 			},
 			{
@@ -31,7 +31,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 704,
+				"line" : 58,
 				"parent" : 2
 			}
 		]
@@ -39,17 +39,17 @@
 	"codemodelVersion" : 
 	{
 		"major" : 2,
-		"minor" : 9
+		"minor" : 10
 	},
-	"id" : "Vulkan::Vulkan::@6890427a1f51a3e7e1df",
+	"id" : "glm::glm-header-only::@6890427a1f51a3e7e1df",
 	"imported" : true,
 	"local" : true,
-	"name" : "Vulkan::Vulkan",
+	"name" : "glm::glm-header-only",
 	"paths" : 
 	{
 		"build" : ".",
 		"source" : "."
 	},
 	"sources" : [],
-	"type" : "UNKNOWN_LIBRARY"
+	"type" : "INTERFACE_LIBRARY"
 }

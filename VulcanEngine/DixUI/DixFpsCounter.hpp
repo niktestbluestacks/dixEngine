@@ -20,6 +20,6 @@ private:
     int m_fps = 0;
     std::string m_lastText;
 };
-}   // namwspace dix
+}   // namespace dix
 
 #endif // DIX_FPS_COUNTER_HPP

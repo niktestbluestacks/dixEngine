@@ -47,6 +47,7 @@ public:
     
 protected:
     void buildVerticesForText(const std::string& text);
+    void buildVerticesForText(const std::string& text, float x, float y);
 
 protected:
     UIRenderer& m_uiRenderer;

@@ -7,7 +7,7 @@
 #include <Model/DixImage/DixImage.hpp>
 
 // libs
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 namespace dix {
 

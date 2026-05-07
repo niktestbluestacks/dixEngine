@@ -5,7 +5,7 @@
 #include <DixCamera/DixCamera.hpp>
 
 // lib
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 namespace dix {
 struct FrameInfo {

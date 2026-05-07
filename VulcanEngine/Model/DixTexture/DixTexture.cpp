@@ -1,5 +1,6 @@
 // dix
 #include <Model/DixTexture/DixTexture.hpp>
+#include <Logger/Logger.hpp>
 
 // libs
 #ifndef STB_IMAGE_IMPLEMENTATION
@@ -9,6 +10,7 @@
 
 // std
 #include <stdexcept>
+#include <filesystem>
 
 namespace dix {
 DixTexture::DixTexture() {
@@ -87,6 +89,14 @@ DixTexture createDefaultTexture(EngineDevice& dixDevice) {
 }       
 
 DixTexture createTextureFromFile(std::string& path, EngineDevice& dixDevice) {
+    // Debug: log texture path
+    DixLogDebug("Loading texture from: " + path);
+    
+    // Verify file exists
+    if (!std::filesystem::exists(path)) {
+        throw std::runtime_error("Texture file not found: " + path);
+    }
+    
     int texWidth, texHeight, texChannels;
     const VkFormat texFormat = VK_FORMAT_R8G8B8A8_UNORM;
     stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);

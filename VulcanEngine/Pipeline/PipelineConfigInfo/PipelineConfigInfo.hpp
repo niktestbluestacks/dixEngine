@@ -5,7 +5,7 @@
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/ShaderModule/ShaderModule.hpp>
 // libs
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 namespace dix {
 

@@ -84,6 +84,15 @@
     <ClCompile Include="VulcanEngine\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VulcanEngine\UI\DixUIElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VulcanEngine\DixUI\DixFpsCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VulcanEngine\DixUI\DixTimeCounter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VulcanEngine\Window\WindowClass\WindowClass.hpp">
@@ -174,6 +183,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VulcanEngine\Model\DixImage\DixImage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\UI\DixUIElement.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\DixUI\DixFpsCounter.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulcanEngine\DixUI\DixTimeCounter.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

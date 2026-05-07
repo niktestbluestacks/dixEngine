@@ -9,7 +9,7 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 namespace dix {
 
@@ -150,12 +150,17 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
 
         // render
         beginSwapChainRenderPass(commandBuffer);
-        m_simpleRenderSystem->renderGameObjects(const_cast<FrameInfo&>(frameInfo), const_cast<std::vector<GameObject>&>(gameObjects));
+        m_simpleRenderSystem->renderGameObjects(
+            const_cast<FrameInfo&>(frameInfo),
+             const_cast<std::vector<GameObject>&>(gameObjects));
         // render UI
         if (m_uiManager && m_uiRenderer) {
             m_uiRenderer->bindPipeline(commandBuffer);
             // push screen size to UI vertex shader (vec2)
-            float screenSize[2] = { static_cast<float>(m_Window.getExtent().width), static_cast<float>(m_Window.getExtent().height) };
+            float screenSize[2] = { 
+                static_cast<float>(m_Window.getExtent().width),
+                static_cast<float>(m_Window.getExtent().height)
+            };
             vkCmdPushConstants(
                 commandBuffer,
                 m_uiRenderer->getPipelineLayout(),

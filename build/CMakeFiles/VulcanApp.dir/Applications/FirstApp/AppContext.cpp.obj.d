@@ -217,8 +217,44 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Rendering/Renderer/Renderer.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/SwapChain/SwapChain.hpp \
+ C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan.hpp \
+ C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_hpp_macros.hpp \
+ C:/msys64/ucrt64/include/c++/16.1.0/version \
+ C:/msys64/ucrt64/include/c++/16.1.0/algorithm \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_algo.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/algorithmfwd.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_heap.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/uniform_int_dist.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_algo.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/optional \
+ C:/msys64/ucrt64/include/c++/16.1.0/pstl/glue_algorithm_defs.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/array \
  C:/msys64/ucrt64/include/c++/16.1.0/cassert \
- C:/msys64/ucrt64/include/assert.h \
+ C:/msys64/ucrt64/include/assert.h C:/msys64/ucrt64/include/string.h \
+ C:/msys64/ucrt64/include/sec_api/string_s.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/utility \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_relops.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/intcmp.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/monostate.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/span \
+ C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_enums.hpp \
+ C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_to_string.hpp \
+ C:/msys64/ucrt64/include/c++/16.1.0/format \
+ C:/msys64/ucrt64/include/c++/16.1.0/locale \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ctime \
+ C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/time_members.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/messages_members.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/codecvt.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.tcc \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_conv.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/cstdint \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode-data.h \
+ C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_handles.hpp \
+ C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_structs.hpp \
+ C:/msys64/ucrt64/include/c++/16.1.0/cstring \
+ C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_funcs.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/DixCamera/DixCamera.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/glm.hpp \
@@ -240,7 +276,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.1.0/tr1/riemann_zeta.tcc \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/setup.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/simd/platform.h \
- C:/msys64/ucrt64/include/c++/16.1.0/cstdint \
  C:/msys64/ucrt64/include/c++/16.1.0/climits \
  C:/msys64/ucrt64/include/c++/16.1.0/cfloat \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/float.h \
@@ -272,7 +307,6 @@ CMakeFiles/VulcanApp.dir/Applications/FirstApp/AppContext.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/compute_vector_decl.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/functional \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/std_function.h \
- C:/msys64/ucrt64/include/c++/16.1.0/array \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/binders.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/funcwrap.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/mofunc_impl.h \

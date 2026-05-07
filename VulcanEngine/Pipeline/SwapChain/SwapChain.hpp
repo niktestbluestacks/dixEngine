@@ -5,7 +5,7 @@
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
 // libs
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 // std
 #include <vector>

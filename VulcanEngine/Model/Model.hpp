@@ -40,13 +40,23 @@ public:
 		VkSampler sampler;
 	};
 
+	struct SubMesh {
+		std::vector<Vertex> vertices;
+		std::vector<uint32_t> indices;
+		std::string texturePath;
+		glm::vec3 baseColor{1.0f};
+		uint32_t textureIndex{0};
+		DixTexture texture; 
+	};
+
 	struct Builder {
 		std::vector <Vertex> vertices{};
 		std::vector <uint32_t> indices{};
-
-		void loadModel(const std::string& filepath, EngineDevice& device);
+		std::vector<SubMesh> submeshes{};
 
 		DixTexture texture;
+
+		void loadModel(const std::string& filepath, EngineDevice& device);
 	};
 
 	Model(EngineDevice& dixDevice, const Model::Builder& builder);

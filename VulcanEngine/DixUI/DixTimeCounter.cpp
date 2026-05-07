@@ -10,7 +10,9 @@ void DixTimeCounter::update(float dt) {
     static std::string lastText = "";
     if (timeT - std::chrono::system_clock::to_time_t(m_startTime) > 0) {
         m_startTime = m_currTime;
-        std::tm* nowTm = std::localtime(&timeT);
+        std::tm nowTmStorage;
+        std::tm* nowTm = &nowTmStorage;
+        localtime_s(nowTm, &timeT);
         lastText = std::to_string(nowTm->tm_year + 1900) + "-" +
                         std::to_string(nowTm->tm_mon + 1) + "-" +
                         std::to_string(nowTm->tm_mday) + "--" +

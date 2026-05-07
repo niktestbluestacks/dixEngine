@@ -16,6 +16,7 @@
 #include <cstring>
 #include <unordered_map>
 #include <fstream>
+#include <filesystem>
 
 namespace std {
 template <>
@@ -154,113 +155,160 @@ std::vector<VkVertexInputAttributeDescription> Model::Vertex::getAttributeDescri
 	return attributeDescriptions;
 }
 
-void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDevice) {
-	tinyobj::attrib_t attrib{};
-	std::vector <tinyobj::shape_t> shapes{};
-	std::vector <tinyobj::material_t> materials{};
-	std::string warn{};
-	std::string err{};
+void Model::Builder::loadModel(const std::string& filepath, EngineDevice& device) {
+    tinyobj::attrib_t attrib{};
+    std::vector<tinyobj::shape_t> shapes{};
+    std::vector<tinyobj::material_t> materials{};
+    std::string warn{}, err{};
 
-	std::ifstream file (filepath);
-	std::string line;
+    // Extract OBJ directory for MTL & texture resolution
+    std::string mtlDir;
+    size_t lastSlash = filepath.find_last_of("/\\");
+    if (lastSlash != std::string::npos) {
+        mtlDir = filepath.substr(0, lastSlash + 1);
+    }
 
-	bool loaded_with_texture = false;
+    // Load OBJ + MTL (mtl_basedir is a plain const char* parameter)
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err,
+                          filepath.c_str(),
+                          mtlDir.empty() ? nullptr : mtlDir.c_str())) {
+        throw std::runtime_error("Failed to load model: " + warn + err);
+    }
+    if (!warn.empty()) {
+        DixLogWarn("tinyobj warning: " + warn);
+    }
 
-	while (std::getline(file, line)) {
-		if (line.front() == 'm') {
-			std::string texture_filepath;
-			texture_filepath = filepath.substr(0, filepath.find_last_of('\\') + 1);
-			// texture_filepath += line.substr(line.find_last_of(' ') + 1, line.size() - 1);
-			if (!tinyobj::LoadObj(
-					&attrib, &shapes, &materials, &warn, &err, 
-					filepath.c_str(), texture_filepath.c_str()
-				)) {
-				throw std::runtime_error(warn + err);
-			}
-			loaded_with_texture = true;
-		}
-	}
+    vertices.clear();
+    indices.clear();
+    texture = {};
+    submeshes.clear();
 
-	file.close();
-
-	if (!loaded_with_texture) {
-		if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str())) {
-			throw std::runtime_error(warn + err);
-		}
-	}
-
-	vertices.clear();
-	indices.clear();
-
-	std::unordered_map <Vertex, uint32_t> uniqueVertices{};
-	for (const auto& shape : shapes) {
-		for (const auto& index : shape.mesh.indices) {
-			Vertex vertex{};
-			if (index.vertex_index >= 0) {
-				vertex.position = {
-					attrib.vertices[3 * index.vertex_index + 0],
-					attrib.vertices[3 * index.vertex_index + 1],
-					attrib.vertices[3 * index.vertex_index + 2]
-				};
-
-				vertex.color = {
-					attrib.colors[3 * index.vertex_index + 0],
-					attrib.colors[3 * index.vertex_index + 1],
-					attrib.colors[3 * index.vertex_index + 2]
-				};
-			}
-
-			if (index.normal_index >= 0) {
-				vertex.normal = {
-					attrib.normals[3 * index.normal_index + 0],
-					attrib.normals[3 * index.normal_index + 1],
-					attrib.normals[3 * index.normal_index + 2]
-				};
-			}
-
-			if (index.texcoord_index >= 0) {
-				vertex.uv = {
-					attrib.texcoords[2 * index.texcoord_index + 0],
-					attrib.texcoords[2 * index.texcoord_index + 1],
-				};
-			}
-
-			if (!uniqueVertices.contains(vertex)) {
-				uniqueVertices[vertex] = static_cast <uint32_t> (vertices.size());
-				vertices.push_back(vertex);
-			}
-			indices.push_back(uniqueVertices[vertex]);
-		}
-	}
-
-    if (loaded_with_texture && !materials.empty()) {
-		DixLogDebug("Number of materials: " + std::to_string(static_cast<int>(materials.size())));
-        const tinyobj::material_t& mat = materials[0];
-		if (!mat.diffuse_texname.empty()) {
-			// Resolve texture path relative to the OBJ file directory unless
-			// the material already supplies an absolute path.
-			std::string texName = mat.diffuse_texname;
-			std::string dir;
-			size_t pos = filepath.find_last_of("/\\");
-			if (pos != std::string::npos) dir = filepath.substr(0, pos + 1);
-
-			bool isAbsolute = false;
-			if (!texName.empty()) {
-				if (texName.size() > 1 && texName[1] == ':') isAbsolute = true; // Windows drive letter
-				if (!texName.empty() && (texName[0] == '/' || texName[0] == '\\')) isAbsolute = true; // Unix or root
-			}
-
-			std::string texPath = isAbsolute ? texName : (dir + texName);
-
-			texture = createTextureFromFile(texPath, dixDevice);
-
-		} else {
-            // no texture file – use the white fallback
-            texture = createDefaultTexture(dixDevice);
+    // Track which (shape, material) maps to which submesh index
+    struct MeshKey {
+        size_t shapeIdx;
+        int materialId;
+        bool operator==(const MeshKey& other) const {
+            return shapeIdx == other.shapeIdx && materialId == other.materialId;
         }
-    } else {
-        // no material – use the white fallback
-        texture = createDefaultTexture(dixDevice);
+    };
+    struct MeshKeyHash {
+        size_t operator()(const MeshKey& k) const {
+            return std::hash<size_t>()(k.shapeIdx) ^ std::hash<int>()(k.materialId);
+        }
+    };
+
+    std::unordered_map<MeshKey, size_t, MeshKeyHash> submeshMap;
+    std::vector<std::unordered_map<Vertex, uint32_t>> submeshUniqueMaps; // Parallel dedup maps
+
+    for (size_t shapeIdx = 0; shapeIdx < shapes.size(); ++shapeIdx) {
+        const auto& shape = shapes[shapeIdx];
+        const auto& mesh = shape.mesh;
+
+        // Iterate over FACES, not raw indices, to correctly associate materials
+        for (size_t faceIdx = 0; faceIdx < mesh.num_face_vertices.size(); ++faceIdx) {
+            // Skip non-triangles
+            if (mesh.num_face_vertices[faceIdx] != 3) {
+                DixLogWarn("Skipping non-triangular face in shape " + std::to_string(shapeIdx));
+                continue;
+            }
+
+            int matId = mesh.material_ids[faceIdx]; // -1 if no material
+            MeshKey key{shapeIdx, matId};
+
+            // Create new submesh entry if needed
+            if (submeshMap.find(key) == submeshMap.end()) {
+                size_t newIdx = submeshes.size();
+                submeshMap[key] = newIdx;
+                submeshes.emplace_back();
+                submeshUniqueMaps.emplace_back(); // New dedup map for this submesh
+
+                // Populate material info
+                if (matId >= 0 && matId < static_cast<int>(materials.size())) {
+                    const auto& mat = materials[matId];
+                    submeshes.back().baseColor = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+
+                    if (!mat.diffuse_texname.empty()) {
+                        std::string texName = mat.diffuse_texname;
+                        bool isAbsolute = (texName.size() > 1 && texName[1] == ':') ||
+                                          (!texName.empty() && (texName[0] == '/' || texName[0] == '\\'));
+                        submeshes.back().texturePath = isAbsolute ? texName : (mtlDir + texName);
+                    }
+                }
+            }
+
+            SubMesh& currentSubmesh = submeshes[submeshMap[key]];
+            auto& uniqueVertices = submeshUniqueMaps[submeshMap[key]]; // ⚠️ Per-submesh dedup
+
+            // Process the 3 vertices of this triangle
+            for (int v = 0; v < 3; ++v) {
+                tinyobj::index_t idx = mesh.indices[3 * faceIdx + v];
+                Vertex vertex{};
+
+                // Position
+                if (idx.vertex_index >= 0) {
+                    vertex.position = glm::vec3(
+                        attrib.vertices[3 * idx.vertex_index + 0],
+                        attrib.vertices[3 * idx.vertex_index + 1],
+                        attrib.vertices[3 * idx.vertex_index + 2]
+                    );
+
+                    // Color: OBJ rarely has per-vertex colors. Fallback to material diffuse.
+                    if (!attrib.colors.empty()) {
+                        vertex.color = glm::vec3(
+                            attrib.colors[3 * idx.vertex_index + 0],
+                            attrib.colors[3 * idx.vertex_index + 1],
+                            attrib.colors[3 * idx.vertex_index + 2]
+                        );
+                    } else {
+                        vertex.color = currentSubmesh.baseColor;
+                    }
+                }
+
+                // Normal
+                if (idx.normal_index >= 0) {
+                    vertex.normal = glm::vec3(
+                        attrib.normals[3 * idx.normal_index + 0],
+                        attrib.normals[3 * idx.normal_index + 1],
+                        attrib.normals[3 * idx.normal_index + 2]
+                    );
+                }
+
+                // UV Coordinates
+                if (idx.texcoord_index >= 0) {
+                    vertex.uv = glm::vec2(
+                        attrib.texcoords[2 * idx.texcoord_index + 0],
+                        1.0f - attrib.texcoords[2 * idx.texcoord_index + 1] // ✅ Flip V for Vulkan/OpenGL
+                    );
+                }
+
+                // Deduplicate within this submesh
+                if (uniqueVertices.find(vertex) == uniqueVertices.end()) {
+                    uniqueVertices[vertex] = static_cast<uint32_t>(currentSubmesh.vertices.size());
+                    currentSubmesh.vertices.push_back(vertex);
+                }
+                currentSubmesh.indices.push_back(uniqueVertices[vertex]);
+            }
+        }
+    }
+
+    // ✅ Load textures for each submesh
+    for (auto& submesh : submeshes) {
+        if (!submesh.texturePath.empty() && std::filesystem::exists(submesh.texturePath)) {
+            DixLogDebug("Loading texture: " + submesh.texturePath);
+            submesh.texture = createTextureFromFile(submesh.texturePath, device);
+        } else {
+            if (!submesh.texturePath.empty()) {
+                DixLogWarn("Texture not found: " + submesh.texturePath + " → using fallback");
+            }
+            submesh.texture = createDefaultTexture(device);
+        }
+    }
+
+    // 🔄 Backward compatibility: If only 1 material exists, flatten to original buffers
+    if (submeshes.size() == 1) {
+        vertices = std::move(submeshes[0].vertices);
+        indices  = std::move(submeshes[0].indices);
+        texture  = submeshes[0].texture;
     }
 }
 

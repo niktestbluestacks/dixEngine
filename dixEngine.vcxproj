@@ -186,6 +186,8 @@
     <ClCompile Include="Applications\FirstApp\AppContext.cpp" />
     <ClCompile Include="Applications\FirstApp\FirstApp.cpp" />
     <ClCompile Include="VulcanEngine\DixCamera\FpsCounter\FpsCounter.cpp" />
+    <ClCompile Include="VulcanEngine\DixUI\DixFpsCounter.cpp" />
+    <ClCompile Include="VulcanEngine\DixUI\DixTimeCounter.cpp" />
     <ClCompile Include="VulcanEngine\main.cpp" />
     <ClCompile Include="VulcanEngine\Model\DixImage\DixImage.cpp" />
     <ClCompile Include="VulcanEngine\Model\DixTexture\DixTexture.cpp" />
@@ -203,6 +205,7 @@
     <ClCompile Include="VulcanEngine\Pipeline\EngineDevice\EngineDevice.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\Pipeline\Pipeline.cpp" />
     <ClCompile Include="VulcanEngine\Pipeline\SwapChain\SwapChain.cpp" />
+    <ClCompile Include="VulcanEngine\UI\DixUIElement.cpp" />
     <ClCompile Include="VulcanEngine\UI\UiPipeline.cpp" />
     <ClCompile Include="VulcanEngine\UI\UIRenderer.cpp" />
     <ClCompile Include="VulcanEngine\Window\WindowClass\WindowClass.cpp" />
@@ -213,6 +216,8 @@
     <ClInclude Include="Dependecies\stb_image.h" />
     <ClInclude Include="Dependecies\tiny_obj_loader.h" />
     <ClInclude Include="VulcanEngine\DixCamera\FpsCounter\FpsCounter.hpp" />
+    <ClInclude Include="VulcanEngine\DixUI\DixFpsCounter.hpp" />
+    <ClInclude Include="VulcanEngine\DixUI\DixTimeCounter.hpp" />
     <ClInclude Include="VulcanEngine\Model\DixImage\DixImage.hpp" />
     <ClInclude Include="VulcanEngine\Model\DixTexture\DixTexture.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\DixDescriptors\DixDescriptors.hpp" />
@@ -230,6 +235,7 @@
     <ClInclude Include="VulcanEngine\Pipeline\PipelineManager\PipelineManager.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\Pipeline\Pipeline.hpp" />
     <ClInclude Include="VulcanEngine\Pipeline\SwapChain\SwapChain.hpp" />
+    <ClInclude Include="VulcanEngine\UI\DixUIElement.hpp" />
     <ClInclude Include="VulcanEngine\UI\IUIElement.hpp" />
     <ClInclude Include="VulcanEngine\UI\UIManager.hpp" />
     <ClInclude Include="VulcanEngine\UI\UiPipeline.hpp" />

@@ -10,11 +10,9 @@
 #include <cstdint>
 
 // libs
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 // optional custom vertex input descriptions
-#include <vector>
-#include <vulkan/vulkan.h>
 #include <vector>
 #include <cstdint>
 

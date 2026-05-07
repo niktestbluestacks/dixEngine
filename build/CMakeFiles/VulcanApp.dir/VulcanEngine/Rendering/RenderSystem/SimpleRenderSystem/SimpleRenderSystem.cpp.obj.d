@@ -399,6 +399,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Rendering/RenderSystem/SimpleRenderSystem/
  C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_structs.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/cstring \
  C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_funcs.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/memory \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_raw_storage_iter.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/align.h \

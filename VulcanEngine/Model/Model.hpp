@@ -5,6 +5,7 @@
 #include <Model/DixTexture/DixTexture.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
+#include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -36,8 +37,8 @@ public:
 	};
 
 	struct TextureInfo {
-		VkImageView view;
-		VkSampler sampler;
+		VkImageView view { VK_NULL_HANDLE };
+		VkSampler sampler { VK_NULL_HANDLE };
 	};
 
 	struct SubMesh {
@@ -58,8 +59,13 @@ public:
 
 		void loadModel(const std::string& filepath, EngineDevice& device);
 	};
-
-	Model(EngineDevice& dixDevice, const Model::Builder& builder);
+	
+	Model(
+		EngineDevice& dixDevice,
+		const Model::Builder& builder,
+		DixDescriptorPool& descriptorPool,
+		DixDescriptorSetLayout& descriptorSetLayout
+	);
 	~Model();
 
 	Model(const Model&) = delete;
@@ -70,11 +76,20 @@ public:
 
 	static std::unique_ptr <Model> createModelFromFile(
 		EngineDevice& engineDevice, 
-		const std::string& filepath);
+		const std::string& filepath,
+		DixDescriptorPool& descriptorPool,
+		DixDescriptorSetLayout& descriptorSetLayout
+	);
+
+	VkDescriptorSet getDescriptorSet() const { return m_descriptorSet; }
 
 private:
 	void createVertexBuffers(const std::vector <Vertex>& vertices);
 	void createIndexBuffers(const std::vector <uint32_t>& indices);
+	void createDescriptorSet(
+		DixDescriptorPool& descriptorPool, 
+		DixDescriptorSetLayout& descriptorSetLayout
+	);
 private:
 	EngineDevice& m_dixDevice;	// static?
 
@@ -86,7 +101,8 @@ private:
 	uint32_t indexCount;
 
 	TextureInfo m_textureInfo{};
-
+	DixTexture m_defaultTexture;
+	VkDescriptorSet m_descriptorSet{VK_NULL_HANDLE};	
 public:
 	const TextureInfo& getTextureInfo() const { return m_textureInfo; }
 };

@@ -50,6 +50,9 @@ public:
 	// 
 	void addUIElement(std::unique_ptr<DixUIElement> element);
 	// void addGameObject(std::unique_ptr<GameObject> object);
+	DixDescriptorPool& getDescriptorPool() { return *m_modelDescriptorPool; }
+	DixDescriptorSetLayout& getModelSetLayout() { return *m_modelSetLayout; }
+
 
 private:
 	Window m_Window;
@@ -62,6 +65,10 @@ private:
 	std::vector<std::unique_ptr<DixBuffer>> m_uboBuffers;
 	std::vector<VkDescriptorSet> m_globalDescriptorSets;
 
+ // per-model descriptor resources
+	std::unique_ptr<DixDescriptorPool> m_modelDescriptorPool;
+	std::unique_ptr<DixDescriptorSetLayout> m_modelSetLayout;
+
 	std::unique_ptr<SimpleRenderSystem> m_simpleRenderSystem;
     std::unique_ptr<dix::UIManager> m_uiManager;
     std::unique_ptr<dix::UIRenderer> m_uiRenderer;
@@ -71,6 +78,7 @@ private:
 	void createUBOs(); // New method to create UBOs
 	void createDescriptorSets(); // New method to create descriptor sets
 	void createRenderSystem(); // New method to create simple render system
+	void createModelDescriptorResources(); // New method to create per-model descriptor resources
 };
 
 } // namespace dix

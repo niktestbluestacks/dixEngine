@@ -25,24 +25,6 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     initialize();
     m_uiManager = std::make_unique<dix::UIManager>();
     m_uiRenderer = std::make_unique<dix::UIRenderer>(m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
-    // add fps counter UI element
-    // auto fps = std::make_unique<DixFpsCounter>(
-    //     DixUIInfo {
-    //         *m_uiRenderer,
-    //         m_Window.getExtent()
-    //         // "",
-    //         // "UI/font.txt",
-    //         // "UI/font02.tga"
-    //     }
-    // );
-    // m_uiManager->addElement(std::move(fps));
-    // auto timeCounter = std::make_unique<DixTimeCounter>(
-    //     DixUIInfo {
-    //         *m_uiRenderer,
-    //         m_Window.getExtent()
-    //     }
-    // );
-    // m_uiManager->addElement(std::move(timeCounter));
 }
 
 AppContext::~AppContext() {
@@ -57,6 +39,7 @@ void AppContext::initialize() {
         .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
         .build();
     createDescriptorSets();
+    createModelDescriptorResources();
     createRenderSystem();
 }
 
@@ -110,10 +93,23 @@ void AppContext::createRenderSystem() {
     m_simpleRenderSystem = std::make_unique<SimpleRenderSystem>(
         m_dixDevice,
         m_dixRenderer.getSwapChainRenderPass(),
-        m_globalSetLayout->getDescriptorSetLayout()
+        m_globalSetLayout->getDescriptorSetLayout(),
+        m_modelSetLayout->getDescriptorSetLayout()
     );
 }
 
+void AppContext::createModelDescriptorResources() {
+    // Create descriptor set layout for per-model textures (binding 1 only)
+    m_modelSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
+        .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+        .build();
+
+    // Create a large pool for model descriptor sets
+    m_modelDescriptorPool = DixDescriptorPool::Builder(m_dixDevice)
+        .setMaxSets(1000)
+        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000)
+        .build();
+}
 void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector<GameObject>& gameObjects) {
     // if window is minimized or has zero area, skip rendering to avoid Vulkan errors
     auto extent = m_Window.getExtent();

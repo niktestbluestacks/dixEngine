@@ -93,7 +93,9 @@ void FirstApp::loadGameObjects() {
 		DixLogDebug("Loading model: " + std::filesystem::absolute(entry).string());
 		std::shared_ptr <Model> dixModel = Model::createModelFromFile(
 				m_context.device(), 
-				std::filesystem::absolute(entry).string()
+				std::filesystem::absolute(entry).string(),
+				m_context.getDescriptorPool(),
+				m_context.getModelSetLayout()
 		);
 
 		auto gameObj = GameObject::createGameObject();

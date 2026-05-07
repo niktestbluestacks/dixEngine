@@ -15,14 +15,18 @@
 namespace dix {
 class SimpleRenderSystem {
 private:
-	void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
+        void createPipelineLayout(
+			VkDescriptorSetLayout globalSetLayout, 
+			VkDescriptorSetLayout modelSetLayout
+		);
 	void createPipeline(VkRenderPass renderPass);
 public:
 
 	SimpleRenderSystem(
 		EngineDevice& engineDeivce, 
 		VkRenderPass renderPass, 
-		VkDescriptorSetLayout globalSetLayout
+		VkDescriptorSetLayout globalSetLayout,
+		VkDescriptorSetLayout modelSetLayout
 	);
 	~SimpleRenderSystem(void);
 

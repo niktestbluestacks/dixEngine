@@ -2246,6 +2246,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Input/Keyboard/KeyboardController.cpp.obj:
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowClass.hpp \
   C:/VulkanSDK/1.4.341.1/include/vk_video/vulkan_video_codec_av1std.h \
@@ -3400,6 +3401,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Model/GameObject/GameObject.cpp.obj: C:/Bi
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowClass.hpp \
   C:/VulkanSDK/1.4.341.1/include/vk_video/vulkan_video_codec_av1std.h \
@@ -3870,6 +3872,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Model/Model.cpp.obj: C:/Big_projects/Game_
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Utils/Hash.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowClass.hpp \
@@ -5110,6 +5113,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/Pipeline/Pipeline.cpp.obj: C:/Big
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/DixTexture/DixTexture.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Pipeline/Pipeline.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowClass.hpp \
@@ -6314,6 +6318,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Rendering/RenderSystem/SimpleRenderSystem/
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/GameObject/GameObject.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Model/Model.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Buffer/DixBuffer.hpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/Pipeline/Pipeline.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp \

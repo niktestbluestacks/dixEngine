@@ -40,9 +40,15 @@ Model::Model(
 	createIndexBuffers(builder.indices);
 
 	// copy texture handles from builder into the model so renderer can access them
+	// if builder has valid texture, use it; otherwise use default
 	if (builder.texture.getImageView() != VK_NULL_HANDLE && builder.texture.getSampler() != VK_NULL_HANDLE) {
 			m_textureInfo.view = builder.texture.getImageView();
 			m_textureInfo.sampler = builder.texture.getSampler();
+	} else {
+		// Create default texture if builder doesn't have one
+		m_defaultTexture = createDefaultTexture(dixDevice);
+		m_textureInfo.view = m_defaultTexture.getImageView();
+		m_textureInfo.sampler = m_defaultTexture.getSampler();
 	}
 
 	createDescriptorSet(descriptorPool, descriptorSetLayout);
@@ -274,15 +280,23 @@ void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDev
 
 			std::string texPath = isAbsolute ? texName : (dir + texName);
 
-			texture = createTextureFromFile(texPath, dixDevice);
+			DixLogDebug("Texture name from MTL: " + texName);
+			DixLogDebug("Is absolute path: " + std::string(isAbsolute ? "true" : "false"));
+			DixLogDebug("Resolved texture path: " + texPath);
+
+			this->texture = createTextureFromFile(texPath, dixDevice);
+
+			DixLogDebug("Texture loaded successfully - ImageView: " + std::to_string(reinterpret_cast<uint64_t>(texture.getImageView()))
+			+ ", Sampler: " + std::to_string(reinterpret_cast<uint64_t>(texture.getSampler())));
+
 
 		} else {
             // no texture file – use the white fallback
-            texture = createDefaultTexture(dixDevice);
+            this->texture = createDefaultTexture(dixDevice);
         }
     } else {
         // no material – use the white fallback
-        texture = createDefaultTexture(dixDevice);
+        this->texture = createDefaultTexture(dixDevice);
     }
 }
 

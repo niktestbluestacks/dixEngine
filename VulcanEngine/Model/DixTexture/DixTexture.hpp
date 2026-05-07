@@ -36,7 +36,7 @@ private:
 };
 
 DixTexture createDefaultTexture(EngineDevice &dixDevice);
-DixTexture createTextureFromFile(std::string& path, EngineDevice& dixDevice);
+DixTexture createTextureFromFile(const std::string& path, EngineDevice& dixDevice);
 
 }   // namespace dix
 

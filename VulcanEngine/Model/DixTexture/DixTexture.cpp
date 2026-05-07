@@ -88,7 +88,7 @@ DixTexture createDefaultTexture(EngineDevice& dixDevice) {
     return { viewImage, viewMemory, view, sampler };
 }       
 
-DixTexture createTextureFromFile(std::string& path, EngineDevice& dixDevice) {
+DixTexture createTextureFromFile(const std::string& path, EngineDevice& dixDevice) {
     // Debug: log texture path
     DixLogDebug("Loading texture from: " + path);
     
@@ -104,8 +104,10 @@ DixTexture createTextureFromFile(std::string& path, EngineDevice& dixDevice) {
 
     const VkDeviceSize imageSize = texWidth * texHeight * 4;
 
+    VkDeviceSize instanceSize = 4; // RGBA8
+
     // 1. staging buffer
-    DixBuffer staging{dixDevice, 4, static_cast<uint32_t>(imageSize),
+    DixBuffer staging{dixDevice, instanceSize, static_cast<uint32_t>(imageSize),
                       VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                       VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                       VK_MEMORY_PROPERTY_HOST_COHERENT_BIT};
@@ -154,7 +156,13 @@ DixTexture createTextureFromFile(std::string& path, EngineDevice& dixDevice) {
     samplerInfo.maxLod = 0.0f;
 
     VkSampler sampler;
-    vkCreateSampler(dixDevice.device(), &samplerInfo, nullptr, &sampler);
+    if (vkCreateSampler(
+        dixDevice.device(),
+        &samplerInfo,
+        nullptr,
+        &sampler) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create sampler for texture: " + path);
+    }
 
     return { viewImage, viewMemory, view, sampler };
 }

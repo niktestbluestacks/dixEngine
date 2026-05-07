@@ -30,16 +30,22 @@ struct hash <dix::Model::Vertex> {
 }	// namespace std
 
 namespace dix {
-Model::Model(EngineDevice& dixDevice, const Model::Builder& builder) :
+Model::Model(
+		EngineDevice& dixDevice, 
+		const Model::Builder& builder, 
+		DixDescriptorPool& descriptorPool, 
+		DixDescriptorSetLayout& descriptorSetLayout) :
 		m_dixDevice{ dixDevice } {
 	createVertexBuffers(builder.vertices);
 	createIndexBuffers(builder.indices);
 
 	// copy texture handles from builder into the model so renderer can access them
 	if (builder.texture.getImageView() != VK_NULL_HANDLE && builder.texture.getSampler() != VK_NULL_HANDLE) {
-		m_textureInfo.view = builder.texture.getImageView();
-		m_textureInfo.sampler = builder.texture.getSampler();
+			m_textureInfo.view = builder.texture.getImageView();
+			m_textureInfo.sampler = builder.texture.getSampler();
 	}
+
+	createDescriptorSet(descriptorPool, descriptorSetLayout);
 }
 
 Model::~Model() {}
@@ -117,11 +123,13 @@ void Model::draw(VkCommandBuffer commandBuffer) {
 
 std::unique_ptr<Model> Model::createModelFromFile(
 		EngineDevice& dixDevice, 
-		const std::string& filepath) {
+		const std::string& filepath,
+		DixDescriptorPool& descriptorPool,
+		DixDescriptorSetLayout& descriptorSetLayout) {
 	Builder builder{};
 	builder.loadModel(filepath, dixDevice);
 
-	return std::make_unique <Model>(dixDevice, builder);
+	return std::make_unique <Model>(dixDevice, builder, descriptorPool, descriptorSetLayout);
 }
 
 void Model::bind(VkCommandBuffer commandBuffer) {
@@ -132,6 +140,20 @@ void Model::bind(VkCommandBuffer commandBuffer) {
 	if (m_hasIndexBuffer) {
 		vkCmdBindIndexBuffer(commandBuffer, m_indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 	}
+}
+
+void Model::createDescriptorSet(
+		DixDescriptorPool& descriptorPool, 
+		DixDescriptorSetLayout& descriptorSetLayout
+	) {
+	VkDescriptorImageInfo imageInfo{};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = m_textureInfo.view;
+	imageInfo.sampler = m_textureInfo.sampler;
+
+	DixDescriptorWriter(descriptorSetLayout, descriptorPool)
+		.writeImage(1, &imageInfo)
+		.build(m_descriptorSet);
 }
 
 std::vector<VkVertexInputBindingDescription> Model::Vertex::getBindingDescriptions() {

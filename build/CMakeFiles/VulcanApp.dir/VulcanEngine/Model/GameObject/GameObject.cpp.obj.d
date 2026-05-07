@@ -227,6 +227,35 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Model/GameObject/GameObject.cpp.obj: \
  C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_structs.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/cstring \
  C:/VulkanSDK/1.4.341.1/include/vulkan/vulkan_funcs.hpp \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.hpp \
+ C:/msys64/ucrt64/include/c++/16.1.0/memory \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_raw_storage_iter.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/align.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/unique_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ios \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.tcc \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/allocated_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/refwrap.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ext/aligned_buffer.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ext/concurrence.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_atomic.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/atomic_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/atomic_lockfree_defines.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/atomic_wait.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/backward/auto_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_uninitialized.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/out_ptr.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/indirect.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/pstl/glue_memory_defs.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/unordered_map \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/unordered_map.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/hashtable.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/hashtable_policy.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/node_handle.h \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/glm.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/_fixes.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/cmath \
@@ -276,14 +305,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Model/GameObject/GameObject.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/type_vec3.inl \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/compute_vector_decl.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/functional \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/refwrap.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/std_function.h \
- C:/msys64/ucrt64/include/c++/16.1.0/unordered_map \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/unordered_map.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/hashtable.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/hashtable_policy.h \
- C:/msys64/ucrt64/include/c++/16.1.0/ext/aligned_buffer.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/node_handle.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/binders.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/funcwrap.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/mofunc_impl.h \
@@ -396,27 +418,6 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Model/GameObject/GameObject.cpp.obj: \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/type_half.inl \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/integer.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/detail/func_integer.inl \
- C:/msys64/ucrt64/include/c++/16.1.0/memory \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_raw_storage_iter.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/align.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/unique_ptr.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h \
- C:/msys64/ucrt64/include/c++/16.1.0/ios \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_base.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/allocated_ptr.h \
- C:/msys64/ucrt64/include/c++/16.1.0/ext/concurrence.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/shared_ptr_atomic.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/atomic_base.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/atomic_lockfree_defines.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/atomic_wait.h \
- C:/msys64/ucrt64/include/c++/16.1.0/backward/auto_ptr.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_uninitialized.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/out_ptr.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/indirect.h \
- C:/msys64/ucrt64/include/c++/16.1.0/pstl/glue_memory_defs.h \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/matrix_transform.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/ext/matrix_projection.hpp \
  C:/Big_projects/Game_project/dixEngine/Dependecies/glm/gtc/constants.hpp \

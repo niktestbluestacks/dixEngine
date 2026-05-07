@@ -11,6 +11,7 @@
 // std
 #include <stdexcept>
 #include <cstdint>
+#include <array>
 
 namespace dix {
 
@@ -22,10 +23,11 @@ struct SimplePushConstantData {
 SimpleRenderSystem::SimpleRenderSystem(
 		EngineDevice& engineDevice, 
 		VkRenderPass renderPass, 
-		VkDescriptorSetLayout globalSetLayout) :
+		VkDescriptorSetLayout globalSetLayout,
+		VkDescriptorSetLayout modelSetLayout) :
 		m_dixDevice{ engineDevice } {
 
-	createPipelineLayout(globalSetLayout);
+	createPipelineLayout(globalSetLayout, modelSetLayout);
 	createPipeline(renderPass);
 }
 
@@ -33,19 +35,22 @@ SimpleRenderSystem::~SimpleRenderSystem() {
 	vkDestroyPipelineLayout(m_dixDevice.device(), m_pipelineLayout, nullptr);
 }
 
-void SimpleRenderSystem::createPipelineLayout(VkDescriptorSetLayout globalSetLayout) {
+void SimpleRenderSystem::createPipelineLayout(
+		VkDescriptorSetLayout globalSetLayout, 
+		VkDescriptorSetLayout modelSetLayout
+	) {
 
 	VkPushConstantRange pushConstantRange{};
 	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 	pushConstantRange.offset = 0;
 	pushConstantRange.size = sizeof(SimplePushConstantData);
 
-	std::vector <VkDescriptorSetLayout> descriptorSetLayout{ globalSetLayout };
+	std::vector <VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout, modelSetLayout };
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = static_cast <uint32_t> (descriptorSetLayout.size());
-	pipelineLayoutInfo.pSetLayouts = descriptorSetLayout.data();
+	pipelineLayoutInfo.setLayoutCount = static_cast <uint32_t> (descriptorSetLayouts.size());
+	pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 	pipelineLayoutInfo.pushConstantRangeCount = 1;
 	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
 	if (vkCreatePipelineLayout(m_dixDevice.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) !=
@@ -72,62 +77,58 @@ void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
 
 void SimpleRenderSystem::renderGameObjects(
 		FrameInfo& frameInfo,
-		std::vector <GameObject>& gameObjects) {
+		std::vector <GameObject>& gameObjects
+	) {
 	// bind pipeline
 	m_pipeline->bind(frameInfo.commandBuffer);
 
+
+	// First, collect all unique textures and prepare descriptor writes
+	// We need to update the descriptor set BEFORE binding it or use per-object descriptor sets
+	// For now, we'll update once per frame with the first object's texture, or use default
+
+	VkDescriptorImageInfo currentImageInfo{};
+	currentImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+	// Use the default texture from the descriptor set initially
+	// The descriptor set was already initialized with a default texture in AppContext::createDescriptorSets()
+	// So we just need to bind it - no need to update per-object unless you implement per-object descriptor sets
+
 	for (auto& obj : gameObjects) {
-		// If the object has a texture, update the global descriptor set's
-		// combined image sampler binding so the fragment shader samples the
-		// correct texture for this object.
-		if (obj.model) {
-			const auto& tex = obj.model->getTextureInfo();
-			if (tex.view != VK_NULL_HANDLE && tex.sampler != VK_NULL_HANDLE) {
-				VkDescriptorImageInfo imageInfo{};
-				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				imageInfo.imageView = tex.view;
-				imageInfo.sampler = tex.sampler;
-
-				VkWriteDescriptorSet write{};
-				write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				write.dstSet = frameInfo.globalDescriptorSet;
-				write.dstBinding = 1;
-				write.dstArrayElement = 0;
-				write.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				write.descriptorCount = 1;
-				write.pImageInfo = &imageInfo;
-
-				vkUpdateDescriptorSets(m_dixDevice.device(), 1, &write, 0, nullptr);
-			}
-		}
-
 		SimplePushConstantData push{};
-		push.modelMatrix = obj.transform.mat4();
-		push.normalMatrix = obj.transform.normalMatrix();
+                push.modelMatrix = obj.transform.mat4();
+                push.normalMatrix = obj.transform.normalMatrix();
 
-		vkCmdPushConstants(
-			frameInfo.commandBuffer,
-			m_pipelineLayout,
-			VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-			0,
-			sizeof(SimplePushConstantData),
-			&push);
+                vkCmdPushConstants(
+                        frameInfo.commandBuffer,
+                        m_pipelineLayout,
+                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+                        0,
+                        sizeof(SimplePushConstantData),
+                        &push);
 
-		// bind descriptor set for this object
-		vkCmdBindDescriptorSets (
-			frameInfo.commandBuffer,
-			VK_PIPELINE_BIND_POINT_GRAPHICS,
-			m_pipelineLayout,
-			0,
-			1,
-			&frameInfo.globalDescriptorSet,
-			0,
-			nullptr
-		);
+                // bind descriptor sets: set 0 = global UBO, set 1 = per-model texture
+                std::array<VkDescriptorSet, 2> descriptorSets{ frameInfo.globalDescriptorSet, VK_NULL_HANDLE };
+                if (obj.model) {
+                        descriptorSets[1] = obj.model->getDescriptorSet();
+                }
 
-		obj.model->bind(frameInfo.commandBuffer);
-		obj.model->draw(frameInfo.commandBuffer);
-	}
+                vkCmdBindDescriptorSets (
+                        frameInfo.commandBuffer,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS,
+                        m_pipelineLayout,
+                        0,
+                        static_cast<uint32_t>(descriptorSets.size()),
+                        descriptorSets.data(),
+                        0,
+                        nullptr
+                );
+
+                if (obj.model) {
+                        obj.model->bind(frameInfo.commandBuffer);
+                        obj.model->draw(frameInfo.commandBuffer);
+                }
+        }
 }
 
-} // namespace dix
+}	// namespace dix

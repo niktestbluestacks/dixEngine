@@ -1,0 +1,81 @@
+#ifndef PIPELINE_MANAGER_HPP
+#define PIPELINE_MANAGER_HPP
+
+// dix
+#include <Utils/Converter.hpp>
+#include <Pipeline/EngineDevice/EngineDevice.hpp>
+#include <Pipeline/Pipeline/Pipeline.hpp>
+#include <vulkan/vulkan.h> // add
+
+// std
+#include <string>
+#include <vector>
+#include <stdexcept>
+
+namespace dix {
+class ShaderModule;
+
+// ============  PipelineConfigInfo  ============
+// A tiny helper to keep all the pipeline build parameters together.
+// You can extend it to support compute, ray‑tracing, etc.
+// (Using PipelineConfigInfo from Pipeline.hpp)
+
+
+class PipelineManager {
+public:
+    PipelineManager(EngineDevice& device);
+    ~PipelineManager();
+
+    PipelineManager(const PipelineManager&) = delete;
+    PipelineManager& operator=(const PipelineManager&) = delete;
+
+    // Update createGraphicsPipeline signature to accept shader filepaths
+    void createGraphicsPipeline(const PipelineConfigInfo& config, const std::string& debugName = "");
+
+    // Getter – you’ll usually just ask for the pipeline.
+    VkPipeline getPipeline() const { return pipeline_; }
+
+private:
+    static std::vector<char> readFile(const std::string& filename);
+
+    static VkPipelineShaderStageCreateInfo makeShaderStage(VkShaderStageFlagBits stage,
+                                                          const std::vector<char>& code,
+                                                          const std::string& entryName = "main");
+
+    struct DescriptorSetLayoutBuilder {
+        DescriptorSetLayoutBuilder(EngineDevice& dev) : device_(dev) {}
+        DescriptorSetLayoutBuilder& addBinding(uint32_t binding,
+                                               VkDescriptorType type,
+                                               VkShaderStageFlags stages,
+                                               uint32_t descriptorCount = 1) {
+            VkDescriptorSetLayoutBinding layoutBinding{};
+            layoutBinding.binding = binding;
+            layoutBinding.descriptorType = type;
+            layoutBinding.descriptorCount = descriptorCount;
+            layoutBinding.stageFlags = stages;
+            layoutBinding.pImmutableSamplers = nullptr;
+            bindings_.push_back(layoutBinding);
+            return *this;
+        }
+        VkDescriptorSetLayout build() {
+            VkDescriptorSetLayoutCreateInfo layoutInfo{};
+            layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+            layoutInfo.bindingCount = static_cast<uint32_t>(bindings_.size());
+            layoutInfo.pBindings = bindings_.data();
+
+            VkDescriptorSetLayout layout;
+            if (vkCreateDescriptorSetLayout(device_.device(), &layoutInfo, nullptr, &layout) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create descriptor set layout!");
+            }
+            return layout;
+        }
+    private:
+        EngineDevice& device_;
+        std::vector<VkDescriptorSetLayoutBinding> bindings_;
+    };
+
+    EngineDevice& device_;
+    VkPipeline pipeline_ = VK_NULL_HANDLE;
+};
+}   // namespace dix
+#endif // PIPELINE_MANAGER_HPP

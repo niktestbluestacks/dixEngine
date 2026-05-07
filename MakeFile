@@ -1,0 +1,34 @@
+CXX := g++
+CXXFLAGS := -fdiagnostics-color=always -g -std=c++26 -mconsole -freflection
+LDFLAGS := -lglfw3 -lvulkan-1 -lgdi32 -lole32 -lshell32 -luser32
+
+# Directories
+BUILD_DIR := build
+SRC_DIRS := VulcanEngine Applications
+VK_INC := -IC:/VulkanSDK/1.4.341.1/Include
+VK_LIB := -LC:/VulkanSDK/1.4.341.1/Lib
+
+# Find all .cpp files
+SRCS := $(shell find $(SRC_DIRS) -name "*.cpp")
+OBJS := $(SRCS:$(SRC_DIRS)/%.cpp=$(BUILD_DIR)/%.o)
+TARGET := VulcanApp.exe
+
+# Include paths
+INCLUDES := -IApplications -IVulcanEngine -IDependencies $(VK_INC)
+
+all: $(TARGET)
+
+# Link
+$(TARGET): $(OBJS)
+	@mkdir -p $(dir $@)
+	$(CXX) $(OBJS) -o $@ $(LDFLAGS) $(VK_LIB)
+
+# Compile (Incremental: only if .cpp is newer than .o)
+$(BUILD_DIR)/%.o: $(SRC_DIRS)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+clean:
+	rm -rf $(BUILD_DIR) $(TARGET)
+
+.PHONY: all clean

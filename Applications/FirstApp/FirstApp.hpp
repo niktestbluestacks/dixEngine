@@ -1,27 +1,51 @@
 #ifndef _FIRST_APP_HPP
 #define _FIRST_APP_HPP
-
-#include <Window/WindowClass/WindowClass.hpp>
-#include <Pipeline/Pipeline/Pipeline.hpp>
+ 
+// dix
+#include <Model/GameObject/GameObject.hpp>
+#include <FirstApp/AppContext.hpp>
 #include <Utils/Converter.hpp>
-#include <Pipeline/EngineDevice/EngineDevice.hpp>
+// std
+#include <string>
+#include <vector>
+#include <string_view>
 
 namespace dix {
-	class FirstApp {
-	public:
-		static constexpr int WIDTH = 800;
-		static constexpr int HEIGHT = 600;
+class FirstApp {
+private:
+	void loadGameObjects(void);
+	void loadUIElements(void);
+private:
+	//void sierpinski(
+	//	std::vector <Model::Vertex>& vertecies,
+	//	int depth,
+	//	glm::vec2 left,
+	//	glm::vec2 right,
+	//	glm::vec2 top,
+	//	glm::vec3 leftColor,
+	//	glm::vec3 rightColor,
+	//	glm::vec3 topColor
+	//);
+public:
+	static constexpr int WIDTH = 800;
+	static constexpr int HEIGHT = 600;
+	static constexpr float MAX_FRAME_TIME = 0.05f;
+	static constexpr std::string_view MODEL_FILEPATH_RELATIVE = "Applications/models";
 
-		void run(void);
 
-	private:
-		Window m_window{ WIDTH, HEIGHT, static_cast <std::string> ("Vulkan") };
-		EngineDevice m_dixdevice{ m_window };
-		Pipeline m_pipeline{m_dixdevice,
-			dix::toShaderPath("SimpleShader/simple_shader.vert.spv"),
-			dix::toShaderPath("SimpleShader/simple_shader.frag.spv"),
-			Pipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
-	};
-}
+	FirstApp(void);
+	~FirstApp(void);
+
+	FirstApp(const FirstApp&) = delete;
+	FirstApp& operator=(const FirstApp&) = delete;
+
+	void run(void);
+
+private:
+    // application context encapsulates renderer/device/shader details
+	AppContext m_context{ WIDTH, HEIGHT, static_cast<std::string>("First Application") };
+	std::vector <GameObject> m_gameObjects;
+};
+}	// namespace dix
 
 #endif // _FIRST_APP_HPP

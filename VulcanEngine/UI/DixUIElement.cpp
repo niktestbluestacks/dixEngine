@@ -49,6 +49,7 @@ void DixUIElement::loadFontTxt(const std::string& path) {
         float u0,u1; 
         int px;
         ss >> code >> sym >> u0 >> u1 >> px;
+        if (sym == "space") sym = " ";
         char c = sym[0];
         m_glyphs[c] = DixGlyphInfo{u0,u1,px};
     }
@@ -87,7 +88,7 @@ void DixUIElement::loadFontAtlas(const std::string& path) {
     }
 }
 
-void DixUIElement::update(float dt) {
+void DixUIElement::update(float dt, const AdditionalUIInfo& additionalInfo) {
     // default implementation does nothing
 }
 

@@ -4,7 +4,7 @@
 #include <string>
 
 namespace dix {
-void DixTimeCounter::update(float dt) {
+void DixTimeCounter::update(float dt, const AdditionalUIInfo& additionalInfo) {
     m_currTime = Clock::now();
     auto timeT = Time::system_clock::to_time_t(m_currTime);
     static std::string lastText = "";

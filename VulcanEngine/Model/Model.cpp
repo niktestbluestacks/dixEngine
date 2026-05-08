@@ -262,7 +262,7 @@ void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDev
 	}
 
     if (loaded_with_texture && !materials.empty()) {
-		DixLogDebug("Number of materials: " + std::to_string(static_cast<int>(materials.size())));
+		DixLogDebug("Number of materials: {}", static_cast<int>(materials.size()));
         const tinyobj::material_t& mat = materials[0];
 		if (!mat.diffuse_texname.empty()) {
 			// Resolve texture path relative to the OBJ file directory unless
@@ -280,14 +280,14 @@ void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDev
 
 			std::string texPath = isAbsolute ? texName : (dir + texName);
 
-			DixLogDebug("Texture name from MTL: " + texName);
-			DixLogDebug("Is absolute path: " + std::string(isAbsolute ? "true" : "false"));
-			DixLogDebug("Resolved texture path: " + texPath);
+			DixLogDebug("Texture name from MTL: {}", texName);
+			DixLogDebug("Is absolute path: {}", std::string(isAbsolute ? "true" : "false"));
+			DixLogDebug("Resolved texture path: {}", texPath);
 
 			this->texture = createTextureFromFile(texPath, dixDevice);
 
-			DixLogDebug("Texture loaded successfully - ImageView: " + std::to_string(reinterpret_cast<uint64_t>(texture.getImageView()))
-			+ ", Sampler: " + std::to_string(reinterpret_cast<uint64_t>(texture.getSampler())));
+			DixLogDebug("Texture loaded successfully - ImageView: {}", std::to_string(reinterpret_cast<uint64_t>(texture.getImageView())));
+			DixLogDebug("Texture loaded successfully - Sampler: {}", std::to_string(reinterpret_cast<uint64_t>(texture.getSampler())));
 
 
 		} else {

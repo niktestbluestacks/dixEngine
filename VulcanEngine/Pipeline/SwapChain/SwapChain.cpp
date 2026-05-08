@@ -1,6 +1,8 @@
 // dix
 #include <Pipeline/SwapChain/SwapChain.hpp>
 
+#include <Logger/Logger.hpp>
+
 // std
 #include <array>
 #include <cstdlib>
@@ -390,15 +392,15 @@ VkPresentModeKHR SwapChain::chooseSwapPresentMode(
         const std::vector<VkPresentModeKHR>& availablePresentModes) {
     for (const auto& availablePresentMode : availablePresentModes) {
         if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
-            std::clog << "Present mode: Mailbox" << std::endl;
+            DixLogInfo("Present mode: Mailbox");
             return availablePresentMode;
         }
     }
-    std::clog << "Present mode: V-Sync" << std::endl;
+    DixLogInfo("Present mode: V-Sync");
 
     //for (const auto &availablePresentMode : availablePresentModes) {
     //    if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-    //        std::clog << "Present mode: Immediate" << std::endl;
+    //        DixLogInfo("Present mode: Immediate");
     //        return availablePresentMode;
     //    }
     //}

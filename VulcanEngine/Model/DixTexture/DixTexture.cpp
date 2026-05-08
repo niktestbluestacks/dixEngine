@@ -90,7 +90,7 @@ DixTexture createDefaultTexture(EngineDevice& dixDevice) {
 
 DixTexture createTextureFromFile(const std::string& path, EngineDevice& dixDevice) {
     // Debug: log texture path
-    DixLogDebug("Loading texture from: " + path);
+    DixLogDebug("Loading texture from: {}", path);
     
     // Verify file exists
     if (!std::filesystem::exists(path)) {

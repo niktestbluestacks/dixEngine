@@ -117,8 +117,11 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
 
     // always update UI (do this before acquiring swapchain image) so UI logic
     // runs even when swapchain recreation causes beginFrame() to return null
+    AdditionalUIInfo additionalInfo{
+        .playerPosition = gameObjects.empty() ? glm::vec3{0.f} : gameObjects[0].transform.translation
+    };
     if (m_uiManager) {
-        m_uiManager->update(frameTime);
+        m_uiManager->update(frameTime, additionalInfo);
     }
 
     if (auto commandBuffer = beginFrame()) {
@@ -148,7 +151,7 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
         beginSwapChainRenderPass(commandBuffer);
         m_simpleRenderSystem->renderGameObjects(
             const_cast<FrameInfo&>(frameInfo),
-             const_cast<std::vector<GameObject>&>(gameObjects));
+            const_cast<std::vector<GameObject>&>(gameObjects));
         // render UI
         if (m_uiManager && m_uiRenderer) {
             m_uiRenderer->bindPipeline(commandBuffer);

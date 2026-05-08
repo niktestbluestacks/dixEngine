@@ -12,7 +12,7 @@ public:
     DixFpsCounter(DixFpsCounter&& other);
     ~DixFpsCounter() override = default;
 
-    void update(float dt) override;
+    void update(float dt, const AdditionalUIInfo& additionalInfo) override;
 
 private:
     float m_acc = 0.f;

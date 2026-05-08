@@ -19,6 +19,10 @@ struct DixGlyphInfo {
     int px; 
 };
 
+struct AdditionalUIInfo{
+    glm::vec3 playerPosition;
+};
+
 struct DixUIInfo {
     UIRenderer& uiRenderer;
     VkExtent2D screenExtent;
@@ -39,7 +43,7 @@ protected:
     virtual void loadFontAtlas(const std::string& path);
 
 public:
-    virtual void update(float dt);
+    virtual void update(float dt, const AdditionalUIInfo& additionalInfo);
     // update CPU-side state
     virtual void render(FrameInfo& fi);
     // upload GPU resources for the upcoming frame (called after beginFrame)

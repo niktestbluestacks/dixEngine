@@ -8,6 +8,7 @@
 #include <Logger/Logger.hpp>
 #include <DixUI/DixFpsCounter.hpp>
 #include <DixUI/DixTimeCounter.hpp>
+#include <DixUI/DixPlayerInfo.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -127,6 +128,18 @@ void FirstApp::loadUIElements(void) {
 		}
     );
     m_context.addUIElement(std::move(timeCounter));
+
+	auto playerInfo = std::make_unique<DixPlayerInfo>(
+		DixUIInfo {
+			*m_context.getUIRenderer(),
+			m_context.getExtent(),
+			// "",
+			// "UI/font.txt",
+			// "UI/font02.tga" 
+		},
+		m_gameObjects.empty() ? glm::vec3{0.f} : m_gameObjects[0].transform.translation
+	);
+	m_context.addUIElement(std::move(playerInfo));
 }
 
 } // namespace dix

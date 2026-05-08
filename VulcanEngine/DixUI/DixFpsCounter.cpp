@@ -9,7 +9,7 @@ DixFpsCounter::DixFpsCounter(DixFpsCounter&& other) : DixUIElement(std::move(oth
         this->m_lastText = std::move(other.m_lastText);
 }
 
-void DixFpsCounter::update(float dt) {
+void DixFpsCounter::update(float dt, const AdditionalUIInfo& additionalInfo) {
     m_acc += dt; 
     ++m_frames;
     if (m_acc >= 1.0f) {

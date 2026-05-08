@@ -1,4 +1,0 @@
-C:/Big_projects/Game_project/dixEngine/build/CMakeFiles/Shaders.dir
-C:/Big_projects/Game_project/dixEngine/build/CMakeFiles/VulcanApp.dir
-C:/Big_projects/Game_project/dixEngine/build/CMakeFiles/edit_cache.dir
-C:/Big_projects/Game_project/dixEngine/build/CMakeFiles/rebuild_cache.dir

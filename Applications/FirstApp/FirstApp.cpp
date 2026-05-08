@@ -65,7 +65,7 @@ void FirstApp::run(void) {
 			m_context.drawFrame(dixcamera, frameTime, m_gameObjects);
 		}
 		catch (const std::exception& e) {
-			DixLogErr("Render error: " + static_cast <std::string> (e.what()));
+			DixLogErr("Render error: {}", e.what());
 			break; // exit run loop on fatal render errors
 		}
 	}

@@ -2,25 +2,12 @@
 #define SIMPLE_RENDER_SYSTEM_HPP
 
 // dix
-#include <DixCamera/DixCamera.hpp>
-#include <Pipeline/EngineDevice/EngineDevice.hpp>
-#include <Model/GameObject/GameObject.hpp>
-#include <Pipeline/Pipeline/Pipeline.hpp>
-#include <Utils/FrameInfo.hpp>
-
-// std
-#include <memory>
-#include <vector>
+#include <Rendering/RenderSystem/DixRenderSystem.hpp>
 
 namespace dix {
-class SimpleRenderSystem {
-private:
-        void createPipelineLayout(
-			VkDescriptorSetLayout globalSetLayout, 
-			VkDescriptorSetLayout modelSetLayout
-		);
-	void createPipeline(VkRenderPass renderPass);
+class SimpleRenderSystem : public DixRenderSystem {
 public:
+	using DixRenderSystem::DixRenderSystem;	// inherit constructors
 
 	SimpleRenderSystem(
 		EngineDevice& engineDeivce, 
@@ -28,22 +15,10 @@ public:
 		VkDescriptorSetLayout globalSetLayout,
 		VkDescriptorSetLayout modelSetLayout
 	);
-	~SimpleRenderSystem(void);
 
-	SimpleRenderSystem(const SimpleRenderSystem&) = delete;
-	SimpleRenderSystem& operator=(const SimpleRenderSystem&) = delete;
+	DIX_DISABLE_COPY(SimpleRenderSystem)
 
-	void renderGameObjects(
-		FrameInfo& frameInfo, 
-		std::vector <GameObject>& gameObjects
-	);
-
-private:
-	EngineDevice& m_dixDevice;
-
-    std::unique_ptr<Pipeline> m_pipeline;
-	VkPipelineLayout m_pipelineLayout;
-};
-}
+};	// class SimpleRenderSystem
+}	// namespace dix
 
 #endif // SIMPLE_RENDER_SYSTEM_HPP

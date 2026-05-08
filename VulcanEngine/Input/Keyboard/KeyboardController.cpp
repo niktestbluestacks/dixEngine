@@ -1,5 +1,6 @@
 // dix
 #include <Input/Keyboard/KeyboardController.hpp>
+#include <Logger/Logger.hpp>
 
 namespace dix {
 void KeyboardController::modeInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject) {
@@ -8,6 +9,13 @@ void KeyboardController::modeInPlaneXZ(GLFWwindow* window, float dt, GameObject&
 	if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;
 	if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) rotate.x += 1.f;
 	if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) rotate.x -= 1.f;
+
+	if (glfwGetKey(window, keys.speedUp) == GLFW_PRESS){
+		moveSpeed = std::min(maxMoveSpeed, moveSpeed + AccelerationCoefficient * dt);
+	}
+	else {
+		moveSpeed = std::max(minMoveSpeed, moveSpeed - AccelerationCoefficient * dt);
+	}
 
 	if (glm::dot(rotate, rotate) > std::numeric_limits<float>::epsilon()) {
 		gameObject.transform.rotation += lookSpeed * dt * glm::normalize(rotate);

@@ -19,6 +19,7 @@ public:
 		int lookRight = GLFW_KEY_RIGHT;
 		int lookUp = GLFW_KEY_UP;
 		int lookDown = GLFW_KEY_DOWN;
+		int speedUp = GLFW_KEY_LEFT_SHIFT;
 	};
 
 	void modeInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
@@ -31,6 +32,10 @@ public:
 	double lastMouseX{ 0.0 };
 	double lastMouseY{ 0.0 };
 	bool firstMouse{ true };
+
+	constexpr static float minMoveSpeed{ 3.f };
+	constexpr static float maxMoveSpeed{ 10.f };
+	constexpr static float AccelerationCoefficient{ 5.f };
 };
 }	// namespace dix
 #endif // KEYBOARD_CONTROLLER_HPP

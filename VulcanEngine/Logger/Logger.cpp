@@ -13,7 +13,7 @@ Logger& Logger::get() {
 	return instance;
 }
 
-void Logger::log(LogLevel level, const std::string& message) {
+void Logger::log(LogLevel level, const std::string message) {
     static auto start_time = std::chrono::system_clock::now();
     std::ostringstream oss;
 	oss << "[DIX ";

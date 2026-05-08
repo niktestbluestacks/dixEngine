@@ -1,17 +1,5 @@
 // dix
 #include <Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp>
-#include <Utils/Converter.hpp>
-
-// libs
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-
-// std
-#include <stdexcept>
-#include <cstdint>
-#include <array>
 
 namespace dix {
 
@@ -25,110 +13,19 @@ SimpleRenderSystem::SimpleRenderSystem(
 		VkRenderPass renderPass, 
 		VkDescriptorSetLayout globalSetLayout,
 		VkDescriptorSetLayout modelSetLayout) :
-		m_dixDevice{ engineDevice } {
-
-	createPipelineLayout(globalSetLayout, modelSetLayout);
-	createPipeline(renderPass);
-}
-
-SimpleRenderSystem::~SimpleRenderSystem() {
-	vkDestroyPipelineLayout(m_dixDevice.device(), m_pipelineLayout, nullptr);
-}
-
-void SimpleRenderSystem::createPipelineLayout(
-		VkDescriptorSetLayout globalSetLayout, 
-		VkDescriptorSetLayout modelSetLayout
-	) {
-
-	VkPushConstantRange pushConstantRange{};
-	pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-	pushConstantRange.offset = 0;
-	pushConstantRange.size = sizeof(SimplePushConstantData);
-
-	std::vector <VkDescriptorSetLayout> descriptorSetLayouts{ globalSetLayout, modelSetLayout };
-
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutInfo.setLayoutCount = static_cast <uint32_t> (descriptorSetLayouts.size());
-	pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
-	pipelineLayoutInfo.pushConstantRangeCount = 1;
-	pipelineLayoutInfo.pPushConstantRanges = &pushConstantRange;
-	if (vkCreatePipelineLayout(m_dixDevice.device(), &pipelineLayoutInfo, nullptr, &m_pipelineLayout) !=
-		VK_SUCCESS) {
-		throw std::runtime_error("failed to create pipelineLayout");
-	}
-}
-
-void SimpleRenderSystem::createPipeline(VkRenderPass renderPass) {
-	assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
-	PipelineConfigInfo pipelineConfig{};
-	Pipeline::defaultPipelineConfigInfo(pipelineConfig);
-
-	pipelineConfig.renderPass = renderPass;
-	pipelineConfig.pipelineLayout = m_pipelineLayout;
-
-	m_pipeline = std::make_unique<Pipeline>(
-		m_dixDevice,
-		// simple shaders are really simple XD
-		toShaderPath("SimpleShader/simple_shader.vert.spv"),
-		toShaderPath("SimpleShader/simple_shader.frag.spv"),
-		pipelineConfig);
-}
-
-void SimpleRenderSystem::renderGameObjects(
-		FrameInfo& frameInfo,
-		std::vector <GameObject>& gameObjects
-	) {
-	// bind pipeline
-	m_pipeline->bind(frameInfo.commandBuffer);
-
-
-	// First, collect all unique textures and prepare descriptor writes
-	// We need to update the descriptor set BEFORE binding it or use per-object descriptor sets
-	// For now, we'll update once per frame with the first object's texture, or use default
-
-	VkDescriptorImageInfo currentImageInfo{};
-	currentImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-	// Use the default texture from the descriptor set initially
-	// The descriptor set was already initialized with a default texture in AppContext::createDescriptorSets()
-	// So we just need to bind it - no need to update per-object unless you implement per-object descriptor sets
-
-	for (auto& obj : gameObjects) {
-		SimplePushConstantData push{};
-                push.modelMatrix = obj.transform.mat4();
-                push.normalMatrix = obj.transform.normalMatrix();
-
-                vkCmdPushConstants(
-                        frameInfo.commandBuffer,
-                        m_pipelineLayout,
-                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-                        0,
-                        sizeof(SimplePushConstantData),
-                        &push);
-
-                // bind descriptor sets: set 0 = global UBO, set 1 = per-model texture
-                std::array<VkDescriptorSet, 2> descriptorSets{ frameInfo.globalDescriptorSet, VK_NULL_HANDLE };
-                if (obj.model) {
-                        descriptorSets[1] = obj.model->getDescriptorSet();
-                }
-
-                vkCmdBindDescriptorSets (
-                        frameInfo.commandBuffer,
-                        VK_PIPELINE_BIND_POINT_GRAPHICS,
-                        m_pipelineLayout,
-                        0,
-                        static_cast<uint32_t>(descriptorSets.size()),
-                        descriptorSets.data(),
-                        0,
-                        nullptr
-                );
-
-                if (obj.model) {
-                        obj.model->bind(frameInfo.commandBuffer);
-                        obj.model->draw(frameInfo.commandBuffer);
-                }
-        }
-}
+		DixRenderSystem(
+			engineDevice,
+			renderPass,
+			globalSetLayout,
+			modelSetLayout,
+			"SimpleShader/simple_shader.vert.spv",
+			"SimpleShader/simple_shader.frag.spv",
+			sizeof(SimplePushConstantData),
+			[](void* pushConstantData, GameObject& obj) {
+				auto* simplePush = static_cast<SimplePushConstantData*>(pushConstantData);
+				simplePush->modelMatrix = obj.transform.mat4();
+				simplePush->normalMatrix = obj.transform.normalMatrix();
+			}
+		) {}
 
 }	// namespace dix

@@ -6,7 +6,7 @@
 
 namespace dix {
 template<typename... Args>
-std::string formatRuntime(const char* fmt, Args&&... args) {
+constexpr std::string formatRuntime(const char* fmt, Args&&... args) {
     if constexpr (sizeof...(args) == 0) {
         return std::string(fmt);
     } else {

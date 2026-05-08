@@ -1,8 +1,8 @@
 *.exe
 *.slnx
 *.vcxpoj
-*.filters
-*.user
+*.vcxproj.filters
+*.vcxproj.user
 .cache/
 .continue/
 .github/
@@ -10,3 +10,4 @@
 Debug/
 x64/
 build/
+Makefile

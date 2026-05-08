@@ -150,14 +150,12 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/EngineDevice/EngineDevice.cpp.obj
  C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_bvector.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/vector.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/formatfwd.h \
- C:/msys64/ucrt64/include/c++/16.1.0/cstring \
- C:/msys64/ucrt64/include/string.h \
- C:/msys64/ucrt64/include/sec_api/string_s.h \
- C:/msys64/ucrt64/include/c++/16.1.0/iostream \
- C:/msys64/ucrt64/include/c++/16.1.0/ostream \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h \
- C:/msys64/ucrt64/include/c++/16.1.0/ios \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ios_base.h \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
+ C:/msys64/ucrt64/include/c++/16.1.0/format \
+ C:/msys64/ucrt64/include/c++/16.1.0/array \
+ C:/msys64/ucrt64/include/c++/16.1.0/locale \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/functexcept.h \
  C:/msys64/ucrt64/include/c++/16.1.0/ext/atomicity.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/gthr.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/gthr-default.h \
@@ -174,25 +172,19 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/EngineDevice/EngineDevice.cpp.obj
  C:/msys64/ucrt64/include/sched.h \
  C:/msys64/ucrt64/include/pthread_unistd.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/atomic_word.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/functexcept.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/system_error \
- C:/msys64/ucrt64/include/c++/16.1.0/stdexcept \
- C:/msys64/ucrt64/include/c++/16.1.0/streambuf \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets.h \
  C:/msys64/ucrt64/include/c++/16.1.0/cwctype \
  C:/msys64/ucrt64/include/wctype.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/ctype_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ios_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/system_error \
+ C:/msys64/ucrt64/include/c++/16.1.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/16.1.0/streambuf \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf_iterator.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/ctype_inline.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/format \
- C:/msys64/ucrt64/include/c++/16.1.0/array \
- C:/msys64/ucrt64/include/c++/16.1.0/locale \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.h \
  C:/msys64/ucrt64/include/c++/16.1.0/ctime \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/time_members.h \
@@ -212,6 +204,15 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/EngineDevice/EngineDevice.cpp.obj
  C:/msys64/ucrt64/include/c++/16.1.0/bits/uniform_int_dist.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_tempbuf.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode-data.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/cstring \
+ C:/msys64/ucrt64/include/string.h \
+ C:/msys64/ucrt64/include/sec_api/string_s.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/iostream \
+ C:/msys64/ucrt64/include/c++/16.1.0/ostream \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ios \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_print.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/istream \

@@ -1,15 +1,12 @@
 CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:\Big_projects\Game_project\dixEngine\VulcanEngine\Logger\Logger.cpp \
  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
- C:/msys64/ucrt64/include/c++/16.1.0/string \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/requires_hosted.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/string_view \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/version.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/c++config.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/os_defines.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/cpu_defines.h \
  C:/msys64/ucrt64/include/c++/16.1.0/pstl/pstl_config.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stringfwd.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/memoryfwd.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/version.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/char_traits.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/postypes.h \
  C:/msys64/ucrt64/include/c++/16.1.0/cwchar \
@@ -44,49 +41,52 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_iterator_base_funcs.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/concept_check.h \
  C:/msys64/ucrt64/include/c++/16.1.0/debug/assertions.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throw.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throwfwd.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/functional_hash.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/hash_bytes.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/range_access.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/initializer_list \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_iterator.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/cpp_type_traits.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ext/type_traits.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/utility.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/invoke.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_algobase.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ext/numeric_traits.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_pair.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/debug/debug.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/predefined_ops.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_function.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/backward/binders.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bit \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/max_size_type.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/numbers \
+ C:/msys64/ucrt64/include/c++/16.1.0/limits \
+ C:/msys64/ucrt64/include/c++/16.1.0/iosfwd \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/requires_hosted.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/stringfwd.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/memoryfwd.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_insert.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/cxxabi_forced.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/string_view.tcc \
+ C:/msys64/ucrt64/include/c++/16.1.0/string \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/allocator.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/c++allocator.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/new_allocator.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/new_throw.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/cpp_type_traits.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/localefwd.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/c++locale.h \
  C:/msys64/ucrt64/include/c++/16.1.0/clocale \
  C:/msys64/ucrt64/include/locale.h C:/msys64/ucrt64/include/stdio.h \
  C:/msys64/ucrt64/include/sec_api/stdio_s.h \
- C:/msys64/ucrt64/include/c++/16.1.0/iosfwd \
  C:/msys64/ucrt64/include/c++/16.1.0/cctype \
  C:/msys64/ucrt64/include/ctype.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_insert.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/cxxabi_forced.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_iterator.h \
- C:/msys64/ucrt64/include/c++/16.1.0/ext/type_traits.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/utility.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/invoke.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_function.h \
- C:/msys64/ucrt64/include/c++/16.1.0/backward/binders.h \
- C:/msys64/ucrt64/include/c++/16.1.0/ext/numeric_traits.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throw.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stdexcept_throwfwd.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_algobase.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_pair.h \
- C:/msys64/ucrt64/include/c++/16.1.0/debug/debug.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/predefined_ops.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bit \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/range_access.h \
- C:/msys64/ucrt64/include/c++/16.1.0/initializer_list \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/erase_if.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_string.h \
  C:/msys64/ucrt64/include/c++/16.1.0/ext/alloc_traits.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/alloc_traits.h \
- C:/msys64/ucrt64/include/c++/16.1.0/string_view \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/functional_hash.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/hash_bytes.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_base.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/max_size_type.h \
- C:/msys64/ucrt64/include/c++/16.1.0/numbers \
- C:/msys64/ucrt64/include/c++/16.1.0/limits \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/string_view.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_algobase.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/ranges_util.h \
  C:/msys64/ucrt64/include/c++/16.1.0/charconv \
@@ -119,11 +119,11 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/uses_allocator.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/16.1.0/tuple \
- C:/msys64/ucrt64/include/c++/16.1.0/iostream \
- C:/msys64/ucrt64/include/c++/16.1.0/ostream \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h \
- C:/msys64/ucrt64/include/c++/16.1.0/ios \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/ios_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/format \
+ C:/msys64/ucrt64/include/c++/16.1.0/array \
+ C:/msys64/ucrt64/include/c++/16.1.0/locale \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/functexcept.h \
  C:/msys64/ucrt64/include/c++/16.1.0/ext/atomicity.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/gthr.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/gthr-default.h \
@@ -140,25 +140,19 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/sched.h \
  C:/msys64/ucrt64/include/pthread_unistd.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/atomic_word.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.h \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/functexcept.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_classes.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/system_error \
- C:/msys64/ucrt64/include/c++/16.1.0/stdexcept \
- C:/msys64/ucrt64/include/c++/16.1.0/streambuf \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets.h \
  C:/msys64/ucrt64/include/c++/16.1.0/cwctype \
  C:/msys64/ucrt64/include/wctype.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/ctype_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ios_base.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/system_error \
+ C:/msys64/ucrt64/include/c++/16.1.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/16.1.0/streambuf \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/streambuf_iterator.h \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/ctype_inline.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.tcc \
- C:/msys64/ucrt64/include/c++/16.1.0/format \
- C:/msys64/ucrt64/include/c++/16.1.0/array \
- C:/msys64/ucrt64/include/c++/16.1.0/locale \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/locale_facets_nonio.h \
  C:/msys64/ucrt64/include/c++/16.1.0/ctime \
  C:/msys64/ucrt64/include/c++/16.1.0/x86_64-w64-mingw32/bits/time_members.h \
@@ -181,6 +175,12 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Logger/Logger.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/uniform_int_dist.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/stl_tempbuf.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/unicode-data.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/iostream \
+ C:/msys64/ucrt64/include/c++/16.1.0/ostream \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/ios \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.h \
+ C:/msys64/ucrt64/include/c++/16.1.0/bits/basic_ios.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_print.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream.tcc \
  C:/msys64/ucrt64/include/c++/16.1.0/istream \

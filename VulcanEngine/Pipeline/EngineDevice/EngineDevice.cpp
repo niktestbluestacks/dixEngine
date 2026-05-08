@@ -1,6 +1,8 @@
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
+#include <Logger/Logger.hpp>
+
 // std
 #include <cstring>
 #include <iostream>
@@ -12,11 +14,12 @@ namespace dix {
 
 // local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
-    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-    void* pUserData) {
-    std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+        VkDebugUtilsMessageTypeFlagsEXT messageType,
+        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+        void* pUserData
+    ) {
+    DixLogWarn("validation layer: ");
 
     return VK_FALSE;
 }
@@ -118,7 +121,9 @@ void EngineDevice::pickPhysicalDevice() {
     if (deviceCount == 0) {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
-    std::cout << "Device count: " << deviceCount << std::endl;
+    if (enableValidationLayers) {
+        DixLogDebug("Device count: ");
+    }
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
@@ -134,7 +139,9 @@ void EngineDevice::pickPhysicalDevice() {
     }
 
     vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-    std::cout << "physical device: " << properties.deviceName << std::endl;
+    if (enableValidationLayers) {
+        DixLogDebug("physical device: ", properties.deviceName);
+    }
 }
 
 void EngineDevice::createLogicalDevice() {
@@ -285,17 +292,25 @@ void EngineDevice::hasGflwRequiredInstanceExtensions() {
     std::vector<VkExtensionProperties> extensions(extensionCount);
     vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, extensions.data());
 
-    std::cout << "available extensions:" << std::endl;
+    if (enableValidationLayers) {
+        DixLogDebug("available extensions:");
+    }
     std::unordered_set<std::string> available;
     for (const auto& extension : extensions) {
-        std::cout << "\t" << extension.extensionName << std::endl;
+        if (enableValidationLayers) {
+            DixLogDebug("\t{}", extension.extensionName);
+        }
         available.insert(extension.extensionName);
     }
 
-    std::cout << "required extensions:" << std::endl;
+    if (enableValidationLayers) {
+        DixLogDebug("required extensions:");
+    }
     auto requiredExtensions = getRequiredExtensions();
     for (const auto& required : requiredExtensions) {
-        std::cout << "\t" << required << std::endl;
+        if (enableValidationLayers) {
+            DixLogDebug("\t{}", required);
+        }
         if (available.find(required) == available.end()) {
             throw std::runtime_error("Missing required glfw extension");
         }

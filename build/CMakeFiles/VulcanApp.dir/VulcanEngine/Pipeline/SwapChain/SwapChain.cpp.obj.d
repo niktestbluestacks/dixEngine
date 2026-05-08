@@ -246,6 +246,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/SwapChain/SwapChain.cpp.obj: \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/out_ptr.h \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/indirect.h \
  C:/msys64/ucrt64/include/c++/16.1.0/pstl/glue_memory_defs.h \
+ C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
  C:/msys64/ucrt64/include/c++/16.1.0/iostream \
  C:/msys64/ucrt64/include/c++/16.1.0/ostream \
  C:/msys64/ucrt64/include/c++/16.1.0/bits/ostream_print.h \

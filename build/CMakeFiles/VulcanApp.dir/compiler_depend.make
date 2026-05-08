@@ -4745,6 +4745,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/DixDescriptors/DixDescriptors.cpp
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/syslimits.h
 
 CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/EngineDevice/EngineDevice.cpp.obj: C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.cpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowClass.hpp \
   C:/VulkanSDK/1.4.341.1/include/vk_video/vulkan_video_codec_av1std.h \
@@ -5910,6 +5911,7 @@ CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/ShaderModule/ShaderModule.cpp.obj
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/16.1.0/include/syslimits.h
 
 CMakeFiles/VulcanApp.dir/VulcanEngine/Pipeline/SwapChain/SwapChain.cpp.obj: C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/SwapChain/SwapChain.cpp \
+  C:/Big_projects/Game_project/dixEngine/VulcanEngine/Logger/Logger.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/EngineDevice/EngineDevice.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Pipeline/SwapChain/SwapChain.hpp \
   C:/Big_projects/Game_project/dixEngine/VulcanEngine/Window/WindowClass/WindowClass.hpp \

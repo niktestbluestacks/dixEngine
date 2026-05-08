@@ -90,7 +90,7 @@ void FirstApp::loadGameObjects() {
 		  std::filesystem::absolute(entry.path()).string().back() == 'l') {
 			continue;
 		}
-		DixLogDebug("Loading model: " + std::filesystem::absolute(entry).string());
+		DixLogDebug("Loading model: {}", std::filesystem::absolute(entry).string());
 		std::shared_ptr <Model> dixModel = Model::createModelFromFile(
 				m_context.device(), 
 				std::filesystem::absolute(entry).string(),

@@ -110,7 +110,12 @@ void AppContext::createModelDescriptorResources() {
         .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000)
         .build();
 }
-void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector<GameObject>& gameObjects) {
+void AppContext::drawFrame(
+        DixCamera& camera, 
+        float frameTime, 
+        const std::vector<GameObject>& gameObjects, 
+        const glm::vec3& playerPosition
+    ) {
     // if window is minimized or has zero area, skip rendering to avoid Vulkan errors
     auto extent = m_Window.getExtent();
     if (extent.width == 0 || extent.height == 0) return;
@@ -118,7 +123,7 @@ void AppContext::drawFrame(DixCamera& camera, float frameTime, const std::vector
     // always update UI (do this before acquiring swapchain image) so UI logic
     // runs even when swapchain recreation causes beginFrame() to return null
     AdditionalUIInfo additionalInfo{
-        .playerPosition = gameObjects.empty() ? glm::vec3{0.f} : gameObjects[0].transform.translation
+        .playerPosition = playerPosition
     };
     if (m_uiManager) {
         m_uiManager->update(frameTime, additionalInfo);

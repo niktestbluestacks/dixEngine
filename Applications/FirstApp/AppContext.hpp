@@ -45,7 +45,12 @@ public:
 	EngineDevice& device() { return m_dixDevice; }
 
 	// draw helper which hides rendering/shader details from the app
-	void drawFrame(DixCamera& camera, float frameTime, const std::vector<GameObject>& gameObjects);
+	void drawFrame(
+		DixCamera& camera, 
+		float frameTime, 
+		const std::vector<GameObject>& gameObjects, 
+		const glm::vec3& playerPosition
+	);
 
 	// 
 	void addUIElement(std::unique_ptr<DixUIElement> element);

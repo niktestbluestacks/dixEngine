@@ -14,6 +14,7 @@ int main() {
 	}
 	catch (const std::exception& e) {
 		DixLogErr(e.what());
+		app.~FirstApp();
 		return EXIT_FAILURE;
 	}
 	return EXIT_SUCCESS;

@@ -107,7 +107,7 @@ void FirstApp::loadGameObjects() {
 		gameObj.model = dixModel;
 		gameObj.transform.translation = { dist(gen), dist(gen), dist(gen) };
 		gameObj.transform.scale = { 1.f, 1.f, 1.f };
-		m_gameObjects.push_back(std::move(gameObj));
+		m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
 	}
 }
 

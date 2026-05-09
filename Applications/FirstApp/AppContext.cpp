@@ -90,7 +90,7 @@ void AppContext::createDescriptorSets() {
 }
 
 void AppContext::createRenderSystem() {
-    m_simpleRenderSystem = std::make_unique<SimpleRenderSystem>(
+    m_renderSystems["SimpleRenderSystem"] = std::make_unique<SimpleRenderSystem>(
         m_dixDevice,
         m_dixRenderer.getSwapChainRenderPass(),
         m_globalSetLayout->getDescriptorSetLayout(),
@@ -113,7 +113,7 @@ void AppContext::createModelDescriptorResources() {
 void AppContext::drawFrame(
         DixCamera& camera, 
         float frameTime, 
-        const std::vector<GameObject>& gameObjects, 
+        std::unordered_map<std::string, std::vector<GameObject>>& gameObjects, 
         const glm::vec3& playerPosition
     ) {
     // if window is minimized or has zero area, skip rendering to avoid Vulkan errors
@@ -154,9 +154,9 @@ void AppContext::drawFrame(
 
         // render
         beginSwapChainRenderPass(commandBuffer);
-        m_simpleRenderSystem->renderGameObjects(
-            const_cast<FrameInfo&>(frameInfo),
-            const_cast<std::vector<GameObject>&>(gameObjects));
+        for (auto& [renderSystemName, objects] : gameObjects) {
+            m_renderSystems[renderSystemName]->renderGameObjects(frameInfo, objects);
+        }
         // render UI
         if (m_uiManager && m_uiRenderer) {
             m_uiRenderer->bindPipeline(commandBuffer);

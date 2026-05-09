@@ -2,6 +2,7 @@
 #define APP_CONTEXT_HPP
 
 // dix
+#include "Rendering/RenderSystem/DixRenderSystem.hpp"
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
@@ -17,6 +18,7 @@
 
 // std
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 namespace dix {
@@ -48,7 +50,7 @@ public:
 	void drawFrame(
 		DixCamera& camera, 
 		float frameTime, 
-		const std::vector<GameObject>& gameObjects, 
+		std::unordered_map<std::string, std::vector<GameObject>>& gameObjects, 
 		const glm::vec3& playerPosition
 	);
 
@@ -74,7 +76,7 @@ private:
 	std::unique_ptr<DixDescriptorPool> m_modelDescriptorPool;
 	std::unique_ptr<DixDescriptorSetLayout> m_modelSetLayout;
 
-	std::unique_ptr<SimpleRenderSystem> m_simpleRenderSystem;
+	std::unordered_map<std::string, std::unique_ptr<DixRenderSystem>> m_renderSystems;
     std::unique_ptr<dix::UIManager> m_uiManager;
     std::unique_ptr<dix::UIRenderer> m_uiRenderer;
     // default fallback texture used for models when a mesh has no texture

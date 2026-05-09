@@ -48,7 +48,7 @@ private:
 		HEIGHT, 
 		static_cast<std::string>("First Application")
 	) };
-	std::vector <GameObject> m_gameObjects;
+	std::unordered_map<std::string, std::vector<GameObject>> m_gameObjects;
 	glm::vec3 playerPosition{ -1.f, -2.f, 2.f };
 };
 }	// namespace dix

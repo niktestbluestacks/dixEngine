@@ -13,11 +13,6 @@
 
 namespace dix {
 
-struct GlobalUbo {
-    alignas(16) glm::mat4 projectionView{ 1.f };
-    alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
-};
-
 AppContext::AppContext(int width, int height, const std::string& title) :
     m_Window{ width, height, title },
     m_dixDevice{ m_Window },
@@ -32,15 +27,17 @@ AppContext::~AppContext() {
 }
 
 void AppContext::initialize() {
+    declareRenderSystems();
     createDescriptorPool();
     createUBOs();
-    m_globalSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
-        .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
-        .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-        .build();
+    createSystemSetLayouts();
     createDescriptorSets();
     createModelDescriptorResources();
     createRenderSystem();
+}
+
+void AppContext::declareRenderSystems() {
+    DIX_RSR.declareRenderSystem<SimpleUbo>("SimpleRenderSystem");
 }
 
 void AppContext::createDescriptorPool() {
@@ -56,46 +53,58 @@ void AppContext::createDescriptorPool() {
 }
 
 void AppContext::createUBOs() {
-    m_uboBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (auto& buf : m_uboBuffers) {
+    for (auto & [renderSystemName, renderInfo] : DIX_RSR.getRenderSystems()) {
+        m_systemUboBuffers[renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (auto& buf : m_systemUboBuffers[renderSystemName]) {
+        auto uboInfo = DIX_RSR.getUboTypeInfo(renderSystemName);
+        assert(uboInfo.size % 16 == 0 && "GlobalUbo size must be a alligned to 16 bytes!");
         buf = std::make_unique<DixBuffer>(
             m_dixDevice,
-            sizeof(GlobalUbo),
+            uboInfo.size,
             1,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
         );
         buf->map();
+        }
     }
 }
 
-void AppContext::createDescriptorSets() {
-    m_globalDescriptorSets.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+void AppContext::createSystemSetLayouts() {
+    // All of layouts must be created manually
+    m_systemSetLayouts["SimpleRenderSystem"] = DixDescriptorSetLayout::Builder(m_dixDevice)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+        .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+        .build();
+}
 
+void AppContext::createDescriptorSets() {
     // Ensure we have a valid default texture to bind for models that don't provide one.
     m_defaultTexture = createDefaultTexture(m_dixDevice);
+    for (auto& [renderSystemName, renderInfo] : DIX_RSR.getRenderSystems()) {
+        m_systemDescriptorSets[renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        VkDescriptorImageInfo imageInfo{};
+        imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        imageInfo.imageView = m_defaultTexture.getImageView();
+        imageInfo.sampler = m_defaultTexture.getSampler();
 
-    VkDescriptorImageInfo imageInfo{};
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = m_defaultTexture.getImageView();
-    imageInfo.sampler = m_defaultTexture.getSampler();
-
-    for (size_t i = 0; i < m_globalDescriptorSets.size(); ++i) {
-        auto bufferInfo = m_uboBuffers[i]->descriptorInfo();
-        DixDescriptorWriter(*m_globalSetLayout, *m_globalPool)
-            .writeBuffer(0, &bufferInfo)
-            .writeImage(1, &imageInfo)
-            .build(m_globalDescriptorSets[i]);
+            for (size_t i = 0; i < m_systemDescriptorSets[renderSystemName].size(); ++i) {
+                auto bufferInfo = m_systemUboBuffers[renderSystemName][i]->descriptorInfo();
+                DixDescriptorWriter(*m_systemSetLayouts[renderSystemName], *m_globalPool)
+                    .writeBuffer(0, &bufferInfo)
+                    .writeImage(1, &imageInfo)
+                    .build(m_systemDescriptorSets[renderSystemName][i]);
+            }
     }
 }
 
 void AppContext::createRenderSystem() {
-    m_renderSystems["SimpleRenderSystem"] = std::make_unique<SimpleRenderSystem>(
+    DIX_RSR.registerRenderSystem<SimpleRenderSystem, SimpleUbo>("SimpleRenderSystem", {
         m_dixDevice,
         m_dixRenderer.getSwapChainRenderPass(),
-        m_globalSetLayout->getDescriptorSetLayout(),
+        m_systemSetLayouts["SimpleRenderSystem"]->getDescriptorSetLayout(),
         m_modelSetLayout->getDescriptorSetLayout()
-    );
+    });
 }
 
 void AppContext::createModelDescriptorResources() {
@@ -128,54 +137,54 @@ void AppContext::drawFrame(
     if (m_uiManager) {
         m_uiManager->update(frameTime, additionalInfo);
     }
-
-    if (auto commandBuffer = beginFrame()) {
-        int frameIndex = getFrameIndex();
-        FrameInfo frameInfo{
-            frameIndex,
-            frameTime,
-            commandBuffer,
-            camera,
-            m_globalDescriptorSets[frameIndex],
-            m_Window.getExtent()
-        };
-        // allow UI elements to upload per-frame resources now that a frame and command buffer exist
-        if (m_uiManager) {
-            m_uiManager->upload(frameInfo);
-        }
-
-        // update global ubo for this frame
-        GlobalUbo ubo{};
-        ubo.projectionView = camera.getProjection() * camera.getView();
-        m_uboBuffers[frameIndex]->writeToIndex(&ubo, 0);
-        m_uboBuffers[frameIndex]->flush();
-
-        // UI was already updated before acquiring the swapchain image
-
-        // render
-        beginSwapChainRenderPass(commandBuffer);
-        for (auto& [renderSystemName, objects] : gameObjects) {
-            m_renderSystems[renderSystemName]->renderGameObjects(frameInfo, objects);
-        }
-        // render UI
-        if (m_uiManager && m_uiRenderer) {
-            m_uiRenderer->bindPipeline(commandBuffer);
-            // push screen size to UI vertex shader (vec2)
-            float screenSize[2] = { 
-                static_cast<float>(m_Window.getExtent().width),
-                static_cast<float>(m_Window.getExtent().height)
-            };
-            vkCmdPushConstants(
+    for (const auto &[renderSystemName, renderInfo] : DIX_RSR.getRenderSystems()) {
+        const auto& [renderSystem, uboInfo] = renderInfo;
+        if (auto commandBuffer = beginFrame()) {
+            int frameIndex = getFrameIndex();
+            FrameInfo frameInfo{
+                frameIndex,
+                frameTime,
                 commandBuffer,
-                m_uiRenderer->getPipelineLayout(),
-                VK_SHADER_STAGE_VERTEX_BIT,
-                0,
-                sizeof(screenSize),
-                &screenSize);
-            m_uiManager->render(frameInfo);
+                camera,
+                m_systemDescriptorSets[renderSystemName][frameIndex],
+                m_Window.getExtent()
+            };
+            // allow UI elements to upload per-frame resources now that a frame and command buffer exist
+            if (m_uiManager) {
+                m_uiManager->upload(frameInfo);
+            }
+
+            // update global ubo for this frame
+            SimpleRenderSystem::GlobalUbo ubo{};
+            ubo.projectionView = camera.getProjection() * camera.getView();
+            m_systemUboBuffers[renderSystemName][frameIndex]->writeToIndex(&ubo, 0);
+            m_systemUboBuffers[renderSystemName][frameIndex]->flush();
+
+            // UI was already updated before acquiring the swapchain image
+
+            // render
+            beginSwapChainRenderPass(commandBuffer);
+            DIX_RSR.getRenderSystem(renderSystemName)->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
+            // render UI
+            if (m_uiManager && m_uiRenderer) {
+                m_uiRenderer->bindPipeline(commandBuffer);
+                // push screen size to UI vertex shader (vec2)
+                float screenSize[2] = { 
+                    static_cast<float>(m_Window.getExtent().width),
+                    static_cast<float>(m_Window.getExtent().height)
+                };
+                vkCmdPushConstants(
+                    commandBuffer,
+                    m_uiRenderer->getPipelineLayout(),
+                    VK_SHADER_STAGE_VERTEX_BIT,
+                    0,
+                    sizeof(screenSize),
+                    &screenSize);
+                m_uiManager->render(frameInfo);
+            }
+            endSwapChainRenderPass(commandBuffer);
+            endFrame();
         }
-        endSwapChainRenderPass(commandBuffer);
-        endFrame();
     }
 }
 

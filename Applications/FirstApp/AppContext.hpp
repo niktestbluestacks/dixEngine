@@ -2,7 +2,6 @@
 #define APP_CONTEXT_HPP
 
 // dix
-#include "Rendering/RenderSystem/DixRenderSystem.hpp"
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
@@ -28,7 +27,7 @@ public:
 	AppContext(int width, int height, const std::string& title);
 	~AppContext();
 
-	void initialize(); // New method to initialize resources
+	void initialize(); 
 	// window/input
 	bool shouldClose() { return m_Window.shouldClose(); }
 	void pollEvents() { glfwPollEvents(); }
@@ -60,7 +59,6 @@ public:
 	DixDescriptorPool& getDescriptorPool() { return *m_modelDescriptorPool; }
 	DixDescriptorSetLayout& getModelSetLayout() { return *m_modelSetLayout; }
 
-
 private:
 	Window m_Window;
 	EngineDevice m_dixDevice;
@@ -68,15 +66,15 @@ private:
 
 	// rendering resources
 	std::unique_ptr<DixDescriptorPool> m_globalPool;
-	std::unique_ptr<DixDescriptorSetLayout> m_globalSetLayout;
-	std::vector<std::unique_ptr<DixBuffer>> m_uboBuffers;
-	std::vector<VkDescriptorSet> m_globalDescriptorSets;
+
+	std::unordered_map<std::string, std::vector<std::unique_ptr<DixBuffer>>> m_systemUboBuffers;
+	std::unordered_map<std::string, std::unique_ptr<DixDescriptorSetLayout>> m_systemSetLayouts;
+	std::unordered_map<std::string, std::vector<VkDescriptorSet>> m_systemDescriptorSets;
 
  // per-model descriptor resources
 	std::unique_ptr<DixDescriptorPool> m_modelDescriptorPool;
 	std::unique_ptr<DixDescriptorSetLayout> m_modelSetLayout;
 
-	std::unordered_map<std::string, std::unique_ptr<DixRenderSystem>> m_renderSystems;
     std::unique_ptr<dix::UIManager> m_uiManager;
     std::unique_ptr<dix::UIRenderer> m_uiRenderer;
     // default fallback texture used for models when a mesh has no texture
@@ -86,6 +84,8 @@ private:
 	void createDescriptorSets(); // New method to create descriptor sets
 	void createRenderSystem(); // New method to create simple render system
 	void createModelDescriptorResources(); // New method to create per-model descriptor resources
+	void createSystemSetLayouts(); // New method to create descriptor set layouts for render systems
+	void declareRenderSystems();
 };
 
 } // namespace dix

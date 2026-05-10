@@ -73,6 +73,8 @@ public:
 		return instance;
 	}
 
+	DIX_DISABLE_COPY_AND_MOVE(RenderSystemRegistery)
+
 	template<typename SystemType, typename UboStruct>
 	void registerRenderSystem(const std::string& name, RenderSystemConstructInfo constructInfo) {
 		assert(is_not_unique_instance(name) && "Render system with this name already exists in the registery!");

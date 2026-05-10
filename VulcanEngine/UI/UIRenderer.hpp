@@ -46,6 +46,5 @@ private:
     VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 };
 
-// Additional comment for clarity
 } // namespace dix
 #endif // UI_RENDERER_HPP

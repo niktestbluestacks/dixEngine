@@ -1,5 +1,4 @@
 // dix
-#include "Model/GameObject/GameObject.hpp"
 #include <Rendering/RenderSystem/DixRenderSystem.hpp>
 #include <Utils/Converter.hpp>
 
@@ -14,6 +13,7 @@
 #include <cstdint>
 #include <array>
 #include <memory>
+#include <cassert>
 
 namespace dix {
 
@@ -146,4 +146,7 @@ void DixRenderSystem::renderGameObjects(
 	}
 }
 
+bool RenderSystemRegistery::is_not_unique_instance(const std::string& name) {
+	return (!m_renderSystems.contains(name) ? true : m_renderSystems[name].first == nullptr);
+}
 }	// namespace dix

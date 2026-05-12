@@ -35,7 +35,7 @@ void Logger::log(LogLevel level, const std::string message) {
             break;
         case ERR:
             std::cerr << oss.str() << "\n";
-            std::cerr << "The program had been running for" + std::to_string(
+            std::cerr << "The program had been running for " + std::to_string(
                 std::chrono::duration_cast<std::chrono::seconds>(
                     std::chrono::system_clock::now() - start_time).count()
                 ) + " seconds and had been termitated in: ";

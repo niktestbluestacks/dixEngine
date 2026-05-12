@@ -8,6 +8,9 @@
 #include <string>
 #include <memory>
 
+// libs
+#include <glm/glm.hpp>
+
 namespace dix {
 class DixAudio {
 public:
@@ -47,6 +50,11 @@ public:
     bool isPaused() const;
     bool isLoaded() const;
 
+    void setPosition(const glm::vec3& pos);
+    void setMinDistance(float dist); // Distance where attenuation starts
+    void setMaxDistance(float dist);
+
+    void updateListener(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up);
 private:
     class Impl;
     std::unique_ptr <Impl> m_Impl;

@@ -3,6 +3,7 @@
 
 // dix
 #include <Model/Model.hpp>
+#include <Utils/Class.hpp>
 
 // libs
 #include <glm/gtc/matrix_transform.hpp>
@@ -30,8 +31,7 @@ public:
 		return GameObject{ currentId++ };
 	}
 
-	GameObject(const GameObject&) = delete;
-	GameObject& operator=(const GameObject&) = delete;
+	DIX_DISABLE_COPY(GameObject)
 	GameObject(GameObject&&) = default;
 	GameObject& operator=(GameObject&&) = default;
 

@@ -1,5 +1,4 @@
 // dix
-#include "Sound/DixAudio.hpp"
 #include <FirstApp/FirstApp.hpp>
 
 #include <FirstApp/AppContext.hpp>
@@ -10,6 +9,8 @@
 #include <DixUI/DixFpsCounter.hpp>
 #include <DixUI/DixTimeCounter.hpp>
 #include <DixUI/DixPlayerInfo.hpp>
+#include <Sound/DixAudio.hpp>
+#include <Utils/DixRandom.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -50,10 +51,15 @@ void FirstApp::run(void) {
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
-	m_sounds["Background theme"] = DixAudio();
+	auto sound = getRandomFile(toAudioPath(""));
+
+	DixLogInfo("Background theme: {}", sound);
+
+	m_sounds["Background theme"] = 
+		DixAudio(sound);
 
 	m_sounds["Background theme"].play(true);
-	
+
 	while (!m_context->shouldClose()) {
 		m_context->pollEvents();
 

@@ -1,4 +1,5 @@
 // dix
+#include "Sound/DixAudio.hpp"
 #include <FirstApp/FirstApp.hpp>
 
 #include <FirstApp/AppContext.hpp>
@@ -49,6 +50,10 @@ void FirstApp::run(void) {
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
+	m_sounds["Background theme"] = DixAudio();
+
+	m_sounds["Background theme"].play(true);
+	
 	while (!m_context->shouldClose()) {
 		m_context->pollEvents();
 

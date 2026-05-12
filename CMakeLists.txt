@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
-project(VulcanEngine CXX)
+project(VulcanEngine CXX C)
 
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+set(CMAKE_C_STANDARD 23)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Найти зависимости
@@ -77,8 +81,6 @@ target_include_directories(VulcanApp PRIVATE
     ${CMAKE_SOURCE_DIR}/Applications
     ${CMAKE_SOURCE_DIR}/VulcanEngine
     ${CMAKE_SOURCE_DIR}/Dependecies
-    ${CMAKE_SOURCE_DIR}/Dependecies/JUCE
-    ${CMAKE_SOURCE_DIR}/Dependecies/JUCE/modules
 )
 
 # Линковка

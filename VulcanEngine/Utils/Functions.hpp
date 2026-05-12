@@ -3,6 +3,7 @@
 
 #include <string>
 #include <format>
+#include <concepts>
 
 namespace dix {
 template<typename... Args>

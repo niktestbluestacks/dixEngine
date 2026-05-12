@@ -5,6 +5,8 @@
 #include <Model/GameObject/GameObject.hpp>
 #include <FirstApp/AppContext.hpp>
 #include <Utils/Converter.hpp>
+#include <Sound/DixAudio.hpp>
+
 // std
 #include <string>
 #include <vector>
@@ -49,6 +51,7 @@ private:
 		static_cast<std::string>("First Application")
 	) };
 	std::unordered_map<std::string, std::vector<GameObject>> m_gameObjects;
+	std::unordered_map<std::string, DixAudio> m_sounds;
 	glm::vec3 playerPosition{ -1.f, -2.f, 2.f };
 };
 }	// namespace dix

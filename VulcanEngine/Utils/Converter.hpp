@@ -12,6 +12,10 @@ namespace dix {
 	constexpr std::string toModelPath(const std::string& modelFilepath) {
 		return std::string(static_cast <std::string> ("../dixEngine/Applications/models/") + modelFilepath);
 	}
+
+	constexpr std::string toAudioPath(const std::string& audioFilepath) {
+		return std::string(static_cast <std::string> ("../dixEngine/Applications/audio/") + audioFilepath);
+	}
 	
 }	// dix
 

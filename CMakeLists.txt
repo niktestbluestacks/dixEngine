@@ -77,6 +77,8 @@ target_include_directories(VulcanApp PRIVATE
     ${CMAKE_SOURCE_DIR}/Applications
     ${CMAKE_SOURCE_DIR}/VulcanEngine
     ${CMAKE_SOURCE_DIR}/Dependecies
+    ${CMAKE_SOURCE_DIR}/Dependecies/JUCE
+    ${CMAKE_SOURCE_DIR}/Dependecies/JUCE/modules
 )
 
 # Линковка

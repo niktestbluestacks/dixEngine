@@ -7,7 +7,6 @@
 #include <array>
 #include <cstdlib>
 #include <cstring>
-#include <iostream>
 #include <limits>
 #include <stdexcept>
 
@@ -398,12 +397,12 @@ VkPresentModeKHR SwapChain::chooseSwapPresentMode(
     }
     DixLogInfo("Present mode: V-Sync");
 
-    //for (const auto &availablePresentMode : availablePresentModes) {
+    // for (const auto &availablePresentMode : availablePresentModes) {
     //    if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
     //        DixLogInfo("Present mode: Immediate");
     //        return availablePresentMode;
     //    }
-    //}
+    // }
 
     return VK_PRESENT_MODE_FIFO_KHR;
 }

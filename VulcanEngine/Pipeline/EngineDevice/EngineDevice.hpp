@@ -3,6 +3,7 @@
 
 // dix
 #include <Window/WindowClass/WindowClass.hpp>
+#include <Utils/Class.hpp>
 
 // std
 #include <vector>
@@ -35,10 +36,7 @@ public:
     ~EngineDevice();
 
     // Not copyable or movable
-    EngineDevice(const EngineDevice&) = delete;
-    EngineDevice& operator=(const EngineDevice&) = delete;
-    EngineDevice(EngineDevice&&) = delete;
-    EngineDevice& operator=(EngineDevice&&) = delete;
+    DIX_DISABLE_COPY_AND_MOVE(EngineDevice);
 
     VkCommandPool getCommandPool() { return commandPool; }
     VkDevice device() { return device_; }

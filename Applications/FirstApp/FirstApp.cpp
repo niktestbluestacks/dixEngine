@@ -60,6 +60,12 @@ void FirstApp::run(void) {
 
 	m_sounds["Background theme"].play(true);
 
+	// for (auto&& gameObj : m_gameObjects["SimpleRendersystem"]) {
+	// 	m_objectAudios[gameObj.getId()].play(true);
+	// 	m_objectAudios[gameObj.getId()].setMinDistance(0.f);
+	// 	m_objectAudios[gameObj.getId()].setMaxDistance(30.f);
+	// }
+
 	while (!m_context->shouldClose()) {
 		m_context->pollEvents();
 
@@ -71,15 +77,15 @@ void FirstApp::run(void) {
 
 		cameraController.moveInPlaneXZ(m_context->getGLFWwindow(), frameTime, viewerObject);
 		playerPosition = viewerObject.transform.translation;
-		playerLookAt = viewerObject.transform.translation;
+		playerLookAt = viewerObject.transform.rotation;
 		dixcamera.setViewYXZ(playerPosition, playerLookAt);
 
 		float aspect = m_context->getAspectRatio();
 		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
 
-		for (auto&& gameObj : m_gameObjects["SimpleRendersystem"]) {
-			m_objectAudios[gameObj].updateListener(gameObj.transform.translation, playerPosition, playerLookAt);
-		}
+		// for (auto&& gameObj : m_gameObjects["SimpleRendersystem"]) {
+		// 	m_objectAudios[gameObj.getId()].updateListener(std::move(gameObj).transform.translation, playerPosition, playerLookAt);
+		// }
         // Delegate rendering details to AppContext to keep FirstApp focused on logic
 		try {
 			m_context->drawFrame(dixcamera, frameTime, m_gameObjects, playerPosition);
@@ -123,8 +129,10 @@ void FirstApp::loadGameObjects() {
 		gameObj.transform.translation = { dist(gen), dist(gen), dist(gen) };
 		gameObj.transform.scale = { 1.f, 1.f, 1.f };
 		m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
-		m_objectAudios[m_gameObjects["SimpleRenderSystem"].back()] = getRandomFile();
 	}
+	// auto objectTheme = getRandomFile();
+	// DixLogDebug("Object theme is: {}", objectTheme);
+	// m_objectAudios[m_gameObjects["SimpleRenderSystem"].back().getId()] = DixAudio(objectTheme);
 }
 
 void FirstApp::loadUIElements(void) {

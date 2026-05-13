@@ -48,14 +48,4 @@ private:
 };
 }	// namespace dix
 
-namespace std {
-template <>
-struct hash<dix::GameObject> {
-size_t operator()(dix::GameObject gameObj) {
-	size_t seed = 0;
-	dix::hashCombine(seed, gameObj.getId());
-	return seed;
-}
-};
-}	// namespace std
 #endif // GAME_OBJECT_HPP

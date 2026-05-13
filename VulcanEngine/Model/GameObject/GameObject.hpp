@@ -4,6 +4,7 @@
 // dix
 #include <Model/Model.hpp>
 #include <Utils/Class.hpp>
+#include <Utils/Hash.hpp>
 
 // libs
 #include <glm/gtc/matrix_transform.hpp>
@@ -32,8 +33,8 @@ public:
 	}
 
 	DIX_DISABLE_COPY(GameObject)
-	GameObject(GameObject&&) = default;
-	GameObject& operator=(GameObject&&) = default;
+	DIX_ENABLE_MOVE(GameObject)
+	~GameObject() = default;
 
 	id_t getId() const { return id; };
 
@@ -46,4 +47,15 @@ private:
 	id_t id;
 };
 }	// namespace dix
+
+namespace std {
+template <>
+struct hash<dix::GameObject> {
+size_t operator()(dix::GameObject gameObj) {
+	size_t seed = 0;
+	dix::hashCombine(seed, gameObj.getId());
+	return seed;
+}
+};
+}	// namespace std
 #endif // GAME_OBJECT_HPP

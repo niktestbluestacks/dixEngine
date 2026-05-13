@@ -44,7 +44,7 @@ FirstApp::~FirstApp(void) {
 
 void FirstApp::run(void) {
 	DixCamera dixcamera{};
-	dixcamera.setViewTarget(playerPosition, glm::vec3{0.f, 0.f, 2.5f});
+	dixcamera.setViewTarget(playerPosition, playerLookAt);
 
 	auto viewerObject = GameObject::createGameObject();
 	KeyboardController cameraController{};
@@ -69,13 +69,17 @@ void FirstApp::run(void) {
 
 		frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
-		cameraController.modeInPlaneXZ(m_context->getGLFWwindow(), frameTime, viewerObject);
+		cameraController.moveInPlaneXZ(m_context->getGLFWwindow(), frameTime, viewerObject);
 		playerPosition = viewerObject.transform.translation;
-		dixcamera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
+		playerLookAt = viewerObject.transform.translation;
+		dixcamera.setViewYXZ(playerPosition, playerLookAt);
 
 		float aspect = m_context->getAspectRatio();
 		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
 
+		for (auto&& gameObj : m_gameObjects["SimpleRendersystem"]) {
+			m_objectAudios[gameObj].updateListener(gameObj.transform.translation, playerPosition, playerLookAt);
+		}
         // Delegate rendering details to AppContext to keep FirstApp focused on logic
 		try {
 			m_context->drawFrame(dixcamera, frameTime, m_gameObjects, playerPosition);
@@ -119,6 +123,7 @@ void FirstApp::loadGameObjects() {
 		gameObj.transform.translation = { dist(gen), dist(gen), dist(gen) };
 		gameObj.transform.scale = { 1.f, 1.f, 1.f };
 		m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
+		m_objectAudios[m_gameObjects["SimpleRenderSystem"].back()] = getRandomFile();
 	}
 }
 

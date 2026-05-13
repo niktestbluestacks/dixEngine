@@ -22,7 +22,7 @@ public:
 		int speedUp = GLFW_KEY_LEFT_SHIFT;
 	};
 
-	void modeInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
+	void moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
 
 	KeyMappings keys{};
 	float moveSpeed{ 3.f };

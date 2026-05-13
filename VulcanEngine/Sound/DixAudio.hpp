@@ -18,10 +18,11 @@ public:
     DixAudio(const std::string& filepath);
     ~DixAudio();
 
-    DIX_DISABLE_COPY(DixAudio)
+    DixAudio(const DixAudio&) = delete; 
+    DixAudio& operator=(const DixAudio&) = delete;
 
-    DixAudio(DixAudio&& other) noexcept;
-    DixAudio& operator=(DixAudio&& other) noexcept;
+    DixAudio(DixAudio&&) noexcept; 
+    DixAudio& operator=(DixAudio&&) noexcept;
 
     bool loadFromFile(const std::string& filepath);
 
@@ -50,11 +51,15 @@ public:
     bool isPaused() const;
     bool isLoaded() const;
 
-    void setPosition(const glm::vec3& pos);
     void setMinDistance(float dist); // Distance where attenuation starts
     void setMaxDistance(float dist);
 
-    void updateListener(const glm::vec3& position, const glm::vec3& forward, const glm::vec3& up);
+    void updateListener(
+        const glm::vec3& objPosition,
+        const glm::vec3& position, 
+        const glm::vec3& forward, 
+        const glm::vec3& up = { 0.f, 1.f, 0.f }
+    );
 private:
     class Impl;
     std::unique_ptr <Impl> m_Impl;

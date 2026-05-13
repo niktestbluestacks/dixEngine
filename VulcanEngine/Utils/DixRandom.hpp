@@ -5,13 +5,13 @@
 #include <Utils/Converter.hpp>
 
 // std
-#include <cstdint>
+#include <cstdlib>
 #include <filesystem>
 #include <vector>
 
 namespace dix {
 namespace fs = std::filesystem;
-inline std::string getRandomFile(std::string filepath) {
+inline std::string getRandomFile(std::string filepath = toAudioPath("")) {
     if (filepath.back() == '/') filepath.pop_back();
 
     std::vector <std::filesystem::path> files (0);
@@ -24,6 +24,6 @@ inline std::string getRandomFile(std::string filepath) {
 
     return files[idx].string();
 }
-}
+}   // namespace dix
 
 #endif // DIX_RANDOM_HPP

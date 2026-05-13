@@ -167,11 +167,6 @@ public:
         return isSoundLoaded; 
     }
 
-    void setPosition(const glm::vec3& pos) {
-        if (!sound) return;
-        ma_sound_set_position(sound, pos.x, pos.y, pos.z);
-    }
-
     void setMinDistance(float dist) {
         if (!sound) return;
         ma_sound_set_min_distance(sound, dist);
@@ -182,6 +177,27 @@ public:
         ma_sound_set_max_distance(sound, dist);
     }
 
+    void updateListener(
+        const glm::vec3& objPosition,
+        const glm::vec3& position, 
+        const glm::vec3& forwardDir, 
+        const glm::vec3& upDir
+    ) {
+
+    if (!isLoaded())  {
+        DixLogWarn("Tried to update Listener position when no sound is loaded!");
+        return;
+    }
+    ma_sound_set_position(sound, objPosition.x, objPosition.y, objPosition.z);
+
+    ma_engine_listener_set_position(&engine, 0, position.x, position.y, position.z);
+
+    ma_engine_listener_set_direction(&engine, 0, forwardDir.x, forwardDir.y, forwardDir.z);
+
+    ma_engine_listener_set_world_up(&engine, 0, upDir.x, upDir.y, upDir.z);
+    
+    ma_engine_listener_set_velocity(&engine, 0, 0.f, 0.f, 0.f);
+    }
 private:
     void updatePan() {
         if (!sound) return;
@@ -193,18 +209,18 @@ private:
 
 DixAudio::DixAudio() : m_Impl(std::make_unique<Impl>()) {}
 
+DixAudio::~DixAudio() = default;
+
+DixAudio::DixAudio(DixAudio&&) noexcept = default;
+
+DixAudio& DixAudio::operator=(DixAudio&&) noexcept = default;
+
 DixAudio::DixAudio(const std::string& filepath): m_Impl(std::make_unique<Impl>()) {
     if (!m_Impl->loadFromFile(filepath)) {
         DixLogErr("Failed to load file {}", filepath);
         throw std::runtime_error("");
     }
 }
-
-DixAudio::~DixAudio() = default;
-
-DixAudio::DixAudio(DixAudio&& other) noexcept = default;
-
-DixAudio& DixAudio::operator=(DixAudio&& other) noexcept = default;
 
 bool DixAudio::loadFromFile(const std::string& filepath) {
     return m_Impl->loadFromFile(filepath);
@@ -265,30 +281,20 @@ bool DixAudio::isPaused() const {
 bool DixAudio::isLoaded() const {
     return m_Impl->isLoaded();
 }
-void DixAudio::setPosition(const glm::vec3& pos) {
-    m_Impl->setPosition(pos);
-}
+
 void DixAudio::setMinDistance(float dist) {
     m_Impl->setMinDistance(dist);
 }
 void DixAudio::setMaxDistance(float dist) {
     m_Impl->setMaxDistance(dist);
 }
-void DixAudio::updateListener(const glm::vec3& position, const glm::vec3& forwardDir, const glm::vec3& upDir) {
-    if (!m_Impl->isLoaded()) return;
+void DixAudio::updateListener(
+        const glm::vec3& objPosition,
+        const glm::vec3& position, 
+        const glm::vec3& forwardDir, 
+        const glm::vec3& upDir
+    ) {
 
-    // Set Listener Position
-    ma_engine_listener_set_position(&m_Impl->engine, 0, position.x, position.y, position.z);
-
-    // Set Listener Direction (Forward Vector)
-    // Miniaudio expects the direction the listener is facing
-    ma_engine_listener_set_direction(&m_Impl->engine, 0, forwardDir.x, forwardDir.y, forwardDir.z);
-
-    // Set Listener Up Vector
-    ma_engine_listener_set_world_up(&m_Impl->engine, 0, upDir.x, upDir.y, upDir.z);
-    
-    // Velocity can be set similarly if you have Doppler effect needs, 
-    // but usually 0,0,0 is fine for static cameras or handled separately.
-    ma_engine_listener_set_velocity(&m_Impl->engine, 0, 0, 0, 0);
+    m_Impl->updateListener(objPosition, position, forwardDir, upDir);
 }
 }   // namespace dix

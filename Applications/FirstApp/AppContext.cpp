@@ -3,7 +3,7 @@
 
 #include <UI/DixUIElement.hpp>
 #include <Utils/Converter.hpp>
-#include <memory>
+#include <Rendering/RenderSystem/RenderSystemRegistery.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -35,7 +35,7 @@ void AppContext::initialize() {
     createModelDescriptorResources();
     createRenderSystem();
 }
-
+ 
 void AppContext::declareRenderSystems() {
     DIX_RSR.declareRenderSystem<SimpleUbo>("SimpleRenderSystem");
 }

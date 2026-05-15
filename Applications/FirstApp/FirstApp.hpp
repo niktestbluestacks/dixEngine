@@ -17,17 +17,6 @@ class FirstApp {
 private:
 	void loadGameObjects(void);
 	void loadUIElements(void);
-private:
-	//void sierpinski(
-	//	std::vector <Model::Vertex>& vertecies,
-	//	int depth,
-	//	glm::vec2 left,
-	//	glm::vec2 right,
-	//	glm::vec2 top,
-	//	glm::vec3 leftColor,
-	//	glm::vec3 rightColor,
-	//	glm::vec3 topColor
-	//);
 public:
 	static constexpr int WIDTH = 800;
 	static constexpr int HEIGHT = 600;
@@ -44,11 +33,9 @@ public:
 	void run(void);
 
 private:
-    // application context encapsulates renderer/device/shader details
 	glm::vec3 playerPosition{ -1.f, -2.f, 2.f };
 	glm::vec3 playerLookAt { 0.f, 0.f, 2.5f };
 	std::unordered_map<std::string, std::vector<GameObject>> m_gameObjects;
-	// std::unordered_map<GameObject::id_t, DixAudio> m_objectAudios;
 	std::unordered_map<std::string, DixAudio> m_sounds;
 	std::unique_ptr <AppContext> m_context{ std::make_unique<AppContext>(
 		WIDTH, 

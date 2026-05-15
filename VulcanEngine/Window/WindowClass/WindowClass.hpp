@@ -1,9 +1,11 @@
 #ifndef WINDOW_CLASS_HPP
 #define WINDOW_CLASS_HPP
 
+// libs
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+// std
 #include <string>
 
 namespace dix {

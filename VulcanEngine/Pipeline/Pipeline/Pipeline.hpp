@@ -4,15 +4,11 @@
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
-// std
-#include <string>
-#include <vector>
-#include <cstdint>
-
 // libs
 #include <vulkan/vulkan.hpp>
 
-// optional custom vertex input descriptions
+// std
+#include <string>
 #include <vector>
 #include <cstdint>
 

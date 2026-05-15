@@ -3,7 +3,7 @@
 
 #include <FirstApp/AppContext.hpp>
 #include <DixCamera/DixCamera.hpp>
-#include <Input/Keyboard/KeyboardController.hpp>
+#include <Input/Keyboard/KeyboardAndMouseController.hpp>
 #include <Utils/Converter.hpp>
 #include <Logger/Logger.hpp>
 #include <DixUI/DixFpsCounter.hpp>
@@ -47,7 +47,7 @@ void FirstApp::run(void) {
 	dixcamera.setViewTarget(playerPosition, playerLookAt);
 
 	auto viewerObject = GameObject::createGameObject();
-	KeyboardController cameraController{};
+	KeyboardAndMouseController cameraController{};
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -59,12 +59,6 @@ void FirstApp::run(void) {
 		DixAudio(sound);
 
 	m_sounds["Background theme"].play(true);
-
-	// for (auto&& gameObj : m_gameObjects["SimpleRendersystem"]) {
-	// 	m_objectAudios[gameObj.getId()].play(true);
-	// 	m_objectAudios[gameObj.getId()].setMinDistance(0.f);
-	// 	m_objectAudios[gameObj.getId()].setMaxDistance(30.f);
-	// }
 
 	while (!m_context->shouldClose()) {
 		m_context->pollEvents();
@@ -83,45 +77,35 @@ void FirstApp::run(void) {
 		float aspect = m_context->getAspectRatio();
 		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
 
-		// for (auto&& gameObj : m_gameObjects["SimpleRendersystem"]) {
-		// 	m_objectAudios[gameObj.getId()].updateListener(std::move(gameObj).transform.translation, playerPosition, playerLookAt);
-		// }
-        // Delegate rendering details to AppContext to keep FirstApp focused on logic
 		try {
 			m_context->drawFrame(dixcamera, frameTime, m_gameObjects, playerPosition);
 		}
 		catch (const std::exception& e) {
 			DixLogErr("Render error: {}", e.what());
-			break; // exit run loop on fatal render errors
+			break;
 		}
 	}
 }
 
 void FirstApp::loadGameObjects() {
-    // Use the device from AppContext for loading models/resources
 	std::random_device rd;
     
-    // 2. Initialize the Mersenne Twister engine
     std::mt19937 gen(rd());
     
-    // 3. Define the distribution range [min, max)
-    // For floats, use std::uniform_real_distribution<float>
     std::uniform_real_distribution<float> dist(0.0f, 10.0f);
-
-
 
 	for (const auto& entry : std::filesystem::directory_iterator(MODEL_FILEPATH_RELATIVE)) {
 
 		if (std::filesystem::is_directory(entry.path()) ||
-		  std::filesystem::absolute(entry.path()).string().back() == 'l') {
+			std::filesystem::absolute(entry.path()).string().back() == 'l') {
 			continue;
 		}
 		DixLogDebug("Loading model: {}", std::filesystem::absolute(entry).string());
 		std::shared_ptr <Model> dixModel = Model::createModelFromFile(
-				m_context->device(), 
-				std::filesystem::absolute(entry).string(),
-				m_context->getDescriptorPool(),
-				m_context->getModelSetLayout()
+			m_context->device(), 
+			std::filesystem::absolute(entry).string(),
+			m_context->getDescriptorPool(),
+			m_context->getModelSetLayout()
 		);
 
 		auto gameObj = GameObject::createGameObject();
@@ -130,9 +114,6 @@ void FirstApp::loadGameObjects() {
 		gameObj.transform.scale = { 1.f, 1.f, 1.f };
 		m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
 	}
-	// auto objectTheme = getRandomFile();
-	// DixLogDebug("Object theme is: {}", objectTheme);
-	// m_objectAudios[m_gameObjects["SimpleRenderSystem"].back().getId()] = DixAudio(objectTheme);
 }
 
 void FirstApp::loadUIElements(void) {

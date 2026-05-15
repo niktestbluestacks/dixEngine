@@ -1,7 +1,6 @@
 // dix
 #include <Sound/DixAudio.hpp>
 #include <Logger/Logger.hpp>
-#include <stdexcept>
 
 // libs
 #define MINIAUDIO_IMPLEMENTATION
@@ -9,6 +8,7 @@
 
 // std
 #include <cassert>
+#include <stdexcept>
 
 namespace dix {
 class DixAudio::Impl {

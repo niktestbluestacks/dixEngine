@@ -6,7 +6,7 @@
 #include <Window/WindowClass/WindowClass.hpp>
 
 namespace dix {
-class KeyboardController {
+class KeyboardAndMouseController {
 public:
 	struct KeyMappings {
 		int moveLeft = GLFW_KEY_A;

@@ -32,8 +32,6 @@ public:
     VkDeviceMemory& getMemory() { return m_memory; };
     VkImageView& getImageView() { return m_view; };
 
-    // Release ownership of the underlying Vulkan handles. After this call
-    // the DixImage will no longer destroy the returned handles.
     std::tuple<VkImage, VkDeviceMemory, VkImageView> releaseOwnership();
 
 private:

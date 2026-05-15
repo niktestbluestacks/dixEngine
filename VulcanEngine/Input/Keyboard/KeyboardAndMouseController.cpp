@@ -1,9 +1,9 @@
 // dix
-#include <Input/Keyboard/KeyboardController.hpp>
+#include <Input/Keyboard/KeyboardAndMouseController.hpp>
 #include <Logger/Logger.hpp>
 
 namespace dix {
-void KeyboardController::moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject) {
+void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject) {
 	glm::vec3 rotate{ 0.f };
 	if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
 	if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;

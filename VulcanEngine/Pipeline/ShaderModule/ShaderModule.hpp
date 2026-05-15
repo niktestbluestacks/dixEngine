@@ -1,7 +1,10 @@
 #ifndef SHADER_MODULE_HPP
 #define SHADER_MODULE_HPP
 
+// libs
 #include <vulkan/vulkan.hpp>
+
+// std
 #include <string>
 #include <vector>
 #include <memory>

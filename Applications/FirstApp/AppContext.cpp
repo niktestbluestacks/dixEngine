@@ -22,9 +22,7 @@ AppContext::AppContext(int width, int height, const std::string& title) :
     m_uiRenderer = std::make_unique<dix::UIRenderer>(m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
 }
 
-AppContext::~AppContext() {
-    // resources owned by unique_ptr will be destroyed automatically
-}
+AppContext::~AppContext() = default;
 
 void AppContext::initialize() {
     declareRenderSystems();
@@ -41,10 +39,6 @@ void AppContext::declareRenderSystems() {
 }
 
 void AppContext::createDescriptorPool() {
-    // m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
-    //     .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
-    //     .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-    //     .build();
     m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -193,11 +187,4 @@ void AppContext::addUIElement(std::unique_ptr<DixUIElement> element) {
         m_uiManager->addElement(std::move(element));
     }
 }
-
-// void AppContext::addGameObject(std::unique_ptr<GameObject>) {
-//     if (m_gameObjects) {
-//         m_gameObjects->addObject(std::move(object));
-//     }
-// }
-
 } // namespace dix

@@ -3,7 +3,7 @@
 
 // dix
 #include <UI/DixUIElement.hpp>
-#include <Input/Keyboard/KeyboardController.hpp>
+#include <Input/Keyboard/KeyboardAndMouseController.hpp>
 
 // libs
 #include <glm/glm.hpp>

@@ -4,16 +4,20 @@
 // dix
 #include <Rendering/RenderSystem/DixRenderSystem.hpp>
 
+// libs
+#include <vulkan/vulkan.h>
+
 namespace dix {
 
 struct SimpleUbo {
 	alignas(16) glm::mat4 projectionView{ 1.f };
 	alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
 };
+
 class SimpleRenderSystem : public DixRenderSystem {
 public:
 	using DixRenderSystem::DixRenderSystem;	// inherit constructors
-	using GlobalUbo = SimpleUbo;
+	using Ubos = std::tuple<SimpleUbo>;
 
 	SimpleRenderSystem(
 		EngineDevice& engineDeivce, 
@@ -21,6 +25,15 @@ public:
 		VkDescriptorSetLayout globalSetLayout,
 		VkDescriptorSetLayout modelSetLayout
 	);
+
+	static constexpr const char* Name() {
+		return "SimpleRenderSystem";
+	}
+
+	// std::tuple <std::pair <VkDescriptorType, VkShaderStageFlagBits>, std::pair <VkDescriptorType, VkShaderStageFlagBits>> getVulkanFlags() {
+	// 	return std::make_tuple( std::pair{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT},
+	// 		 std::pair({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}) );
+	// }
 
 	DIX_DISABLE_COPY(SimpleRenderSystem)
 

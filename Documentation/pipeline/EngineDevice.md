@@ -140,7 +140,9 @@ device.createBuffer(size, usage, properties, buffer, bufferMemory);
 ```
 
 ## Notes
-- Validation layers are automatically enabled in debug builds (`#ifndef NDEBUG`)
+- Validation layers flag (`enableValidationLayers`) is automatically set to `true` in debug builds and `false` in release builds
+- **Important**: The `validationLayers` vector is currently empty/commented out in the implementation, meaning no validation layers will be loaded even when enabled
+- To enable validation layers, uncomment `"VK_LAYER_KHRONOS_validation"` in the `validationLayers` vector in `EngineDevice.hpp`
 - The class manages the entire Vulkan device lifecycle
 - All resources are cleaned up in the destructor
 - The class follows RAII principles for resource management

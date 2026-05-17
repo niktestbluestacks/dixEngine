@@ -12,7 +12,7 @@ DixDescriptorSetLayout::Builder& DixDescriptorSetLayout::Builder::addBinding(
     VkDescriptorType descriptorType,
     VkShaderStageFlags stageFlags,
     uint32_t count) {
-    assert(bindings.count(binding) == 0 && "Binding already in use");
+    assert(!bindings.contains(binding) && "Binding already in use");
     VkDescriptorSetLayoutBinding layoutBinding{};
     layoutBinding.binding = binding;
     layoutBinding.descriptorType = descriptorType;

@@ -17,6 +17,11 @@ namespace dix {
 
 using VulkanRenderSystemFlagType = typename std::tuple<uint32_t, VkDescriptorType, VkShaderStageFlags>;
 
+struct BasePushConstantData {
+	glm::mat4 modelMatrix{ 1.f };
+	glm::mat4 normalMatrix{ 1.f };
+};
+
 class DixRenderSystem {
 protected:
     virtual void createPipelineLayout(
@@ -25,6 +30,7 @@ protected:
     );
 	virtual void createPipeline(VkRenderPass renderPass);
 public:
+	using PushConstantData = BasePushConstantData;
 
 	DixRenderSystem(
 		EngineDevice& engineDevice, 
@@ -33,7 +39,6 @@ public:
 		VkDescriptorSetLayout modelSetLayout,
         std::string vertShaderBinaryPath, 
         std::string fragShaderBinaryPath,
-        int sizeofPushConstantData,
         std::function<void(void*, GameObject&)> transformGameObject
 	);
 	virtual ~DixRenderSystem(void);
@@ -52,7 +57,7 @@ protected:
     std::unique_ptr<Pipeline> m_pipeline;
 	VkPipelineLayout m_pipelineLayout;
     std::function<void(void*, GameObject&)> m_transformGameObject;
-    int m_sizeofPushConstantData;
+    static constexpr int m_sizeofPushConstantData = sizeof(PushConstantData);
 };
 }	// namespace dix
 #endif // DIX_RENDER_SYSTEM_HPP

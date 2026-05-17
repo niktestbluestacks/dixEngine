@@ -18,6 +18,7 @@
 #include <UI/DixUIElement.hpp>
 #include <Utils/Converter.hpp>
 #include <Rendering/RenderSystem/RenderSystemRegistery.hpp>
+#include <Utils/TupleHelper.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -127,14 +128,17 @@ public:
 
 					// Update UBO for this system
 					int IndexOfWriteToIndex = 0;
-					std::apply([&](auto&& arg) {
-						std::remove_reference_t<decltype(arg)> ubo{};
-						ubo.projectionView = camera.getProjection() * camera.getView();
-						
-						m_systemUboBuffers[renderSystemName][frameIndex]->writeToIndex(&ubo, IndexOfWriteToIndex);
-						++IndexOfWriteToIndex;
-						m_systemUboBuffers[renderSystemName][frameIndex]->flush();
-
+					int uboTypeIndex = 0;
+					std::apply([&](auto&&... uboArgs) {
+						(([&](auto&& arg) {
+							using UboType = std::remove_reference_t<decltype(arg)>;
+							UboType ubo{};
+							ubo.projectionView = camera.getProjection() * camera.getView();
+							// Access: [renderSystemName][frameIndex][uboTypeIndex]
+							m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->writeToBuffer(&ubo, sizeof(UboType));
+							m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->flush();
+							++uboTypeIndex;
+							}(std::get<0>(std::tuple<std::decay_t<decltype(uboArgs)>>{}))), ...);
 					}, desc.Ubos);
 
 					// Render geometry
@@ -183,7 +187,7 @@ private:
 	// rendering resources
 	std::unique_ptr<DixDescriptorPool> m_globalPool;
 
-	std::unordered_map<std::string, std::vector<std::unique_ptr<DixBuffer>>> m_systemUboBuffers;
+	std::unordered_map<std::string, std::vector<std::vector<std::unique_ptr<DixBuffer>>>> m_systemUboBuffers;
 	std::unordered_map<std::string, std::unique_ptr<DixDescriptorSetLayout>> m_systemSetLayouts;
 	std::unordered_map<std::string, std::vector<VkDescriptorSet>> m_systemDescriptorSets;
 
@@ -206,17 +210,31 @@ private:
 
 	template <typename RenderSystemInfo>
 	void createSingleUbo(RenderSystemInfo&& info) {
+		constexpr size_t uboCount = std::tuple_size_v<std::remove_reference_t<decltype(info.Ubos)>>;
+
+		// Resize outer vector: [frameIndex][uboTypeIndex]
 		m_systemUboBuffers[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-		for (auto& buf : m_systemUboBuffers[info.renderSystemName]) {
-			
-			buf = std::make_unique<DixBuffer>(
-				m_dixDevice,
-				sizeof(std::get<0>(info.Ubos)),
-				1,
-				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
-			);
-			buf->map();
+		 // For each frame, create buffers for each UBO type
+		for (auto& frameBuffers : m_systemUboBuffers[info.renderSystemName]) {
+			frameBuffers.resize(uboCount);
+
+			size_t uboTypeIndex = 0;
+			std::apply([&](auto&&... uboTypes) {
+				(([&](auto&& uboTypeInstance) {
+					using UboType = std::decay_t<decltype(uboTypeInstance)>;
+					VkDeviceSize bufferSize = sizeof(UboType);
+
+					frameBuffers[uboTypeIndex] = std::make_unique<DixBuffer>(
+					m_dixDevice,
+					bufferSize,
+					1,
+					VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+					);
+					frameBuffers[uboTypeIndex]->map();
+					++uboTypeIndex;
+				}(std::get<0>(std::tuple<std::decay_t<decltype(uboTypes)>>{}))), ...);
+			}, info.Ubos);
 		}
 	}
 	void createDescriptorSets() {
@@ -235,7 +253,8 @@ private:
 		imageInfo.sampler = m_defaultTexture.getSampler();
 
 		for (size_t i = 0; i < m_systemDescriptorSets[info.renderSystemName].size(); ++i) {
-			auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i]->descriptorInfo();
+			// Use the first UBO buffer (index 0) for descriptor set
+			auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][0]->descriptorInfo();
 			DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_globalPool)
 				.writeBuffer(0, &bufferInfo)
 				.writeImage(1, &imageInfo)

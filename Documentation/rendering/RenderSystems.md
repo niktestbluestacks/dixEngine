@@ -1,3 +1,5 @@
+# Render Systems Documentation
+
 ## Overview
 
 The Render System architecture in the DixEngine provides a flexible and extensible framework for rendering game objects using Vulkan. This document covers the architecture, usage patterns with AppContext, and technical implementation details.
@@ -392,11 +394,22 @@ Creates a pool that can allocate descriptor sets for all render systems.
 
 #### Step 3: Create Uniform Buffers
 
-Creates UBOs for each frame in flight for each render system. The size is determined by iterating over the `Ubos` tuple of each render system.
+Creates UBOs for each frame in flight for each render system. The size is determined by `sizeof(info.Ubos)` where `info.Ubos` is the tuple type containing all UBO structures for that render system.
+
+**Note**: The current implementation uses `sizeof(info.Ubos)` directly on the tuple type. For proper UBO sizing, you may need to calculate the total size of all UBO structures within the tuple, ensuring proper alignment (multiples of 16 bytes).
 
 #### Step 4: Create Descriptor Set Layouts
 
-Defines the layout of descriptor sets for each render system by calling `getVulkanFlags()` on each render system type.
+Defines the layout of descriptor sets for each render system by calling `getVulkanFlags()` on each render system **instance** (not type). The method returns a tuple of `VulkanRenderSystemFlagType` which are then unpacked to build the descriptor set layout.
+
+```cpp
+auto&& vulkanFlags = renderSystemDesc.renderSystem->getVulkanFlags();
+std::apply([&](auto&&... bindingTuples) {
+    (std::apply([&](auto&&... args) {
+        builder.addBinding(std::forward<decltype(args)>(args)...);
+    }, bindingTuples), ...);
+}, vulkanFlags);
+```
 
 #### Step 5: Create Descriptor Sets
 
@@ -408,7 +421,39 @@ Sets up per-model descriptor resources including the model set layout and descri
 
 #### Step 7: Instantiate Render Systems
 
-Creates render system instances using the constructor parameters from each render system type.
+Creates render system instances using the constructor parameters. The current implementation uses `std::apply` to iterate over render system descriptions but has a limitation - it hardcodes access to the first element:
+
+```cpp
+void createRenderSystems() {
+    std::apply([this](auto&& arg) {
+        using T = std::remove_reference_t<decltype(*(std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem))>;
+        std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = new T (
+            m_dixDevice,
+            m_dixRenderer.getSwapChainRenderPass(),
+            m_systemSetLayouts[std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+            m_modelSetLayout->getDescriptorSetLayout()
+        );
+    }, m_renderSystemRegistery.getRenderSystemDescriptions());
+}
+```
+
+**Important Limitation**: The current implementation incorrectly uses `std::get<0>` inside the lambda instead of using the `arg` parameter directly. This should be refactored to:
+
+```cpp
+std::apply([this](auto&&... args) {
+    (([&](auto&& arg) {
+        using T = std::remove_reference_t<decltype(*arg.renderSystem)>;
+        arg.renderSystem = new T(
+            m_dixDevice,
+            m_dixRenderer.getSwapChainRenderPass(),
+            m_systemSetLayouts[arg.renderSystemName]->getDescriptorSetLayout(),
+            m_modelSetLayout->getDescriptorSetLayout()
+        );
+    }(args)), ...);
+}, m_renderSystemRegistery.getRenderSystemDescriptions());
+```
+
+Until this is fixed, the system effectively supports only a single render system.
 
 ## Creating Custom Render Systems
 
@@ -424,12 +469,30 @@ struct CustomUbo {
 
 ### Step 2: Create Render System Class
 
-Inherit from `DixRenderSystem` and implement required static methods:
+Inherit from `DixRenderSystem` and implement required static methods. Note that `getVulkanFlags()` is currently called on the **instance** (not as a static method), so it should be a regular static constexpr method:
+
 ```cpp
 class CustomRenderSystem : public DixRenderSystem {
 public:
     using DixRenderSystem::DixRenderSystem;
     using Ubos = std::tuple<CustomUbo>;
+
+    // Constructor matching base class signature
+    CustomRenderSystem(
+        EngineDevice& engineDevice,
+        VkRenderPass renderPass,
+        VkDescriptorSetLayout globalSetLayout,
+        VkDescriptorSetLayout modelSetLayout
+    ) : DixRenderSystem(
+        engineDevice,
+        renderPass,
+        globalSetLayout,
+        modelSetLayout,
+        "path/to/vert.spv",
+        "path/to/frag.spv",
+        sizeof(CustomPushConstantData),
+        transformGameObjectCallback
+    ) {}
 
     static constexpr const char* Name() {
         return "CustomRenderSystem";
@@ -444,6 +507,8 @@ public:
     DIX_DISABLE_COPY(CustomRenderSystem)
 };
 ```
+
+**Important**: The constructor must match the base class `DixRenderSystem` signature exactly, as it's inherited via `using DixRenderSystem::DixRenderSystem;` or explicitly defined.
 
 ### Step 3: Add to AppContext Template
 
@@ -484,7 +549,30 @@ Push constants provide fast access to frequently changing data:
 
 ### Multi-Pass Rendering
 
-Multiple render systems can be used for different passes. Each render system is processed in order during `drawFrame()` using `std::apply` on the tuple of render system descriptions.
+Multiple render systems can be used for different passes. Each render system is processed in order during `drawFrame()` using `std::apply` on the tuple of render system descriptions:
+
+```cpp
+std::apply([&](auto&&... renderSystemDescs) {
+    (([&](auto&& desc) {
+        const auto& renderSystemName = desc.renderSystemName;
+        const auto& renderSystem = desc.renderSystem;
+
+        // Update UBO for this system
+        std::apply([&](auto&& arg) {
+            std::remove_reference_t<decltype(arg)> ubo{};
+            ubo.projectionView = camera.getProjection() * camera.getView();
+            m_systemUboBuffers[renderSystemName][frameIndex]->writeToIndex(&ubo, IndexOfWriteToIndex);
+            ++IndexOfWriteToIndex;
+            m_systemUboBuffers[renderSystemName][frameIndex]->flush();
+        }, desc.Ubos);
+
+        // Render geometry
+        renderSystem->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
+    }(renderSystemDescs)), ...);
+}, m_renderSystemRegistery.getRenderSystemDescriptions());
+```
+
+**Note**: The current UBO update logic in `drawFrame()` assumes a single UBO per render system and uses `desc.Ubos` directly. For render systems with multiple UBOs in the tuple, this logic needs to be extended to iterate over all UBOs properly.
 
 ### Thread Safety
 
@@ -529,3 +617,14 @@ Multiple render systems can be used for different passes. Each render system is 
 6. **Template instantiation errors**
    - Ensure your render system satisfies all required concepts: `HasUbos`, `HasName`, `HasVulkanFlags`
    - Verify `Ubos` is a `std::tuple` type
+   - Check that the constructor signature matches the base class `DixRenderSystem`
+
+7. **UBO size calculation issues**
+   - The current implementation uses `sizeof(info.Ubos)` which returns the size of the tuple itself, not the sum of its elements
+   - For multiple UBOs in a tuple, manually calculate the total size with proper alignment
+   - Each UBO member must be aligned to 16 bytes using `alignas(16)`
+
+8. **Multiple render systems limitation**
+   - The current `createRenderSystems()` implementation has hardcoded references to `std::get<0>`
+   - This limits the system to a single render system until refactored
+   - When adding multiple render systems, ensure all tuple iterations use proper parameter pack expansion

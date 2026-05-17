@@ -27,7 +27,7 @@ protected:
 public:
 
 	DixRenderSystem(
-		EngineDevice& engineDeivce, 
+		EngineDevice& engineDevice, 
 		VkRenderPass renderPass, 
 		VkDescriptorSetLayout globalSetLayout,
 		VkDescriptorSetLayout modelSetLayout,

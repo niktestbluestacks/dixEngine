@@ -29,17 +29,11 @@ DixRenderSystem::DixRenderSystem(
 		VkDescriptorSetLayout modelSetLayout,
         std::string vertShaderBinaryPath, 
         std::string fragShaderBinaryPath,
-        int sizeofPushConstantData,
         std::function<void(void*, GameObject&)> transformGameObject):
 		m_dixDevice{ engineDevice },
         m_vertShaderBinaryPath{ vertShaderBinaryPath },
         m_fragShaderBinaryPath{ fragShaderBinaryPath },
-        m_sizeofPushConstantData{ sizeofPushConstantData },
-        m_transformGameObject{ transformGameObject } {
-
-	createPipelineLayout(globalSetLayout, modelSetLayout);
-	createPipeline(renderPass);
-}
+        m_transformGameObject{ transformGameObject } {}
 
 DixRenderSystem::~DixRenderSystem() {
 	vkDestroyPipelineLayout(m_dixDevice.device(), m_pipelineLayout, nullptr);
@@ -98,8 +92,8 @@ void DixRenderSystem::renderGameObjects(
 	currentImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 
 	for (auto& obj : gameObjects) {
-        auto buffer = std::make_unique<std::byte[]>(m_sizeofPushConstantData);
-	    void* push = static_cast<void*>(buffer.get());
+        std::array<std::byte, m_sizeofPushConstantData> buffer;
+		void* push = buffer.data();
         m_transformGameObject(push, obj);
 
 		vkCmdPushConstants(

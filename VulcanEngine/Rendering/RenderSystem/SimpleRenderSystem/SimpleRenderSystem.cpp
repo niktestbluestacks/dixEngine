@@ -3,11 +3,6 @@
 
 namespace dix {
 
-struct SimplePushConstantData {
-	glm::mat4 modelMatrix{ 1.f };
-	glm::mat4 normalMatrix{ 1.f };
-};
-
 SimpleRenderSystem::SimpleRenderSystem(
 		EngineDevice& engineDevice, 
 		VkRenderPass renderPass, 
@@ -20,12 +15,14 @@ SimpleRenderSystem::SimpleRenderSystem(
 			modelSetLayout,
 			"SimpleShader/simple_shader.vert.spv",
 			"SimpleShader/simple_shader.frag.spv",
-			sizeof(SimplePushConstantData),
 			[](void* pushConstantData, GameObject& obj) {
 				auto* simplePush = static_cast<SimplePushConstantData*>(pushConstantData);
 				simplePush->modelMatrix = obj.transform.mat4();
 				simplePush->normalMatrix = obj.transform.normalMatrix();
 			}
-		) {}
+		) {
+			createPipelineLayout(globalSetLayout, modelSetLayout);
+			createPipeline(renderPass);
+		}
 
 }	// namespace dix

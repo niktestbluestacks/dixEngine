@@ -14,11 +14,17 @@ struct SimpleUbo {
 	alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 1.f, -3.f, -1.f });
 };
 
+struct SimplePushConstantData {
+	glm::mat4 modelMatrix{ 1.f };
+	glm::mat4 normalMatrix{ 1.f };
+};
+
 class SimpleRenderSystem : public DixRenderSystem {
 public:
 	using DixRenderSystem::DixRenderSystem;	// inherit constructors
 	using Ubos = std::tuple<SimpleUbo>;
-	
+	using PushConstantData = SimplePushConstantData;
+
 	SimpleRenderSystem(
 		EngineDevice& engineDevice, 
 		VkRenderPass renderPass, 

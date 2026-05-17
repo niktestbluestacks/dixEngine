@@ -37,7 +37,7 @@ FirstApp::FirstApp(void) {
 
 FirstApp::~FirstApp(void) {
 	DixLogInfo("Closing FirstApp...");
-	m_context->~AppContext();
+	m_context.reset();
 	m_gameObjects.clear();
 	DixLogInfo("FirstApp closed successfully!");
 }

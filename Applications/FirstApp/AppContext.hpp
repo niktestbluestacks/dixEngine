@@ -216,7 +216,7 @@ private:
 			
 			buf = std::make_unique<DixBuffer>(
 				m_dixDevice,
-				sizeof(info.Ubos),
+				sizeof(std::get<0>(info.Ubos)),
 				1,
 				VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
 				VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT
@@ -248,14 +248,17 @@ private:
 		}
 	}
 	void createRenderSystems() {
-		std::apply([this](auto&& arg) {
-		using T = std::remove_reference_t<decltype(*(std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem))>;
-		std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = new T (
-			m_dixDevice,
-			m_dixRenderer.getSwapChainRenderPass(),
-			m_systemSetLayouts[std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
-			m_modelSetLayout->getDescriptorSetLayout()
-		);}, m_renderSystemRegistery.getRenderSystemDescriptions());
+		size_t renderSystemIndex = 0;
+		std::apply([&](auto&& arg) {
+			using T = std::remove_reference_t<decltype(*(std::get<renderSystemIndex>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem))>;
+			std::get<renderSystemIndex>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = new T (
+				m_dixDevice,
+				m_dixRenderer.getSwapChainRenderPass(),
+				m_systemSetLayouts[std::get<renderSystemIndex>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+				m_modelSetLayout->getDescriptorSetLayout()
+			);
+			++renderSystemIndex;
+		}, m_renderSystemRegistery.getRenderSystemDescriptions());
 	}
 
 	

@@ -18,7 +18,7 @@ class SimpleRenderSystem : public DixRenderSystem {
 public:
 	using DixRenderSystem::DixRenderSystem;	// inherit constructors
 	using Ubos = std::tuple<SimpleUbo>;
-
+	
 	SimpleRenderSystem(
 		EngineDevice& engineDeivce, 
 		VkRenderPass renderPass, 
@@ -30,10 +30,12 @@ public:
 		return "SimpleRenderSystem";
 	}
 
-	// std::tuple <std::pair <VkDescriptorType, VkShaderStageFlagBits>, std::pair <VkDescriptorType, VkShaderStageFlagBits>> getVulkanFlags() {
-	// 	return std::make_tuple( std::pair{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT},
-	// 		 std::pair({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}) );
-	// }
+	static constexpr std::tuple <VulkanRenderSystemFlagType, VulkanRenderSystemFlagType> getVulkanFlags() {
+		return std::make_tuple(
+			VulkanRenderSystemFlagType{0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT}, 
+			VulkanRenderSystemFlagType{1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT}
+		);
+	}
 
 	DIX_DISABLE_COPY(SimpleRenderSystem)
 

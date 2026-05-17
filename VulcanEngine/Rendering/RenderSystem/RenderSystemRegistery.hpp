@@ -21,19 +21,20 @@ struct RenderSystemConstructInfo {
 template <typename RenderSystem>
 requires 
 	HasUbos <RenderSystem> &&
-	HasName <RenderSystem> 
-	// HasVulkanFlags <RenderSystem>
-	// is_tuple_v <typename RenderSystem::GlobalUbo>
+	is_tuple_v <typename RenderSystem::Ubos> &&
+	HasName <RenderSystem> &&
+	HasVulkanFlags <RenderSystem>
 struct RenderSystemDescription {
-	RenderSystem* renderSystem;
-	RenderSystem::Ubos Ubos;
+
+	RenderSystem* renderSystem;	// will be initialized later
+	RenderSystem::Ubos Ubos;	// good already
 	const char* renderSystemName = RenderSystem::Name();
 };
 
 template <typename... RenderSystems>
 class RenderSystemRegistery {
-	constexpr RenderSystemRegistery():
-	m_renderSystems(std::make_tuple<RenderSystemDescription<RenderSystems>...>) {}
+public:
+	constexpr RenderSystemRegistery() = default;
 
 	std::tuple <RenderSystemDescription<RenderSystems>...>& getRenderSystemDescriptions() {
 		return m_renderSystems;

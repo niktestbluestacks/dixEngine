@@ -89,30 +89,18 @@ void DixRenderSystem::createPipeline(VkRenderPass renderPass) {
 void DixRenderSystem::renderGameObjects(
 		FrameInfo& frameInfo,
 		std::vector <GameObject>& gameObjects
-	) {
+	) const {
 	// bind pipeline
 	m_pipeline->bind(frameInfo.commandBuffer);
 
 
-	// First, collect all unique textures and prepare descriptor writes
-	// We need to update the descriptor set BEFORE binding it or use per-object descriptor sets
-	// For now, we'll update once per frame with the first object's texture, or use default
-
 	VkDescriptorImageInfo currentImageInfo{};
 	currentImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-	// Use the default texture from the descriptor set initially
-	// The descriptor set was already initialized with a default texture in AppContext::createDescriptorSets()
-	// So we just need to bind it - no need to update per-object unless you implement per-object descriptor sets
 
 	for (auto& obj : gameObjects) {
         auto buffer = std::make_unique<std::byte[]>(m_sizeofPushConstantData);
 	    void* push = static_cast<void*>(buffer.get());
         m_transformGameObject(push, obj);
-
-        // SimplePushConstantData push{};
-        // push.modelMatrix = obj.transform.mat4();
-        // push.normalMatrix = obj.transform.normalMatrix();
 
 		vkCmdPushConstants(
 			frameInfo.commandBuffer,

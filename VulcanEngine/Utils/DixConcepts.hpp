@@ -8,13 +8,13 @@
 namespace dix {
 
 template <typename T>
-concept HasUbos = requires (T t) {
-    { T::Ubos };
+concept HasUbos = requires {
+    typename T::Ubos;
 };
 
 template <typename T>
-concept HasName = requires (T t) {
-    { T::Name() };
+concept HasName = requires {
+    T::Name();
 };
 
 template <typename T>
@@ -29,7 +29,7 @@ inline constexpr bool is_tuple_v = is_tuple<T>::value;
 
 template <typename T>
 concept HasVulkanFlags = requires (T t) {
-    { T::getVulkanFlags };
+    { T::getVulkanFlags() };
 };
 
 }   // namespace dix

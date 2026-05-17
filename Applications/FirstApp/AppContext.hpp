@@ -32,7 +32,7 @@
 
 namespace dix {
 
-template <typename ...RenderSystems>
+template <typename... RenderSystems>
 class AppContext {
 public:
 	AppContext(int width, int height, const std::string& title):
@@ -90,38 +90,59 @@ public:
 		if (m_uiManager) {
 			m_uiManager->update(frameTime, additionalInfo);
 		}
-		// TODO:
-		// CHANGE THIS
-		const auto& renderSystemName = std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).name;
-		const auto& renderSystem = std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions())->renderSystem;
-		const auto& uboSize = sizeof(std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).Ubos);
-		// for (const auto &[renderSystemName, renderInfo] : DIX_RSR.getRenderSystems()) {
+
 		if (auto commandBuffer = beginFrame()) {
 			int frameIndex = getFrameIndex();
-			FrameInfo frameInfo{
+			std::string uiSystemName = std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName;
+    
+			FrameInfo uiFrameInfo{
 				frameIndex,
 				frameTime,
 				commandBuffer,
 				camera,
-				m_systemDescriptorSets[renderSystemName][frameIndex],
+				m_systemDescriptorSets[uiSystemName][frameIndex], // Ensure this key exists!
 				m_Window.getExtent()
 			};
-			// allow UI elements to upload per-frame resources now that a frame and command buffer exist
+			// // allow UI elements to upload per-frame resources now that a frame and command buffer exist
 			if (m_uiManager) {
-				m_uiManager->upload(frameInfo);
+				m_uiManager->upload(uiFrameInfo);
 			}
-
-			// update global ubo for this frame
-			decltype(std::get<0>(SimpleRenderSystem::Ubos())) ubo{};
-			ubo.projectionView = camera.getProjection() * camera.getView();
-			m_systemUboBuffers[renderSystemName][frameIndex]->writeToIndex(&ubo, 0);
-			m_systemUboBuffers[renderSystemName][frameIndex]->flush();
-
-			// UI was already updated before acquiring the swapchain image
 
 			// render
 			beginSwapChainRenderPass(commandBuffer);
-			renderSystem.renderGameObjects(frameInfo, gameObjects[renderSystemName]);
+
+			std::apply([&](auto&&... renderSystemDescs) {
+				(([&](auto&& desc) {
+					const auto& renderSystemName = desc.renderSystemName;
+					const auto& renderSystem = desc.renderSystem;
+
+					FrameInfo frameInfo{
+						frameIndex,
+						frameTime,
+						commandBuffer,
+						camera,
+						m_systemDescriptorSets[renderSystemName][frameIndex],
+						m_Window.getExtent()
+					};
+
+					// Update UBO for this system
+					int IndexOfWriteToIndex = 0;
+					std::apply([&](auto&& arg) {
+						std::remove_reference_t<decltype(arg)> ubo{};
+						ubo.projectionView = camera.getProjection() * camera.getView();
+						
+						m_systemUboBuffers[renderSystemName][frameIndex]->writeToIndex(&ubo, IndexOfWriteToIndex);
+						++IndexOfWriteToIndex;
+						m_systemUboBuffers[renderSystemName][frameIndex]->flush();
+
+					}, desc.Ubos);
+
+					// Render geometry
+					renderSystem->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
+
+				}(renderSystemDescs)), ...);
+			}, m_renderSystemRegistery.getRenderSystemDescriptions());
+
 			// render UI
 			if (m_uiManager && m_uiRenderer) {
 				m_uiRenderer->bindPipeline(commandBuffer);
@@ -137,7 +158,7 @@ public:
 					0,
 					sizeof(screenSize),
 					&screenSize);
-				m_uiManager->render(frameInfo);
+				m_uiManager->render(uiFrameInfo);
 			}
 			endSwapChainRenderPass(commandBuffer);
 			endFrame();
@@ -184,14 +205,14 @@ private:
 
 	void createUBOs() {
 		std::apply([this](auto&& arg) {
-			createSingeUbo(std::forward<decltype(arg)>(arg));
+			createSingleUbo(std::forward<decltype(arg)>(arg));
 		}, m_renderSystemRegistery.getRenderSystemDescriptions());	
 	}
 
 	template <typename RenderSystemInfo>
 	void createSingleUbo(RenderSystemInfo&& info) {
-		m_systemUboBuffers[info.name].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-		for (auto& buf : m_systemUboBuffers[info.name]) {
+		m_systemUboBuffers[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+		for (auto& buf : m_systemUboBuffers[info.renderSystemName]) {
 			
 			buf = std::make_unique<DixBuffer>(
 				m_dixDevice,
@@ -212,27 +233,29 @@ private:
 
 	template <typename RenderSystemInfo>
 	void createSingleDescriptorSet(RenderSystemInfo info) {
-		m_systemDescriptorSets[info.name].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+		m_systemDescriptorSets[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		imageInfo.imageView = m_defaultTexture.getImageView();
 		imageInfo.sampler = m_defaultTexture.getSampler();
 
-		for (size_t i = 0; i < m_systemDescriptorSets[info.name].size(); ++i) {
-			auto bufferInfo = m_systemUboBuffers[info.name][i]->descriptorInfo();
-			DixDescriptorWriter(*m_systemSetLayouts[info.name], *m_globalPool)
+		for (size_t i = 0; i < m_systemDescriptorSets[info.renderSystemName].size(); ++i) {
+			auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i]->descriptorInfo();
+			DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_globalPool)
 				.writeBuffer(0, &bufferInfo)
 				.writeImage(1, &imageInfo)
-				.build(m_systemDescriptorSets[info.name][i]);
+				.build(m_systemDescriptorSets[info.renderSystemName][i]);
 		}
 	}
 	void createRenderSystems() {
-		// TODO: CHANGE THIS
-		std::get<0>(m_renderSystemRegistery.getRenderSystemDesctiptions())->renderSystem(
-		m_dixDevice,
-        m_dixRenderer.getSwapChainRenderPass(),
-        m_systemSetLayouts["SimpleRenderSystem"]->getDescriptorSetLayout(),
-        m_modelSetLayout->getDescriptorSetLayout());
+		std::apply([this](auto&& arg) {
+		using T = std::remove_reference_t<decltype(*(std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem))>;
+		std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = new T (
+			m_dixDevice,
+			m_dixRenderer.getSwapChainRenderPass(),
+			m_systemSetLayouts[std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+			m_modelSetLayout->getDescriptorSetLayout()
+		);}, m_renderSystemRegistery.getRenderSystemDescriptions());
 	}
 
 	
@@ -248,11 +271,20 @@ private:
 			.build();
 	}
 	void createSystemSetLayouts() {
-		// TODO: change it to iterato throe tuples of flags inside render system
-		m_systemSetLayouts["SimpleRenderSystem"] = DixDescriptorSetLayout::Builder(m_dixDevice)
-			.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
-			.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-			.build();
+		auto processRenderSystem = [&](auto&& renderSystemDesc) {
+        	auto&& vulkanFlags = renderSystemDesc.renderSystem->getVulkanFlags();
+        	auto builder = DixDescriptorSetLayout::Builder(m_dixDevice);
+			std::apply([&](auto&&... bindingTuples) {
+				(std::apply([&](auto&&... args) {
+					builder.addBinding(std::forward<decltype(args)>(args)...);
+				}, bindingTuples), ...); 
+			}, vulkanFlags);
+        	m_systemSetLayouts[renderSystemDesc.renderSystemName] = builder.build();
+    	};
+    
+    	std::apply([&](auto&&... args) {
+        	(processRenderSystem(args), ...);
+    	}, m_renderSystemRegistery.getRenderSystemDescriptions());
 	}
 	void declareRenderSystems();
 	void createDescriptorPool() {

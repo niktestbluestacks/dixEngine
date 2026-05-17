@@ -16,6 +16,8 @@
 
 namespace dix {
 
+using VulkanRenderSystemFlagType = typename std::tuple<uint32_t, VkDescriptorType, VkShaderStageFlags>;
+
 class DixRenderSystem {
 protected:
     virtual void createPipelineLayout(
@@ -42,7 +44,7 @@ public:
 	virtual void renderGameObjects(
 		FrameInfo& frameInfo, 
 		std::vector <GameObject>& gameObjects
-	);
+	) const;
 protected:
     std::string m_vertShaderBinaryPath;
     std::string m_fragShaderBinaryPath;

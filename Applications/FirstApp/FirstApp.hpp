@@ -27,8 +27,7 @@ public:
 	FirstApp(void);
 	~FirstApp(void);
 
-	FirstApp(const FirstApp&) = delete;
-	FirstApp& operator=(const FirstApp&) = delete;
+	DIX_DISABLE_COPY(FirstApp)
 
 	void run(void);
 

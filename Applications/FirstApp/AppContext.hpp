@@ -18,8 +18,8 @@
 #include <UI/DixUIElement.hpp>
 #include <Utils/Converter.hpp>
 #include <Rendering/RenderSystem/RenderSystemRegistery.hpp>
-#include <utility>
 
+// libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -29,6 +29,7 @@
 #include <memory>
 #include <unordered_map>
 #include <vector>
+#include <utility>
 
 namespace dix {
 
@@ -114,7 +115,6 @@ public:
 			std::apply([&](auto&&... renderSystemDescs) {
 				(([&](auto&& desc) {
 					const auto& renderSystemName = desc.renderSystemName;
-					const auto& renderSystem = desc.renderSystem;
 
 					FrameInfo frameInfo{
 						frameIndex,
@@ -138,7 +138,7 @@ public:
 					}, desc.Ubos);
 
 					// Render geometry
-					renderSystem->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
+					desc.renderSystem->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
 
 				}(renderSystemDescs)), ...);
 			}, m_renderSystemRegistery.getRenderSystemDescriptions());
@@ -168,7 +168,7 @@ public:
 	// 
 	void addUIElement(std::unique_ptr<DixUIElement> element) {
 		if (m_uiManager) {
-        m_uiManager->addElement(std::move(element));
+        	m_uiManager->addElement(std::move(element));
     	}
 	}
 	// void addGameObject(std::unique_ptr<GameObject> object);
@@ -197,11 +197,6 @@ private:
 	DixTexture m_defaultTexture;
 
 	RenderSystemRegistery<RenderSystems...> m_renderSystemRegistery;
-
-	template <typename RenderSystemInfo>
-	void drawFrameForSingleRenderSystem(RenderSystemInfo&& info) {
-
-	}
 
 	void createUBOs() {
 		std::apply([this](auto&& arg) {
@@ -232,7 +227,7 @@ private:
 	}
 
 	template <typename RenderSystemInfo>
-	void createSingleDescriptorSet(RenderSystemInfo info) {
+	void createSingleDescriptorSet(RenderSystemInfo&& info) {
 		m_systemDescriptorSets[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -248,19 +243,21 @@ private:
 		}
 	}
 	void createRenderSystems() {
-		size_t renderSystemIndex = 0;
-		std::apply([&](auto&& arg) {
-			using T = std::remove_reference_t<decltype(*(std::get<renderSystemIndex>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem))>;
-			std::get<renderSystemIndex>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = new T (
-				m_dixDevice,
-				m_dixRenderer.getSwapChainRenderPass(),
-				m_systemSetLayouts[std::get<renderSystemIndex>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
-				m_modelSetLayout->getDescriptorSetLayout()
-			);
-			++renderSystemIndex;
-		}, m_renderSystemRegistery.getRenderSystemDescriptions());
+		createRenderSystemsImpl(std::index_sequence_for<RenderSystems...>{});
 	}
 
+	template<size_t... Indices>
+	void createRenderSystemsImpl(std::index_sequence<Indices...>) {
+		(([&]() {
+			using T = std::remove_reference_t<decltype(*std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem)>;
+			std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
+				m_dixDevice,
+				m_dixRenderer.getSwapChainRenderPass(),
+				m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+				m_modelSetLayout->getDescriptorSetLayout()
+			);
+		})(), ...);
+	}
 	
 	void createModelDescriptorResources() {
 		m_modelSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
@@ -289,7 +286,6 @@ private:
         	(processRenderSystem(args), ...);
     	}, m_renderSystemRegistery.getRenderSystemDescriptions());
 	}
-	void declareRenderSystems();
 	void createDescriptorPool() {
 		m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
 			.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)

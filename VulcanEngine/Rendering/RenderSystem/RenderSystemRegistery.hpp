@@ -26,7 +26,7 @@ requires
 	HasVulkanFlags <RenderSystem>
 struct RenderSystemDescription {
 
-	RenderSystem* renderSystem;	// will be initialized later
+	std::unique_ptr<RenderSystem> renderSystem = nullptr;	// will be initialized later
 	RenderSystem::Ubos Ubos;	// good already
 	const char* renderSystemName = RenderSystem::Name();
 };

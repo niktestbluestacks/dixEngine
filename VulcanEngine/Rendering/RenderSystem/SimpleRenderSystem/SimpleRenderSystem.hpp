@@ -20,7 +20,7 @@ public:
 	using Ubos = std::tuple<SimpleUbo>;
 	
 	SimpleRenderSystem(
-		EngineDevice& engineDeivce, 
+		EngineDevice& engineDevice, 
 		VkRenderPass renderPass, 
 		VkDescriptorSetLayout globalSetLayout,
 		VkDescriptorSetLayout modelSetLayout

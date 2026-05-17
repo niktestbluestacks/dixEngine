@@ -179,6 +179,11 @@ public:
 	DixDescriptorPool& getDescriptorPool() { return *m_modelDescriptorPool; }
 	DixDescriptorSetLayout& getModelSetLayout() { return *m_modelSetLayout; }
 
+	void shutdown() {
+		m_uiManager.reset();
+		m_uiRenderer.reset();
+	}
+
 private:
 	Window m_Window;
 	EngineDevice m_dixDevice;

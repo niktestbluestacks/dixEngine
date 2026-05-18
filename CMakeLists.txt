@@ -15,16 +15,25 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 1. FIND DEPENDENCIES
 # ==========================================
 find_package(Vulkan REQUIRED)
-find_package(glfw3 REQUIRED)
+find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)  # ← Добавить эту строку
 
 # Find glslc
 if(Vulkan_GLSLC_EXECUTABLE)
     set(GLSLC ${Vulkan_GLSLC_EXECUTABLE})
 else()
-    set(GLSLC "C:/VulkanSDK/1.4.341.1/Bin/glslc.exe")
+    # Если CMake его не нашел автоматически, ищем программу в системе
+    find_program(GLSLC_PATH glslc)
+    
+    if(GLSLC_PATH)
+        set(GLSLC ${GLSLC_PATH})
+    else()
+        # Запасной вариант для Windows, если автоматический поиск не сработал
+        set(GLSLC "C:/VulkanSDK/1.4.341.1/Bin/glslc.exe")
+    endif()
 endif()
 
+message(STATUS "Shader compiler found: ${GLSLC}")
 
 
 # ==========================================
@@ -96,3 +105,10 @@ execute_process(
     ${CMAKE_BINARY_DIR}/compile_commands.json
     ${CMAKE_SOURCE_DIR}/compile_commands.json
 )
+
+if(NOT WIN32)
+    # Автоматически подменяем вызовы localtime_s на уровне компилятора
+    add_compile_definitions(
+        "localtime_s(tm_ptr, time_ptr)=localtime_r(time_ptr, tm_ptr)"
+    )
+endif()

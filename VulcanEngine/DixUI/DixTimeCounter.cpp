@@ -3,6 +3,10 @@
 #include <ctime>
 #include <string>
 
+#ifndef _WIN32
+#define localtime_s(tm_ptr, time_ptr) localtime_r(time_ptr, tm_ptr)
+#endif
+
 namespace dix {
 void DixTimeCounter::update(float dt, const AdditionalUIInfo& additionalInfo) {
     m_currTime = Clock::now();

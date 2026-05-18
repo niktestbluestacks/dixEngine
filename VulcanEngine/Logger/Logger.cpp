@@ -6,6 +6,10 @@
 #include <sstream>
 #include <chrono>
 
+#ifndef _WIN32
+#define localtime_s(tm_ptr, time_ptr) localtime_r(time_ptr, tm_ptr)
+#endif
+
 namespace dix {
 
 Logger& Logger::get() {

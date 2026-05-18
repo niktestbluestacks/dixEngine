@@ -26,7 +26,7 @@ struct QueueFamilyIndices {
 
 class EngineDevice {
 public:
-#ifdef NDEBUG
+#if !defined(NDEBUG) || !defined(_WIN32)
     const bool enableValidationLayers = false;
 #else
     const bool enableValidationLayers = true;

@@ -18,8 +18,8 @@ ParticleRenderSystem::ParticleRenderSystem(
         renderPass,
         globalSetLayout,
         modelSetLayout,
-        "Particle/particle.vert.spv",
-        "Particle/particle.frag.spv",
+        "ParticleShader/particle.vert.spv",
+        "ParticleShader/particle.frag.spv",
         [](void* pushConstantData, GameObject& obj) {
                 auto* particlePush = static_cast<ParticlePushConstantData*>(pushConstantData);
                 particlePush->modelMatrix = obj.transform.mat4();
@@ -96,7 +96,7 @@ void ParticleRenderSystem::createComputePipeline(VkDescriptorSetLayout globalSet
 
     m_computePipeline = std::make_unique<ComputePipeline>(
         m_dixDevice,
-        toShaderPath("Particle/particle_compute.comp.spv"),
+        toShaderPath("ParticleShader/particle_compute.comp.spv"),
         computeConfigInfo
     );
 }

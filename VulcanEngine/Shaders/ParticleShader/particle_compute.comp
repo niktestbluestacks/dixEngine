@@ -1,0 +1,56 @@
+#version 460
+
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
+
+// Match the c++ struct
+struct Particle {
+    vec3 position;
+    float lifetime;
+    vec3 velocity;
+    float size;
+    vec4 color;
+};
+
+// Storage buffer for particle data (r/w)
+layout(std430, binding = 0) buffer ParticleBuffer {
+    uint particleCount;
+    Particle particles[];
+} particleBuffer;
+
+layout(binding = 1) uniform SimulationParams {
+    vec3 gravity;
+    float deltaTime;
+    vec3 wind;
+    float dampling;
+} params;
+
+void main() {
+    uint index = gl_GlobalInvocationID.x;
+
+    if (index >= particleBuffer.particleCount) return;
+
+    Particle p = particleBuffer.particles[index];
+
+    // Only update active particles
+    if (p.lifetime < 0.0) return;
+
+    // Update velocity and forces
+    p.velocity += params.gravity * params.deltaTime;
+    p.velocity += params.wind * params.deltaTime;
+    p.velocity *= params.dampling;
+
+    // upd position
+    p.position += p.velocity * params.deltaTime;
+
+    // upd lifetime
+    p.lifetime -= params.deltaTime;
+
+    // // Simple floor collision
+    // if (p.position.y < 0.0) {
+    //     p.position.y = 0.0;
+    //     p.velocity.y *= -0.5; // Bounce with energy loss
+    // }
+
+    // Write back updated particle
+    particleBuffer.particles[index] = p;
+}

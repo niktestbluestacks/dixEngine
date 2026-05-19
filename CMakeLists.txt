@@ -46,6 +46,7 @@ file(MAKE_DIRECTORY ${SHADER_BINARY_DIR})
 file(GLOB_RECURSE SHADER_SOURCES 
     "${SHADER_SOURCE_DIR}/*.vert"
     "${SHADER_SOURCE_DIR}/*.frag"
+    "${SHADER_SOURCE_DIR}/*.comp"
 )
 
 # Debug: Fixed counter (CMAKE_MATCH_COUNT doesn't work with GLOB)

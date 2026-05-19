@@ -209,8 +209,8 @@ private:
 	RenderSystemRegistery<RenderSystems...> m_renderSystemRegistery;
 
 	void createUBOs() {
-		std::apply([this](auto&& arg) {
-			createSingleUbo(std::forward<decltype(arg)>(arg));
+		std::apply([this](auto&&... arg) {
+			(createSingleUbo(std::forward<decltype(arg)>(arg)), ...);
 		}, m_renderSystemRegistery.getRenderSystemDescriptions());	
 	}
 
@@ -245,8 +245,8 @@ private:
 	}
 	void createDescriptorSets() {
 		m_defaultTexture = createDefaultTexture(m_dixDevice);
-		std::apply([this](auto&& arg) {
-			createSingleDescriptorSet(std::forward<decltype(arg)>(arg));
+		std::apply([this](auto&&... arg) {
+			(createSingleDescriptorSet(std::forward<decltype(arg)>(arg)), ...);
 		}, m_renderSystemRegistery.getRenderSystemDescriptions());
 	}
 

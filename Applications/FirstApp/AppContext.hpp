@@ -19,6 +19,7 @@
 #include <Utils/Converter.hpp>
 #include <Rendering/RenderSystem/RenderSystemRegistery.hpp>
 #include <Utils/TupleHelper.hpp>
+#include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
 
 // libs
 #define GLM_FORCE_RADIANS

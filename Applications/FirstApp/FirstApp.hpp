@@ -36,10 +36,11 @@ private:
 	glm::vec3 playerLookAt { 0.f, 0.f, 2.5f };
 	std::unordered_map<std::string, std::vector<GameObject>> m_gameObjects;
 	std::unordered_map<std::string, DixAudio> m_sounds;
-	std::unique_ptr <AppContext<SimpleRenderSystem>> m_context{ std::make_unique<AppContext<SimpleRenderSystem>>(
-		WIDTH, 
-		HEIGHT, 
-		static_cast<std::string>("First Application")
+	std::unique_ptr <AppContext<SimpleRenderSystem, ParticleRenderSystem>> m_context{ 
+		std::make_unique<AppContext<SimpleRenderSystem, ParticleRenderSystem>>(
+			WIDTH, 
+			HEIGHT, 
+			static_cast<std::string>("First Application")
 	) };
 };
 }	// namespace dix

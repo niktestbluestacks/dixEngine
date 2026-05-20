@@ -14,3 +14,8 @@ Makefile
 Applications/audio/
 buildLinux/
 *.yaml
+CMakeFiles/
+CMakeCache.txt
+VulcanApp
+cmake_install.cmake
+VulcanApp

@@ -168,7 +168,7 @@ private:
 	std::unordered_map<std::string, std::unique_ptr<DixDescriptorSetLayout>> m_systemSetLayouts;
 	std::unordered_map<std::string, std::vector<VkDescriptorSet>> m_systemDescriptorSets;
 
- // per-model descriptor resources
+ 	// per-model descriptor resources
 	std::unique_ptr<DixDescriptorPool> m_modelDescriptorPool;
 	std::unique_ptr<DixDescriptorSetLayout> m_modelSetLayout;
 

@@ -31,9 +31,13 @@ DixBuffer::DixBuffer(
 }
 
 DixBuffer::~DixBuffer() {
-    unmap();
-    vkDestroyBuffer(m_dixDevice.device(), m_buffer, nullptr);
-    vkFreeMemory(m_dixDevice.device(), m_memory, nullptr);
+    if (m_buffer && m_mapped != VK_NULL_HANDLE) {
+        vkUnmapMemory(m_dixDevice.device(), m_memory);
+        m_mapped = nullptr;
+
+        vkDestroyBuffer(m_dixDevice.device(), m_buffer, nullptr);
+        vkFreeMemory(m_dixDevice.device(), m_memory, nullptr);
+    }
 }
 
 VkResult DixBuffer::map(VkDeviceSize size, VkDeviceSize offset) {

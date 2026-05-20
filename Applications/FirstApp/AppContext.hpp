@@ -2,36 +2,7 @@
 #define APP_CONTEXT_HPP
 
 // dix
-#include <Pipeline/EngineDevice/EngineDevice.hpp>
-#include <Pipeline/DixDescriptors/DixDescriptors.hpp>
-#include <Pipeline/Buffer/DixBuffer.hpp>
-#include <Rendering/Renderer/Renderer.hpp>
-#include <Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp>
-#include <Window/WindowClass/WindowClass.hpp>
-#include <Utils/FrameInfo.hpp>
-#include <DixCamera/DixCamera.hpp>
-#include <Model/GameObject/GameObject.hpp>
-#include <UI/UIManager.hpp>
-#include <UI/UIRenderer.hpp>
-#include <Model/DixTexture/DixTexture.hpp>
-#include <Utils/DixConcepts.hpp>
-#include <UI/DixUIElement.hpp>
-#include <Utils/Converter.hpp>
-#include <Rendering/RenderSystem/RenderSystemRegistery.hpp>
-#include <Utils/TupleHelper.hpp>
-#include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
-
-// libs
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <vulkan/vulkan.hpp>
-
-// std
-#include <memory>
-#include <unordered_map>
-#include <vector>
-#include <utility>
+#include <FirstApp/AppInclude.hpp>
 
 namespace dix {
 

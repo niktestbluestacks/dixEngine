@@ -1,28 +1,6 @@
 // dix
 #include <FirstApp/FirstApp.hpp>
-
 #include <FirstApp/AppContext.hpp>
-#include <DixCamera/DixCamera.hpp>
-#include <Input/Keyboard/KeyboardAndMouseController.hpp>
-#include <Utils/Converter.hpp>
-#include <Logger/Logger.hpp>
-#include <DixUI/DixFpsCounter.hpp>
-#include <DixUI/DixTimeCounter.hpp>
-#include <DixUI/DixPlayerInfo.hpp>
-#include <Sound/DixAudio.hpp>
-#include <Utils/DixRandom.hpp>
-
-// libs
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/constants.hpp>
-
-// std
-#include <chrono>
-#include <string>
-#include <filesystem>
-#include <random>
 
 namespace dix {
 

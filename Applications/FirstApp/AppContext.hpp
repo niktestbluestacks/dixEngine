@@ -149,6 +149,13 @@ public:
 	}
 	// void addGameObject(std::unique_ptr<GameObject> object);
 	DixDescriptorPool& getDescriptorPool() { return *m_modelDescriptorPool; }
+	DixDescriptorPool& getSystemDescriptorPool(const std::string& systemName) {
+		auto it = m_systemDescriptorPools.find(systemName);
+		if (it == m_systemDescriptorPools.end()) {
+			throw std::runtime_error("Descriptor pool not found for system: " + systemName);
+		}
+		return *it->second;
+	}
 	DixDescriptorSetLayout& getModelSetLayout() { return *m_modelSetLayout; }
 
 	void shutdown() {
@@ -161,8 +168,8 @@ private:
 	EngineDevice m_dixDevice;
 	Renderer m_dixRenderer;
 
-	// rendering resources
-	std::unique_ptr<DixDescriptorPool> m_globalPool;
+	// per-render-system descriptor pools and sets
+	std::unordered_map<std::string, std::unique_ptr<DixDescriptorPool>> m_systemDescriptorPools;
 
 	std::unordered_map<std::string, std::vector<std::vector<std::unique_ptr<DixBuffer>>>> m_systemUboBuffers;
 	std::unordered_map<std::string, std::unique_ptr<DixDescriptorSetLayout>> m_systemSetLayouts;
@@ -232,7 +239,7 @@ private:
 		for (size_t i = 0; i < m_systemDescriptorSets[info.renderSystemName].size(); ++i) {
 			// Use the first UBO buffer (index 0) for descriptor set
 			auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][0]->descriptorInfo();
-			DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_globalPool)
+			DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_systemDescriptorPools[info.renderSystemName])
 				.writeBuffer(0, &bufferInfo)
 				.writeImage(1, &imageInfo)
 				.build(m_systemDescriptorSets[info.renderSystemName][i]);
@@ -252,7 +259,7 @@ private:
 					m_dixRenderer.getSwapChainRenderPass(),
 					m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
 					m_modelSetLayout->getDescriptorSetLayout(),
-					*m_globalPool
+					*m_systemDescriptorPools[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]
 				);
 			} else {
 				std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
@@ -293,11 +300,41 @@ private:
     	}, m_renderSystemRegistery.getRenderSystemDescriptions());
 	}
 	void createDescriptorPool() {
-		m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
-			.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-			.build();
+		std::apply([this](auto&&... renderSystemDesc) {
+			(createSingleDescriptorPool(renderSystemDesc), ...);
+		}, m_renderSystemRegistery.getRenderSystemDescriptions());
+	}
+
+	template <typename RenderSystemInfo>
+	void createSingleDescriptorPool(RenderSystemInfo&& info) {
+		constexpr size_t uboCount = std::tuple_size_v<std::remove_reference_t<decltype(info.Ubos)>>;
+		auto vulkanFlags = info.renderSystem->getVulkanFlags();
+
+		// Count descriptor types needed
+		size_t uniformBufferCount = 0;
+		size_t storageBufferCount = 0;
+		size_t combinedImageSamplerCount = 0;
+
+		std::apply([&](auto&&... bindingTuples) {
+			(std::apply([&](auto binding, auto type, auto stages) {
+				if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+					uniformBufferCount += SwapChain::MAX_FRAMES_IN_FLIGHT;
+				} else if (type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) {
+					storageBufferCount += SwapChain::MAX_FRAMES_IN_FLIGHT;
+				} else if (type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
+					combinedImageSamplerCount += SwapChain::MAX_FRAMES_IN_FLIGHT;
+				}
+			}, bindingTuples), ...);
+		}, vulkanFlags);
+
+		// Create pool for this specific render system
+		auto builder = DixDescriptorPool::Builder(m_dixDevice)
+			.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT + 4) // frames + safety margin
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, uniformBufferCount + 4)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, storageBufferCount + 4)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, combinedImageSamplerCount + 4);
+
+		m_systemDescriptorPools[info.renderSystemName] = builder.build();
 	}
 };
 

@@ -48,7 +48,7 @@ public:
         DixDescriptorPool& descriptorPool
     );
 
-    ~ParticleRenderSystem();
+    ~ParticleRenderSystem() override;
 
     static constexpr const char* Name() {
         return "ParticleRenderSystem";
@@ -93,7 +93,6 @@ private:
     uint32_t m_currentBufferIndex{ 0 };
     ParticleSimulationParams m_simParams{};
     uint32_t m_particleCount{ 0 };
-    DixDescriptorPool& m_descriptorPool;
     static constexpr uint32_t MAX_PARTICLES = 10000;
 };  // ParticleRenderSystem
 }   // namespace dix

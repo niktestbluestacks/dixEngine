@@ -67,6 +67,34 @@ public:
 
 		if (auto commandBuffer = beginFrame()) {
 			int frameIndex = getFrameIndex();
+
+			// Update UBOs for all systems first
+			std::apply([&](auto&&... renderSystemDescs) {
+				(([&](auto&& desc) {
+					const auto& renderSystemName = desc.renderSystemName;
+
+					// Update UBO for this system
+					int uboTypeIndex = 0;
+					std::apply([&](auto&&... uboArgs) {
+						(([&](auto&& arg) {
+							using UboType = std::remove_reference_t<decltype(arg)>;
+							UboType ubo{};
+							ubo.projectionView = camera.getProjection() * camera.getView();
+							m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->writeToBuffer(&ubo, sizeof(UboType));
+							m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->flush();
+
+							// Update descriptor set with new buffer info
+							VkDescriptorBufferInfo bufferInfo = m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->descriptorInfo();
+							DixDescriptorWriter writer(*m_systemSetLayouts[renderSystemName], *m_systemDescriptorPools[renderSystemName]);
+							writer.writeBuffer(0, &bufferInfo);
+							writer.overwrite(m_systemDescriptorSets[renderSystemName][frameIndex]);
+
+							++uboTypeIndex;
+						}(std::get<0>(std::tuple<std::decay_t<decltype(uboArgs)>>{}))), ...);
+					}, desc.Ubos);
+				}(renderSystemDescs)), ...);
+			}, m_renderSystemRegistery.getRenderSystemDescriptions());
+
 			std::string uiSystemName = std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName;
     
 			FrameInfo uiFrameInfo{
@@ -133,7 +161,20 @@ public:
 					VK_SHADER_STAGE_VERTEX_BIT,
 					0,
 					sizeof(screenSize),
-					&screenSize);
+					&screenSize
+				);
+
+				 // Use first system's descriptor set for UI
+				std::string uiSystemName = std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName;
+				FrameInfo uiFrameInfo{
+					frameIndex,
+					frameTime,
+					commandBuffer,
+					camera,
+					m_systemDescriptorSets[uiSystemName][frameIndex],
+					m_Window.getExtent()
+				};
+
 				m_uiManager->render(uiFrameInfo);
 			}
 			endSwapChainRenderPass(commandBuffer);
@@ -237,12 +278,9 @@ private:
 		imageInfo.sampler = m_defaultTexture.getSampler();
 
 		for (size_t i = 0; i < m_systemDescriptorSets[info.renderSystemName].size(); ++i) {
-			// Use the first UBO buffer (index 0) for descriptor set
-			auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][0]->descriptorInfo();
-			DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_systemDescriptorPools[info.renderSystemName])
-				.writeBuffer(0, &bufferInfo)
-				.writeImage(1, &imageInfo)
-				.build(m_systemDescriptorSets[info.renderSystemName][i]);
+			// Create empty descriptor sets - they will be updated per-frame with overwrite()
+			DixDescriptorWriter writer(*m_systemSetLayouts[info.renderSystemName], *m_systemDescriptorPools[info.renderSystemName]);
+			writer.build(m_systemDescriptorSets[info.renderSystemName][i]);
 		}
 	}
 	void createRenderSystems() {
@@ -253,22 +291,13 @@ private:
 	void createRenderSystemsImpl(std::index_sequence<Indices...>) {
 		(([&]() {
 			using T = std::remove_reference_t<decltype(*std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem)>;
-			if constexpr (std::is_same_v<T, ParticleRenderSystem>) {
-				std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
-					m_dixDevice,
-					m_dixRenderer.getSwapChainRenderPass(),
-					m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
-					m_modelSetLayout->getDescriptorSetLayout(),
-					*m_systemDescriptorPools[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]
-				);
-			} else {
-				std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
-					m_dixDevice,
-					m_dixRenderer.getSwapChainRenderPass(),
-					m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
-					m_modelSetLayout->getDescriptorSetLayout()
-				);
-			}
+			std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
+				m_dixDevice,
+				m_dixRenderer.getSwapChainRenderPass(),
+				m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+				m_modelSetLayout->getDescriptorSetLayout(),
+				*m_systemDescriptorPools[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]
+			);
 		})(), ...);
 	}
 	
@@ -329,10 +358,10 @@ private:
 
 		// Create pool for this specific render system
 		auto builder = DixDescriptorPool::Builder(m_dixDevice)
-			.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT + 4) // frames + safety margin
-			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, uniformBufferCount + 4)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, storageBufferCount + 4)
-			.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, combinedImageSamplerCount + 4);
+			.setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, uniformBufferCount)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, storageBufferCount)
+			.addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, combinedImageSamplerCount);
 
 		m_systemDescriptorPools[info.renderSystemName] = builder.build();
 	}

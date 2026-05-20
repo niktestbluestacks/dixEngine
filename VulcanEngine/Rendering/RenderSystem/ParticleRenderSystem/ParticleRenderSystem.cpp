@@ -20,14 +20,14 @@ ParticleRenderSystem::ParticleRenderSystem(
         renderPass,
         globalSetLayout,
         modelSetLayout,
+        descriptorPool,
         "ParticleShader/particle.vert.spv",
         "ParticleShader/particle.frag.spv",
         [](void* pushConstantData, GameObject& obj) {
                 auto* particlePush = static_cast<ParticlePushConstantData*>(pushConstantData);
                 particlePush->modelMatrix = obj.transform.mat4();
         }
-    ),
-    m_descriptorPool(descriptorPool) {
+    ) {
 
         // Create double buffers for particles to avoid CPU/GPU race conditions
         VkDeviceSize particleBufferSize = sizeof(uint32_t) + sizeof(Particle) * MAX_PARTICLES;
@@ -70,9 +70,7 @@ ParticleRenderSystem::ParticleRenderSystem(
         m_simulationParamsBuffer->writeToBuffer(&m_simParams, sizeof(ParticleSimulationParams));
         m_simulationParamsBuffer->unmap();
 
-        createPipelineLayout(globalSetLayout, modelSetLayout);
         createComputePipeline(globalSetLayout, modelSetLayout);
-        createPipeline(renderPass);
         setupDescriptors();
 }
 

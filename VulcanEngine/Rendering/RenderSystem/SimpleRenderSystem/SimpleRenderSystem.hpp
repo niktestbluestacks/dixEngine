@@ -29,7 +29,8 @@ public:
 		EngineDevice& engineDevice, 
 		VkRenderPass renderPass, 
 		VkDescriptorSetLayout globalSetLayout,
-		VkDescriptorSetLayout modelSetLayout
+		VkDescriptorSetLayout modelSetLayout,
+		DixDescriptorPool& descriptorPool
 	);
 
 	static constexpr const char* Name() {

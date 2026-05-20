@@ -43,17 +43,22 @@
 #include <Utils/DixRandom.hpp>
 #include <Utils/FrameInfo.hpp>
 #include <Utils/DixConcepts.hpp>
+// dix
 
 // libs
+// GLM
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
+
+// VULKAN
 #include <vulkan/vulkan.hpp>
+// libs
 
 // std
-#if defined(__GNUG__) && __GNUG__ >= 14
-#include <bits/stdc++.h>
+#if defined(__GNUG__) && __cplusplus > 202302L
+#include <bits/stdc++.h>    // including all of the standtard library won't hurt the performance, it will just make life easier
 #else
 #include <chrono>
 #include <string>
@@ -65,5 +70,6 @@
 #include <unordered_map>
 #include <utility>
 #endif // __GNUG__
+// std
 
 #endif // APP_INCLUDE_HPP

@@ -1,16 +1,7 @@
 #ifndef _FIRST_APP_HPP
 #define _FIRST_APP_HPP
  
-// dix
-#include <Model/GameObject/GameObject.hpp>
 #include <FirstApp/AppContext.hpp>
-#include <Utils/Converter.hpp>
-#include <Sound/DixAudio.hpp>
-
-// std
-#include <string>
-#include <vector>
-#include <string_view>
 
 namespace dix {
 class FirstApp {

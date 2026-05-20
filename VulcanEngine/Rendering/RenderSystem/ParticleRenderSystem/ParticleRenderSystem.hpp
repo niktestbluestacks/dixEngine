@@ -1,5 +1,5 @@
 #ifndef PARTICLE_RENDER_SYSTEM_HPP
-#define PATRICLE_RENDER_SYSTEM_HPP
+#define PARTICLE_RENDER_SYSTEM_HPP
 
 // dix
 #include "Pipeline/EngineDevice/EngineDevice.hpp"
@@ -66,6 +66,8 @@ public:
     void updateParticles(float deltaTime);
     void createParticleEmitter(glm::vec3 position, uint32_t count);
     void dispatchCompute(VkCommandBuffer commandBuffer, uint32_t particleCount);
+    void cleanupDeadParticles();
+    void waitForGpuCompletion();
 
     void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) const override;
 private:
@@ -73,16 +75,22 @@ private:
 
     void createComputePipeline(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout modelSetLayout);
     void setupDescriptors();
-    void bindBuffers(VkCommandBuffer commandBuffer) const;
+    void bindBuffers(VkCommandBuffer commandBuffer, uint32_t bufferIndex) const;
+    void swapBuffers();
 
     std::unique_ptr<ComputePipeline> m_computePipeline;
     VkPipelineLayout m_computePipelineLayout{ VK_NULL_HANDLE };
     std::unique_ptr<DixDescriptorSetLayout> m_computeSetLayout;
 
-    std::unique_ptr<DixBuffer> m_particleBuffer;
+    // Double buffering to avoid CPU/GPU race conditions
+    std::array<std::unique_ptr<DixBuffer>, 2> m_particleBuffers;
     std::unique_ptr<DixBuffer> m_simulationParamsBuffer;
-    VkDescriptorSet m_particleDescriptorSet{ VK_NULL_HANDLE };
+    std::array<VkDescriptorSet, 2> m_particleDescriptorSets{ VK_NULL_HANDLE, VK_NULL_HANDLE };
 
+    // Synchronization primitives
+    std::array<VkFence, 2> m_frameFences{ VK_NULL_HANDLE, VK_NULL_HANDLE };
+
+    uint32_t m_currentBufferIndex{ 0 };
     ParticleSimulationParams m_simParams{};
     uint32_t m_particleCount{ 0 };
     DixDescriptorPool& m_descriptorPool;

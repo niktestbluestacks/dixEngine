@@ -2,6 +2,7 @@
 #include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
+#include <Logger/Logger.hpp>
 
 // std
 #include <random>
@@ -28,14 +29,31 @@ ParticleRenderSystem::ParticleRenderSystem(
     ),
     m_descriptorPool(descriptorPool) {
 
+        // Create double buffers for particles to avoid CPU/GPU race conditions
         VkDeviceSize particleBufferSize = sizeof(uint32_t) + sizeof(Particle) * MAX_PARTICLES;
-        m_particleBuffer = std::make_unique<DixBuffer>(
-            engineDevice,
-            particleBufferSize,
-            1,
-            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-        );
+        for (size_t i = 0; i < m_particleBuffers.size(); ++i) {
+            m_particleBuffers[i] = std::make_unique<DixBuffer>(
+                engineDevice,
+                particleBufferSize,
+                1,
+                VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+            );
+
+            // Initialize particle count to 0 in each buffer
+            m_particleBuffers[i]->map();
+            uint32_t zeroCount = 0;
+            m_particleBuffers[i]->writeToBuffer(&zeroCount, sizeof(uint32_t));
+            m_particleBuffers[i]->unmap();
+
+            // Create fence for synchronization
+            VkFenceCreateInfo fenceInfo{};
+            fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+            fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT; // Start signaled so first frame doesn't wait
+            if (vkCreateFence(engineDevice.device(), &fenceInfo, nullptr, &m_frameFences[i]) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create fence for particle buffer");
+            }
+        }
 
         // Create simulation params uniform buffer
         m_simulationParamsBuffer = std::make_unique<DixBuffer>(
@@ -52,12 +70,6 @@ ParticleRenderSystem::ParticleRenderSystem(
         m_simulationParamsBuffer->writeToBuffer(&m_simParams, sizeof(ParticleSimulationParams));
         m_simulationParamsBuffer->unmap();
 
-        // Initialize particle count to 0
-        m_particleBuffer->map();
-        uint32_t zeroCount = 0;
-        m_particleBuffer->writeToBuffer(&zeroCount, sizeof(uint32_t));
-        m_particleBuffer->unmap();
-
         createPipelineLayout(globalSetLayout, modelSetLayout);
         createComputePipeline(globalSetLayout, modelSetLayout);
         createPipeline(renderPass);
@@ -67,6 +79,13 @@ ParticleRenderSystem::ParticleRenderSystem(
 ParticleRenderSystem::~ParticleRenderSystem() {
     if (m_computePipelineLayout != VK_NULL_HANDLE) {
         vkDestroyPipelineLayout(m_dixDevice.device(), m_computePipelineLayout, nullptr);
+    }
+
+     // Cleanup fences
+    for (VkFence fence : m_frameFences) {
+        if (fence != VK_NULL_HANDLE) {
+            vkDestroyFence(m_dixDevice.device(), fence, nullptr);
+        }
     }
 }
 
@@ -125,9 +144,9 @@ void ParticleRenderSystem::createPipeline(VkRenderPass renderPass) {
     );
 }
 
-void ParticleRenderSystem::bindBuffers(VkCommandBuffer commandBuffer) const {
+void ParticleRenderSystem::bindBuffers(VkCommandBuffer commandBuffer, uint32_t bufferIndex) const {
     // Bind the particle storage buffer as vertex buffer
-    VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
+    VkBuffer buffers[] = { m_particleBuffers[bufferIndex]->getBuffer() };
     VkDeviceSize offsets[] = { sizeof(uint32_t) }; // Skip the particle count at the beginning
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 }
@@ -137,7 +156,7 @@ void ParticleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<G
     m_pipeline->bind(frameInfo.commandBuffer);
 
     // bind particle buffer
-    bindBuffers(frameInfo.commandBuffer);
+    bindBuffers(frameInfo.commandBuffer, m_currentBufferIndex);
 
     // Set viewport and scissor using screenExtent from FrameInfo
     VkViewport viewport{ 0.0f, 0.0f, static_cast<float>(frameInfo.screenExtent.width), static_cast<float>(frameInfo.screenExtent.height), 0.0f, 1.0f };
@@ -160,7 +179,7 @@ void ParticleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<G
             push);
 
         // bind descriptor sets: set 0 = global UBO, set 1 = particle storage buffer
-        std::array<VkDescriptorSet, 2> descriptorSets{ frameInfo.globalDescriptorSet, m_particleDescriptorSet };
+        std::array<VkDescriptorSet, 2> descriptorSets{ frameInfo.globalDescriptorSet, m_particleDescriptorSets[m_currentBufferIndex] };
 
         vkCmdBindDescriptorSets (
             frameInfo.commandBuffer,
@@ -220,25 +239,29 @@ void ParticleRenderSystem::createComputePipeline(VkDescriptorSetLayout globalSet
 }
 
 void ParticleRenderSystem::setupDescriptors() {
-    assert((!m_particleBuffer || !m_simulationParamsBuffer) && "Particle buffers not created!");
+    assert((m_particleBuffers[0] && m_particleBuffers[1] && m_simulationParamsBuffer) && "Particle buffers not created!");
 
-    VkDescriptorBufferInfo particleBufferInfo{};
-    particleBufferInfo.buffer = m_particleBuffer->getBuffer();
-    particleBufferInfo.offset = sizeof(uint32_t); // Skip particle count
-    particleBufferInfo.range = sizeof(Particle) * MAX_PARTICLES;
+    // Setup descriptors for both buffers (double buffering)
+    for (size_t i = 0; i < m_particleBuffers.size(); ++i) {
+        VkDescriptorBufferInfo particleBufferInfo{};
+        particleBufferInfo.buffer = m_particleBuffers[i]->getBuffer();
+        particleBufferInfo.offset = sizeof(uint32_t); // Skip particle count
+        particleBufferInfo.range = sizeof(Particle) * MAX_PARTICLES;
 
-    VkDescriptorBufferInfo simParamsBufferInfo{};
-    simParamsBufferInfo.buffer = m_simulationParamsBuffer->getBuffer();
-    simParamsBufferInfo.offset = 0;
-    simParamsBufferInfo.range = sizeof(ParticleSimulationParams);
+        VkDescriptorBufferInfo simParamsBufferInfo{};
+        simParamsBufferInfo.buffer = m_simulationParamsBuffer->getBuffer();
+        simParamsBufferInfo.offset = 0;
+        simParamsBufferInfo.range = sizeof(ParticleSimulationParams);
 
-    // Use DixDescriptorWriter to build the descriptor set
-    DixDescriptorWriter writer(*m_computeSetLayout, m_descriptorPool);
-    writer.writeBuffer(0, &particleBufferInfo);
-    writer.writeBuffer(1, &simParamsBufferInfo);
+        // Use DixDescriptorWriter to build the descriptor set
+        DixDescriptorWriter writer(*m_computeSetLayout, m_descriptorPool);
+        writer.writeBuffer(0, &particleBufferInfo);
+        writer.writeBuffer(1, &simParamsBufferInfo);
 
-    if (!writer.build(m_particleDescriptorSet)) {
-        throw std::runtime_error("failed to allocate particle descriptor set");
+        if (!writer.build(m_particleDescriptorSets[i])) {
+            DixLogErr("Failed to allocate particle descriptor set at index {}", i);
+            throw std::runtime_error("failed to allocate particle descriptor set");
+        }
     }
 }
 
@@ -261,7 +284,7 @@ void ParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer, uint32
         m_computePipelineLayout,
         0,
         1,
-        &m_particleDescriptorSet,
+        &m_particleDescriptorSets[m_currentBufferIndex],
         0,
         nullptr
     );
@@ -281,6 +304,8 @@ void ParticleRenderSystem::updateParticles(float deltaTime) {
 }
 
 void ParticleRenderSystem::createParticleEmitter(glm::vec3 position, uint32_t count) {
+    waitForGpuCompletion();
+
     if (m_particleCount + count > MAX_PARTICLES) {
         count = MAX_PARTICLES - m_particleCount;
     }
@@ -292,12 +317,14 @@ void ParticleRenderSystem::createParticleEmitter(glm::vec3 position, uint32_t co
     std::uniform_real_distribution<float> colorDist(0.5f, 1.0f);
 
     // Map buffer and write particles
-    m_particleBuffer->map();
+    m_particleBuffers[m_currentBufferIndex]->map();
 
-    uint32_t* particleCountPtr = static_cast<uint32_t*>(m_particleBuffer->getMappedMemory());
+    uint32_t* particleCountPtr = static_cast<uint32_t*>(m_particleBuffers[m_currentBufferIndex]->getMappedMemory());
     *particleCountPtr = m_particleCount + count;
 
-    Particle* particles = reinterpret_cast<Particle*>(static_cast<uint8_t*>(m_particleBuffer->getMappedMemory()) + sizeof(uint32_t));
+    Particle* particles = reinterpret_cast<Particle*>(
+        static_cast<uint8_t*>(m_particleBuffers[m_currentBufferIndex]->getMappedMemory()) + sizeof(uint32_t)
+    );
 
     for (uint32_t i = 0; i < count; ++i) {
         Particle& p = particles[m_particleCount + i];
@@ -308,8 +335,55 @@ void ParticleRenderSystem::createParticleEmitter(glm::vec3 position, uint32_t co
         p.color = glm::vec4(colorDist(gen), colorDist(gen) * 0.5f, colorDist(gen) * 0.2f, 1.0f);
     }
 
-    m_particleBuffer->unmap();
+    m_particleBuffers[m_currentBufferIndex]->unmap();
     m_particleCount += count;
+}
+
+void ParticleRenderSystem::cleanupDeadParticles() {
+    // Wait for GPU to finish using the current buffer before modifying it
+    waitForGpuCompletion();
+
+    m_particleBuffers[m_currentBufferIndex]->map();
+
+    uint32_t* particleCountPtr = static_cast<uint32_t*>(m_particleBuffers[m_currentBufferIndex]->getMappedMemory());
+    Particle* particles = reinterpret_cast<Particle*>(static_cast<uint8_t*>(m_particleBuffers[m_currentBufferIndex]->getMappedMemory()) + sizeof(uint32_t));
+
+    uint32_t writeIndex = 0;
+    for (uint32_t i = 0; i < m_particleCount; ++i) {
+        // Decrement lifetime
+        particles[i].lifetime -= m_simParams.deltaTime;
+
+        // Keep particle if still alive
+        if (particles[i].lifetime > 0.0f) {
+            if (writeIndex != i) {
+                particles[writeIndex] = particles[i];
+            }
+            ++writeIndex;
+        }
+    }
+
+    // Update particle count
+    *particleCountPtr = writeIndex;
+    m_particleCount = writeIndex;
+
+    m_particleBuffers[m_currentBufferIndex]->unmap();
+}
+
+void ParticleRenderSystem::waitForGpuCompletion() {
+    // Wait for the fence associated with the current buffer
+    if (m_frameFences[m_currentBufferIndex] != VK_NULL_HANDLE) {
+        VkResult result = vkWaitForFences(m_dixDevice.device(), 1, &m_frameFences[m_currentBufferIndex], VK_TRUE, UINT64_MAX);
+        if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to wait for fence");
+        }
+        // Reset fence for next use
+        vkResetFences(m_dixDevice.device(), 1, &m_frameFences[m_currentBufferIndex]);
+    }
+}
+
+void ParticleRenderSystem::swapBuffers() {
+    // Move to next buffer (toggle between 0 and 1)
+    m_currentBufferIndex = (m_currentBufferIndex + 1) % m_particleBuffers.size();
 }
 
 }       // namespace dix

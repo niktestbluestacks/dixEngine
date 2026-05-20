@@ -44,7 +44,8 @@ public:
         EngineDevice& engineDevice,
         VkRenderPass renderPass,
         VkDescriptorSetLayout globalSetLayout,
-        VkDescriptorSetLayout modelSetLayout
+        VkDescriptorSetLayout modelSetLayout,
+        DixDescriptorPool& descriptorPool
     );
 
     ~ParticleRenderSystem();
@@ -66,10 +67,13 @@ public:
     void createParticleEmitter(glm::vec3 position, uint32_t count);
     void dispatchCompute(VkCommandBuffer commandBuffer, uint32_t particleCount);
 
+    void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) const override;
 private:
+    void createPipeline(VkRenderPass renderPass) override;
+
     void createComputePipeline(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout modelSetLayout);
     void setupDescriptors();
-    void bindBuffers(VkCommandBuffer commandBuffer);
+    void bindBuffers(VkCommandBuffer commandBuffer) const;
 
     std::unique_ptr<ComputePipeline> m_computePipeline;
     VkPipelineLayout m_computePipelineLayout{ VK_NULL_HANDLE };
@@ -77,9 +81,11 @@ private:
 
     std::unique_ptr<DixBuffer> m_particleBuffer;
     std::unique_ptr<DixBuffer> m_simulationParamsBuffer;
+    VkDescriptorSet m_particleDescriptorSet{ VK_NULL_HANDLE };
 
     ParticleSimulationParams m_simParams{};
     uint32_t m_particleCount{ 0 };
+    DixDescriptorPool& m_descriptorPool;
     static constexpr uint32_t MAX_PARTICLES = 10000;
 };  // ParticleRenderSystem
 }   // namespace dix

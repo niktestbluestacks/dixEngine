@@ -275,12 +275,22 @@ private:
 	void createRenderSystemsImpl(std::index_sequence<Indices...>) {
 		(([&]() {
 			using T = std::remove_reference_t<decltype(*std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem)>;
-			std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
-				m_dixDevice,
-				m_dixRenderer.getSwapChainRenderPass(),
-				m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
-				m_modelSetLayout->getDescriptorSetLayout()
-			);
+			if constexpr (std::is_same_v<T, ParticleRenderSystem>) {
+				std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
+					m_dixDevice,
+					m_dixRenderer.getSwapChainRenderPass(),
+					m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+					m_modelSetLayout->getDescriptorSetLayout(),
+					*m_globalPool
+				);
+			} else {
+				std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
+					m_dixDevice,
+					m_dixRenderer.getSwapChainRenderPass(),
+					m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+					m_modelSetLayout->getDescriptorSetLayout()
+				);
+			}
 		})(), ...);
 	}
 	

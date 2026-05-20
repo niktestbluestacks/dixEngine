@@ -12,7 +12,8 @@ ParticleRenderSystem::ParticleRenderSystem(
     EngineDevice& engineDevice,
     VkRenderPass renderPass,
     VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout) :
+    VkDescriptorSetLayout modelSetLayout,
+    DixDescriptorPool& descriptorPool) :
     DixRenderSystem(
         engineDevice,
         renderPass,
@@ -24,9 +25,9 @@ ParticleRenderSystem::ParticleRenderSystem(
                 auto* particlePush = static_cast<ParticlePushConstantData*>(pushConstantData);
                 particlePush->modelMatrix = obj.transform.mat4();
         }
-    ) {
+    ),
+    m_descriptorPool(descriptorPool) {
 
-        // Create particle storage buffer
         VkDeviceSize particleBufferSize = sizeof(uint32_t) + sizeof(Particle) * MAX_PARTICLES;
         m_particleBuffer = std::make_unique<DixBuffer>(
             engineDevice,
@@ -51,6 +52,12 @@ ParticleRenderSystem::ParticleRenderSystem(
         m_simulationParamsBuffer->writeToBuffer(&m_simParams, sizeof(ParticleSimulationParams));
         m_simulationParamsBuffer->unmap();
 
+        // Initialize particle count to 0
+        m_particleBuffer->map();
+        uint32_t zeroCount = 0;
+        m_particleBuffer->writeToBuffer(&zeroCount, sizeof(uint32_t));
+        m_particleBuffer->unmap();
+
         createPipelineLayout(globalSetLayout, modelSetLayout);
         createComputePipeline(globalSetLayout, modelSetLayout);
         createPipeline(renderPass);
@@ -60,6 +67,117 @@ ParticleRenderSystem::ParticleRenderSystem(
 ParticleRenderSystem::~ParticleRenderSystem() {
     if (m_computePipelineLayout != VK_NULL_HANDLE) {
         vkDestroyPipelineLayout(m_dixDevice.device(), m_computePipelineLayout, nullptr);
+    }
+}
+
+void ParticleRenderSystem::createPipeline(VkRenderPass renderPass) {
+    assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+    PipelineConfigInfo pipelineConfig{};
+    Pipeline::defaultPipelineConfigInfo(pipelineConfig);
+
+    pipelineConfig.inputAssemblyInfo.topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
+
+    pipelineConfig.renderPass = renderPass;
+    pipelineConfig.pipelineLayout = m_pipelineLayout;
+
+    // Set up vertex input descriptions for particle rendering
+    // Particle struct: position(vec3), lifetime(float), velocity(vec3), size(float), color(vec4)
+    std::vector<VkVertexInputBindingDescription> bindingDescriptions(1);
+    bindingDescriptions[0].binding = 0;
+    bindingDescriptions[0].stride = sizeof(Particle);
+    bindingDescriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions(5);
+    attributeDescriptions[0].binding = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[0].offset = offsetof(Particle, position);
+
+    attributeDescriptions[1].binding = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format = VK_FORMAT_R32_SFLOAT;
+    attributeDescriptions[1].offset = offsetof(Particle, lifetime);
+
+    attributeDescriptions[2].binding = 0;
+    attributeDescriptions[2].location = 2;
+    attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[2].offset = offsetof(Particle, velocity);
+
+    attributeDescriptions[3].binding = 0;
+    attributeDescriptions[3].location = 3;
+    attributeDescriptions[3].format = VK_FORMAT_R32_SFLOAT;
+    attributeDescriptions[3].offset = offsetof(Particle, size);
+
+    attributeDescriptions[4].binding = 0;
+    attributeDescriptions[4].location = 4;
+    attributeDescriptions[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    attributeDescriptions[4].offset = offsetof(Particle, color);
+
+    pipelineConfig.vertexBindingDescriptions = bindingDescriptions;
+    pipelineConfig.vertexAttributeDescriptions = attributeDescriptions;
+
+    m_pipeline = std::make_unique<Pipeline>(
+        m_dixDevice,
+        toShaderPath(m_vertShaderBinaryPath),
+        toShaderPath(m_fragShaderBinaryPath),
+        pipelineConfig
+    );
+}
+
+void ParticleRenderSystem::bindBuffers(VkCommandBuffer commandBuffer) const {
+    // Bind the particle storage buffer as vertex buffer
+    VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
+    VkDeviceSize offsets[] = { sizeof(uint32_t) }; // Skip the particle count at the beginning
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+}
+
+void ParticleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) const {
+    // bind pipeline
+    m_pipeline->bind(frameInfo.commandBuffer);
+
+    // bind particle buffer
+    bindBuffers(frameInfo.commandBuffer);
+
+    // Set viewport and scissor using screenExtent from FrameInfo
+    VkViewport viewport{ 0.0f, 0.0f, static_cast<float>(frameInfo.screenExtent.width), static_cast<float>(frameInfo.screenExtent.height), 0.0f, 1.0f };
+    vkCmdSetViewport(frameInfo.commandBuffer, 0, 1, &viewport);
+
+    VkRect2D scissor{ {0, 0}, {frameInfo.screenExtent.width, frameInfo.screenExtent.height} };
+    vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);
+
+    for (auto& obj : gameObjects) {
+        std::array<std::byte, m_sizeofPushConstantData> buffer;
+        void* push = buffer.data();
+        m_transformGameObject(push, obj);
+
+        vkCmdPushConstants(
+            frameInfo.commandBuffer,
+            m_pipelineLayout,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            0,
+            m_sizeofPushConstantData,
+            push);
+
+        // bind descriptor sets: set 0 = global UBO, set 1 = particle storage buffer
+        std::array<VkDescriptorSet, 2> descriptorSets{ frameInfo.globalDescriptorSet, m_particleDescriptorSet };
+
+        vkCmdBindDescriptorSets (
+            frameInfo.commandBuffer,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipelineLayout,
+            0,
+            static_cast<uint32_t>(descriptorSets.size()),
+            descriptorSets.data(),
+            0,
+            nullptr
+        );
+
+        // Draw particles using draw count from buffer
+        // The first element of the buffer contains the particle count
+        if (m_particleCount > 0) {
+            vkCmdDraw(frameInfo.commandBuffer, m_particleCount, 1, 0, 0);
+        }
     }
 }
 
@@ -102,8 +220,26 @@ void ParticleRenderSystem::createComputePipeline(VkDescriptorSetLayout globalSet
 }
 
 void ParticleRenderSystem::setupDescriptors() {
-    // Descriptor sets are created per-frame in AppContext via getVulkanFlags()
-    // This method is a placeholder if additional setup is needed
+    assert((!m_particleBuffer || !m_simulationParamsBuffer) && "Particle buffers not created!");
+
+    VkDescriptorBufferInfo particleBufferInfo{};
+    particleBufferInfo.buffer = m_particleBuffer->getBuffer();
+    particleBufferInfo.offset = sizeof(uint32_t); // Skip particle count
+    particleBufferInfo.range = sizeof(Particle) * MAX_PARTICLES;
+
+    VkDescriptorBufferInfo simParamsBufferInfo{};
+    simParamsBufferInfo.buffer = m_simulationParamsBuffer->getBuffer();
+    simParamsBufferInfo.offset = 0;
+    simParamsBufferInfo.range = sizeof(ParticleSimulationParams);
+
+    // Use DixDescriptorWriter to build the descriptor set
+    DixDescriptorWriter writer(*m_computeSetLayout, m_descriptorPool);
+    writer.writeBuffer(0, &particleBufferInfo);
+    writer.writeBuffer(1, &simParamsBufferInfo);
+
+    if (!writer.build(m_particleDescriptorSet)) {
+        throw std::runtime_error("failed to allocate particle descriptor set");
+    }
 }
 
 void ParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer, uint32_t particleCount) {
@@ -119,16 +255,16 @@ void ParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer, uint32
     // Note: You need to create and store compute descriptor sets similar to graphics ones
     // For now, this assumes you'll integrate with the existing descriptor system
 
-    // vkCmdBindDescriptorSets(
-    //      commandBuffer,
-    //      VK_PIPELINE_BIND_POINT_COMPUTE,
-    //      m_computePipelineLayout,
-    //      0,
-    //      1,
-    //      &computeDescriptorSet,
-    //      0,
-    //      nullptr
-    // );
+    vkCmdBindDescriptorSets(
+        commandBuffer,
+        VK_PIPELINE_BIND_POINT_COMPUTE,
+        m_computePipelineLayout,
+        0,
+        1,
+        &m_particleDescriptorSet,
+        0,
+        nullptr
+    );
 
     // Dispatch compute shader
     uint32_t workGroups = (particleCount + 63) / 64; // Assuming local_size_x = 64 in compute shader

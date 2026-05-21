@@ -15,7 +15,10 @@ int main() {
 	catch (const std::exception& e) {
 		DixLogErr(e.what());
 		app.~FirstApp();
+		std::cin.get();
 		return EXIT_FAILURE;
 	}
+	app.~FirstApp();
+	std::cin.get();
 	return EXIT_SUCCESS;
 }

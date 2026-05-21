@@ -3,6 +3,7 @@
 *.vcxpoj
 *.vcxproj.filters
 *.vcxproj.user
+*.obj
 .cache/
 .continue/
 .github/
@@ -19,3 +20,4 @@ CMakeCache.txt
 VulcanApp
 cmake_install.cmake
 VulcanApp
+.clangd

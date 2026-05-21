@@ -1,12 +1,13 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 project(VulcanEngine CXX C)
 
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Найти зависимости
@@ -76,8 +77,16 @@ add_custom_target(Shaders ALL DEPENDS ${SHADER_BINARIES})
 # Собрать все .cpp файлы
 file(GLOB_RECURSE ENGINE_SOURCES 
     "${CMAKE_SOURCE_DIR}/VulcanEngine/*.cpp"
+    "${CMAKE_SOURCE_DIR}/VulcanEngine/*.tpp"
     "${CMAKE_SOURCE_DIR}/Applications/*.cpp"
+    "${CMAKE_SOURCE_DIR}/Applications/*.tpp"
 )
+
+file(GLOB_RECURSE TPP_FILES 
+    "${CMAKE_SOURCE_DIR}/VulcanEngine/*.tpp"
+    "${CMAKE_SOURCE_DIR}/Applications/*.tpp"
+)
+set_source_files_properties(${TPP_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 # Создать исполняемый файл
 add_executable(VulcanApp ${ENGINE_SOURCES})

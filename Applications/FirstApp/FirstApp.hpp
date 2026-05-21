@@ -13,7 +13,7 @@ public:
 	static constexpr int HEIGHT = 600;
 	static constexpr float MAX_FRAME_TIME = 0.05f;
 	static constexpr std::string_view MODEL_FILEPATH_RELATIVE = "Applications/models";
-
+	
 
 	FirstApp(void);
 	~FirstApp(void);

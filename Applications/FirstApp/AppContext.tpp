@@ -2,7 +2,7 @@
 #define APP_CONTEXT_TPP
 
 namespace dix {
-
+    
 template <typename... RenderSystems>
 void AppContext<RenderSystems...>::drawFrame(
 		DixCamera& camera, 

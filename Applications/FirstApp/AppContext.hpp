@@ -72,7 +72,7 @@ private:
 	Window m_Window;
 	EngineDevice m_dixDevice;
 	Renderer m_dixRenderer;
-
+	
 	// rendering resources
 	std::unordered_map<std::string, std::unique_ptr<DixDescriptorPool>> m_systemPool;
 

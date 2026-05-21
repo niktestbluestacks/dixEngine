@@ -12,7 +12,7 @@ FirstApp::FirstApp(void) {
 	loadUIElements();
 	DixLogInfo("FirstApp initialized successfully!");
 }
-
+	
 FirstApp::~FirstApp(void) {
 	DixLogInfo("Closing FirstApp...");
 	m_context.reset();

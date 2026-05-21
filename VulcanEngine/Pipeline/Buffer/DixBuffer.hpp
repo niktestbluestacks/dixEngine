@@ -5,7 +5,7 @@
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
 namespace dix {
-
+    
 class DixBuffer {
 public:
     DixBuffer(

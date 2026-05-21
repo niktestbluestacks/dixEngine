@@ -29,7 +29,7 @@ DixBuffer::DixBuffer(
     bufferSize = alignmentSize * instanceCount;
     device.createBuffer(bufferSize, usageFlags, memoryPropertyFlags, m_buffer, m_memory);
 }
-
+    
 DixBuffer::~DixBuffer() {
     if (m_mapped && m_buffer) {
         vkUnmapMemory(m_dixDevice.device(), m_memory);

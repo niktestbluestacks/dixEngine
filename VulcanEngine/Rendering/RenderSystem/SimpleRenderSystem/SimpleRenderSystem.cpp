@@ -7,12 +7,14 @@ SimpleRenderSystem::SimpleRenderSystem(
 		EngineDevice& engineDevice, 
 		VkRenderPass renderPass, 
 		VkDescriptorSetLayout globalSetLayout,
-		VkDescriptorSetLayout modelSetLayout) :
+		VkDescriptorSetLayout modelSetLayout,
+		DixDescriptorPool& descriptorPool) :
 		DixRenderSystem(
 			engineDevice,
 			renderPass,
 			globalSetLayout,
 			modelSetLayout,
+			descriptorPool,
 			"SimpleShader/simple_shader.vert.spv",
 			"SimpleShader/simple_shader.frag.spv",
 			[](void* pushConstantData, GameObject& obj) {

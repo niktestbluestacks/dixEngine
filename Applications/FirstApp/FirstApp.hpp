@@ -1,6 +1,7 @@
 #ifndef _FIRST_APP_HPP
 #define _FIRST_APP_HPP
  
+#include "Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp"
 #include <FirstApp/AppContext.hpp>
 
 namespace dix {

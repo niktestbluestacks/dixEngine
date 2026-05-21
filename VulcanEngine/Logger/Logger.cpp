@@ -52,7 +52,7 @@ void Logger::log(LogLevel level, const std::string message) {
                         std::to_string(nowTm->tm_mday) + "--" +
                         std::to_string(nowTm->tm_hour) + ":" + 
                         std::to_string(nowTm->tm_min) + ":" + 
-                        std::to_string(nowTm->tm_sec);
+                        std::to_string(nowTm->tm_sec) << std::endl;
             break;
     }
 }

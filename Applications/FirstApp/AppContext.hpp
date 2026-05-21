@@ -21,7 +21,7 @@ public:
 	~AppContext() = default;
 
 	void initialize() {
-		createDescriptorPool();
+		createDescriptorPools();
 		createUBOs();
 		createSystemSetLayouts();
 		createDescriptorSets();
@@ -74,7 +74,7 @@ private:
 	Renderer m_dixRenderer;
 
 	// rendering resources
-	std::unique_ptr<DixDescriptorPool> m_globalPool;
+	std::unordered_map<std::string, std::unique_ptr<DixDescriptorPool>> m_systemPool;
 
 	std::unordered_map<std::string, std::vector<std::vector<std::unique_ptr<DixBuffer>>>> m_systemUboBuffers;
 	std::unordered_map<std::string, std::unique_ptr<DixDescriptorSetLayout>> m_systemSetLayouts;
@@ -107,7 +107,10 @@ private:
 	
 	void createModelDescriptorResources();
 	void createSystemSetLayouts();
-	void createDescriptorPool();
+
+	void createDescriptorPools();
+	template <typename RenderSystemInfo>
+	void createSingleDescriptorPool(RenderSystemInfo&& info);
 };
 
 } // namespace dix

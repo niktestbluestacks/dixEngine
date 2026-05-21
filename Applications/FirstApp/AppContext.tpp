@@ -140,7 +140,7 @@ void AppContext<RenderSystems...>::createSingleDescriptorSet(RenderSystemInfo&& 
     for (size_t i = 0; i < m_systemDescriptorSets[info.renderSystemName].size(); ++i) {
         // Use the first UBO buffer (index 0) for descriptor set
         auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][0]->descriptorInfo();
-        DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_globalPool)
+        DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_systemPool[info.renderSystemName])
             .writeBuffer(0, &bufferInfo)
             .writeImage(1, &imageInfo)
             .build(m_systemDescriptorSets[info.renderSystemName][i]);
@@ -151,28 +151,25 @@ template <typename... RenderSystems> template<size_t... Indices>
 void AppContext<RenderSystems...>::createRenderSystemsImpl(std::index_sequence<Indices...>) {
     (([&]() {
         using T = std::remove_reference_t<decltype(*std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem)>;
-        if constexpr (std::is_same_v<T, ParticleRenderSystem>) {
-            std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
-                m_dixDevice,
-                m_dixRenderer.getSwapChainRenderPass(),
-                m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
-                m_modelSetLayout->getDescriptorSetLayout(),
-                *m_globalPool
-            );
-        } else {
-            std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
-                m_dixDevice,
-                m_dixRenderer.getSwapChainRenderPass(),
-                m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
-                m_modelSetLayout->getDescriptorSetLayout()
-            );
-        }
+        std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
+            m_dixDevice,
+            m_dixRenderer.getSwapChainRenderPass(),
+            m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+            m_modelSetLayout->getDescriptorSetLayout()
+        );
     })(), ...);
 }
 	
 template <typename... RenderSystems>
-void AppContext<RenderSystems...>::createDescriptorPool() {
-    m_globalPool = DixDescriptorPool::Builder(m_dixDevice)
+void AppContext<RenderSystems...>::createDescriptorPools() {
+    std::apply([&](auto&&... args) {
+        (createSingleDescriptorPool(std::forward<decltype(args)>(args)), ...);
+    }, m_renderSystemRegistery.getRenderSystemDescriptions());
+}
+
+template <typename... RenderSystems> template <typename RenderSystemInfo>
+void AppContext<RenderSystems...>::createSingleDescriptorPool(RenderSystemInfo&& info) {
+    m_systemPool[info.renderSystemName] = DixDescriptorPool::Builder(m_dixDevice)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)

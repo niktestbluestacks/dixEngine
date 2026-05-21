@@ -54,7 +54,7 @@ Model::Model(
 	createDescriptorSet(descriptorPool, descriptorSetLayout);
 }
 
-Model::~Model() {}
+Model::~Model() = default;
 
 void Model::createVertexBuffers(const std::vector<Vertex>& vertices) {
 	vertexCount = static_cast <uint32_t> (vertices.size());

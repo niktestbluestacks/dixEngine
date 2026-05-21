@@ -62,12 +62,12 @@ private:
         const std::vector<VkPresentModeKHR>& availablePresentModes);
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-    VkFormat swapChainImageFormat;
-    VkFormat swapChainDepthFormat;
-    VkExtent2D swapChainExtent;
+    VkFormat swapChainImageFormat{};
+    VkFormat swapChainDepthFormat{};
+    VkExtent2D swapChainExtent{};
 
     std::vector<VkFramebuffer> swapChainFramebuffers;
-    VkRenderPass renderPass;
+    VkRenderPass renderPass{ VK_NULL_HANDLE };
 
     std::vector<VkImage> depthImages;
     std::vector<VkDeviceMemory> depthImageMemorys;
@@ -76,10 +76,10 @@ private:
     std::vector<VkImageView> swapChainImageViews;
 
     EngineDevice& device;
-    VkExtent2D windowExtent;
+    VkExtent2D windowExtent{};
 
     VkSwapchainKHR swapChain;
-    std::shared_ptr <SwapChain> oldSwapChain;
+    std::shared_ptr <SwapChain> oldSwapChain { nullptr };
 
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;

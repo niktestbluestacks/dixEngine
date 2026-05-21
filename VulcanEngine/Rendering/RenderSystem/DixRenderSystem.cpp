@@ -27,16 +27,42 @@ DixRenderSystem::DixRenderSystem(
 		VkRenderPass renderPass, 
 		VkDescriptorSetLayout globalSetLayout,
 		VkDescriptorSetLayout modelSetLayout,
+		DixDescriptorPool& descriptorPool,
         std::string vertShaderBinaryPath, 
         std::string fragShaderBinaryPath,
         std::function<void(void*, GameObject&)> transformGameObject):
 		m_dixDevice{ engineDevice },
         m_vertShaderBinaryPath{ vertShaderBinaryPath },
         m_fragShaderBinaryPath{ fragShaderBinaryPath },
-        m_transformGameObject{ transformGameObject } {}
+        m_transformGameObject{ transformGameObject },
+		m_descriptorPool{ descriptorPool } {
+	// Create a local copy of the set layout for internal descriptor management
+	auto builder = DixDescriptorSetLayout::Builder(engineDevice);
+	builder.addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+	builder.addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+	m_globalSetLayout = builder.build();
+
+	createPipelineLayout(globalSetLayout, modelSetLayout);
+	createPipeline(renderPass);
+	setupDescriptors();
+}
 
 DixRenderSystem::~DixRenderSystem() {
 	vkDestroyPipelineLayout(m_dixDevice.device(), m_pipelineLayout, nullptr);
+}
+
+void DixRenderSystem::setupDescriptors() {
+	VkDescriptorImageInfo imageInfo{};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	// Note: Default texture should be passed in or created separately
+	// For now, we'll use a null image view which will be filled by derived classes if needed
+
+	for (size_t i = 0; i < SwapChain::MAX_FRAMES_IN_FLIGHT; ++i) {
+		// Descriptor set will be written per-frame when UBO is updated
+		// The actual buffer info and image info will be set in renderGameObjects
+		DixDescriptorWriter writer(*m_globalSetLayout, m_descriptorPool);
+		writer.build(m_descriptorSets[i]);
+	}
 }
 
 void DixRenderSystem::createPipelineLayout(
@@ -105,7 +131,7 @@ void DixRenderSystem::renderGameObjects(
 			push);
 
 		// bind descriptor sets: set 0 = global UBO, set 1 = per-model texture
-		std::array<VkDescriptorSet, 2> descriptorSets{ frameInfo.globalDescriptorSet, VK_NULL_HANDLE };
+		std::array<VkDescriptorSet, 2> descriptorSets{ m_descriptorSets[frameInfo.frameIndex], VK_NULL_HANDLE };
 		if (obj.model) {
 			descriptorSets[1] = obj.model->getDescriptorSet();
 		}

@@ -21,8 +21,10 @@ SwapChain::SwapChain(EngineDevice& deviceRef, VkExtent2D extent, std::shared_ptr
     : device{ deviceRef }, windowExtent{ extent }, oldSwapChain{ previous } {
     init();
 
-    // clean up old swap chain since it's no longer needed
-    oldSwapChain = nullptr;
+    // // clean up old swap chain since it's no longer needed
+    // oldSwapChain = nullptr;
+    // oldSwapChain will be cleaned up automatically when this SwapChain is destroyed
+    // Vulkan handles the transition using the oldSwapchain handle passed during creation
 }
 
 void SwapChain::init() {
@@ -36,32 +38,51 @@ void SwapChain::init() {
 
 SwapChain::~SwapChain() {
     for (auto imageView : swapChainImageViews) {
-        vkDestroyImageView(device.device(), imageView, nullptr);
+        if (imageView != VK_NULL_HANDLE) {
+            vkDestroyImageView(device.device(), imageView, nullptr);
+        }
     }
     swapChainImageViews.clear();
 
-    if (swapChain != nullptr) {
+    if (swapChain != VK_NULL_HANDLE) {
         vkDestroySwapchainKHR(device.device(), swapChain, nullptr);
-        swapChain = nullptr;
+        swapChain = VK_NULL_HANDLE;
     }
 
-    for (int i = 0; i < depthImages.size(); i++) {
-        vkDestroyImageView(device.device(), depthImageViews[i], nullptr);
-        vkDestroyImage(device.device(), depthImages[i], nullptr);
-        vkFreeMemory(device.device(), depthImageMemorys[i], nullptr);
+    for (size_t i = 0; i < depthImages.size(); i++) {
+        if (depthImageViews[i] != VK_NULL_HANDLE) {
+            vkDestroyImageView(device.device(), depthImageViews[i], nullptr);
+        }
+        if (depthImages[i] != VK_NULL_HANDLE) {
+            vkDestroyImage(device.device(), depthImages[i], nullptr);
+        }
+        if (depthImageMemorys[i] != VK_NULL_HANDLE) {
+            vkFreeMemory(device.device(), depthImageMemorys[i], nullptr);
+        }
     }
 
     for (auto framebuffer : swapChainFramebuffers) {
-        vkDestroyFramebuffer(device.device(), framebuffer, nullptr);
+        if (framebuffer != VK_NULL_HANDLE) {
+            vkDestroyFramebuffer(device.device(), framebuffer, nullptr);
+        }
     }
 
-    vkDestroyRenderPass(device.device(), renderPass, nullptr);
+    if (renderPass != VK_NULL_HANDLE) {
+        vkDestroyRenderPass(device.device(), renderPass, nullptr);
+        renderPass = VK_NULL_HANDLE;
+    }
 
     // cleanup synchronization objects
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-        vkDestroySemaphore(device.device(), renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(device.device(), imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(device.device(), inFlightFences[i], nullptr);
+        if (imageAvailableSemaphores[i] != VK_NULL_HANDLE) {
+            vkDestroySemaphore(device.device(), imageAvailableSemaphores[i], nullptr);
+        }
+        if (renderFinishedSemaphores[i] != VK_NULL_HANDLE) {
+            vkDestroySemaphore(device.device(), renderFinishedSemaphores[i], nullptr);
+        }
+        if (inFlightFences[i] != VK_NULL_HANDLE) {
+            vkDestroyFence(device.device(), inFlightFences[i], nullptr);
+        }
     }
 }
 

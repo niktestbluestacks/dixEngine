@@ -46,10 +46,10 @@ VkResult DixBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
 }
 
 /**
-    * Unmap a mapped memory range
-    *
-    * @note Does not return a result as vkUnmapMemory can't fail
-    */
+* Unmap a mapped memory range
+*
+* @note Does not return a result as vkUnmapMemory can't fail
+*/
 void DixBuffer::unmap() {
     if (m_mapped) {
         vkUnmapMemory(m_dixDevice.device(), m_memory);

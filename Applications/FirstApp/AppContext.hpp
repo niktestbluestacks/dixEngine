@@ -227,47 +227,12 @@ private:
 
 	RenderSystemRegistery<RenderSystems...> m_renderSystemRegistery;
 
-	void createUBOs() {
-		std::apply([this](auto&&... arg) {
-			(createSingleUbo(std::forward<decltype(arg)>(arg)), ...);
-		}, m_renderSystemRegistery.getRenderSystemDescriptions());	
-	}
+	void createUBOs();
 
 	template <typename RenderSystemInfo>
-	void createSingleUbo(RenderSystemInfo&& info) {
-		constexpr size_t uboCount = std::tuple_size_v<std::remove_reference_t<decltype(info.Ubos)>>;
+	void createSingleUbo(RenderSystemInfo&& info);
 
-		// Resize outer vector: [frameIndex][uboTypeIndex]
-		m_systemUboBuffers[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-		 // For each frame, create buffers for each UBO type
-		for (auto& frameBuffers : m_systemUboBuffers[info.renderSystemName]) {
-			frameBuffers.resize(uboCount);
-
-			size_t uboTypeIndex = 0;
-			std::apply([&](auto&&... uboTypes) {
-				(([&](auto&& uboTypeInstance) {
-					using UboType = std::decay_t<decltype(uboTypeInstance)>;
-					VkDeviceSize bufferSize = sizeof(UboType);
-
-					frameBuffers[uboTypeIndex] = std::make_unique<DixBuffer>(
-					m_dixDevice,
-					bufferSize,
-					1,
-					VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-					VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-					);
-					frameBuffers[uboTypeIndex]->map();
-					++uboTypeIndex;
-				}(std::get<0>(std::tuple<std::decay_t<decltype(uboTypes)>>{}))), ...);
-			}, info.Ubos);
-		}
-	}
-	void createDescriptorSets() {
-		m_defaultTexture = createDefaultTexture(m_dixDevice);
-		std::apply([this](auto&&... arg) {
-			(createSingleDescriptorSet(std::forward<decltype(arg)>(arg)), ...);
-		}, m_renderSystemRegistery.getRenderSystemDescriptions());
-	}
+	void createDescriptorSets();
 
 	template <typename RenderSystemInfo>
 	void createSingleDescriptorSet(RenderSystemInfo&& info) {
@@ -368,5 +333,7 @@ private:
 };
 
 } // namespace dix
+
+#include <FirstApp/AppContext.tpp>
 
 #endif // APP_CONTEXT_HPP

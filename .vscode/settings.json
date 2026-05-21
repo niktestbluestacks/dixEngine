@@ -1,4 +1,7 @@
 {
     "cmake.sourceDirectory": "C:/Big_projects/Game_project/dixEngine",
-    "makefile.configureOnOpen": false
+    "makefile.configureOnOpen": false,
+    "files.associations": {
+    "*.tpp": "cpp"
+    }
 }

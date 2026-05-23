@@ -21,8 +21,10 @@ struct Particle {
 struct ParticleSimulationParams {
     alignas(16) glm::vec3 gravity { 0.f, -1.f, 0.f };
     float deltaTime;
-    alignas(16) glm::vec3 wind { 1.f, 0.f, 0.f };
-    float damping { .99f };
+    alignas(16) glm::vec3 wind { 100.f, 0.f, 0.f };
+    float damping { 1.f };
+    alignas(16) glm::vec3 particlesPos { 0.f, 0.f, 0.f };
+    float particlesLife { 10.f };
 };
 
 struct ParticleUbo {

@@ -248,8 +248,8 @@ void ParticleRenderSystem::createParticleEmitter(glm::vec3 position, uint32_t co
         p.position = position + glm::vec3(posDist(gen), posDist(gen), posDist(gen));
         p.velocity = glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen));
         p.lifetime = 1.0f;
-        p.size = 0.1f;
-        p.color = glm::vec4(colDist(gen), colDist(gen) * 0.5f, colDist(gen) * 0.2f, 1.0f);
+        p.size = 1.f;
+        p.color = glm::vec4(colDist(gen), colDist(gen), colDist(gen), 1.0f);
     }
 
     m_particleBuffer->unmap();

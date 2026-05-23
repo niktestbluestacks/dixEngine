@@ -22,6 +22,8 @@ layout(binding = 1) uniform SimulationParams {
     float deltaTime;
     vec3 wind;
     float dampling;
+    vec3 particlesPosition;
+    float particlesLifetime;
 } params;
 
 void main() {
@@ -31,8 +33,14 @@ void main() {
 
     Particle p = particleBuffer.particles[index];
 
-    // Only update active particles
-    if (p.lifetime < 0.0) return;
+    // Reset dead particles
+    if (p.lifetime <= 0.0) {
+        p.position = params.particlesPosition;  // emitter position (should be passed as uniform)
+        p.velocity = vec3(0.0);
+        p.lifetime = params.particlesLifetime;
+        particleBuffer.particles[index] = p;
+        return;
+    }
 
     // Update velocity and forces
     p.velocity += params.gravity * params.deltaTime;

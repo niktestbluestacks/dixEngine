@@ -129,21 +129,45 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
     }
 }
 
-template <typename... RenderSystems> template <typename RenderSystemInfo>
+template <typename... RenderSystems>
+template <typename RenderSystemInfo>
 void AppContext<RenderSystems...>::createSingleDescriptorSet(RenderSystemInfo&& info) {
+    using RenderSystemType = std::decay_t<decltype(*info.renderSystem)>;
+    constexpr auto flags = RenderSystemType::getVulkanFlags();
+    
     m_systemDescriptorSets[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+
+    // Prepare a default image info just in case a binding requires it (fallback)
     VkDescriptorImageInfo imageInfo{};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfo.imageView = m_defaultTexture.getImageView();
     imageInfo.sampler = m_defaultTexture.getSampler();
 
     for (size_t i = 0; i < m_systemDescriptorSets[info.renderSystemName].size(); ++i) {
-        // Use the first UBO buffer (index 0) for descriptor set
-        auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][0]->descriptorInfo();
-        DixDescriptorWriter(*m_systemSetLayouts[info.renderSystemName], *m_systemPool[info.renderSystemName])
-            .writeBuffer(0, &bufferInfo)
-            .writeImage(1, &imageInfo)
-            .build(m_systemDescriptorSets[info.renderSystemName][i]);
+        DixDescriptorWriter writer(*m_systemSetLayouts[info.renderSystemName], *m_systemPool[info.renderSystemName]);
+
+        // Iterate over the compile-time flags to write descriptors dynamically
+        std::apply([&](auto&&... flag) {
+            (([&](const auto& f) {
+                uint32_t binding = std::get<0>(f);
+                VkDescriptorType type = std::get<1>(f);
+
+                if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER || type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) {
+                    // Assume buffer index matches binding index for simplicity, 
+                    // or map binding -> buffer index if your strategy differs
+                    if (binding < m_systemUboBuffers[info.renderSystemName][i].size()) {
+                        auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][binding]->descriptorInfo();
+                        writer.writeBuffer(binding, &bufferInfo);
+                    }
+                } else if (type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER || type == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE) {
+                    writer.writeImage(binding, &imageInfo);
+                }
+            })(flag), ...);
+        }, flags);
+
+        if (!writer.build(m_systemDescriptorSets[info.renderSystemName][i])) {
+            throw std::runtime_error("Failed to build descriptor set for " + static_cast <std::string>(info.renderSystemName));
+        }
     }
 }
 
@@ -151,12 +175,18 @@ template <typename... RenderSystems> template<size_t... Indices>
 void AppContext<RenderSystems...>::createRenderSystemsImpl(std::index_sequence<Indices...>) {
     (([&]() {
         using T = std::remove_reference_t<decltype(*std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem)>;
-        std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem = std::make_unique<T>(
+        auto& renderSystemDesc = std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions());
+        const auto& renderSystemName = renderSystemDesc.renderSystemName;
+
+        renderSystemDesc.renderSystem = std::make_unique<T>(
             m_dixDevice,
             m_dixRenderer.getSwapChainRenderPass(),
-            m_systemSetLayouts[std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName]->getDescriptorSetLayout(),
+            m_systemSetLayouts[renderSystemName]->getDescriptorSetLayout(),
             m_modelSetLayout->getDescriptorSetLayout()
         );
+
+        // Transfer ownership of the descriptor pool to the render system
+        renderSystemDesc.renderSystem->setDescriptorPool(std::move(m_systemPool[renderSystemName]));
     })(), ...);
 }
 	

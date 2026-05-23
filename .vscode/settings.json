@@ -3,5 +3,10 @@
     "makefile.configureOnOpen": false,
     "files.associations": {
     "*.tpp": "cpp"
-    }
+    },
+    "clangd.arguments": [
+        "--compile-commands-dir=build",
+        "--background-index",
+        "--query-driver=C:/msys64/ucrt64/bin/g++.exe"
+    ]
 }

@@ -1,4 +1,5 @@
 // dix
+#include "Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp"
 #include <FirstApp/FirstApp.hpp>
 #include <FirstApp/AppContext.hpp>
 
@@ -19,6 +20,8 @@ FirstApp::~FirstApp(void) {
 	m_gameObjects.clear();
 	DixLogInfo("FirstApp closed successfully!");
 }
+
+constexpr const char ParticleRS[] = "ParticleRenderSystem";
 
 void FirstApp::run(void) {
 	DixCamera dixcamera{};
@@ -54,6 +57,9 @@ void FirstApp::run(void) {
 
 		float aspect = m_context->getAspectRatio();
 		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
+
+		m_context->getRenderSystem<ParticleRenderSystem>()
+		.updateParticles(frameTime);
 
 		try {
 			m_context->drawFrame(dixcamera, frameTime, m_gameObjects, playerPosition);
@@ -93,10 +99,12 @@ void FirstApp::loadGameObjects() {
 		m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
 	}
 
-	// // particle emitter
+	// particle emitter
 	// auto particleEmitter = GameObject::createGameObject();
 	// particleEmitter.transform.translation = glm::vec3{5.f, 5.f, 5.f};
 	// m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
+	m_context->getRenderSystem<ParticleRenderSystem>()
+	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 500);
 }
 
 void FirstApp::loadUIElements(void) {

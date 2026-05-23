@@ -1,9 +1,7 @@
 #ifndef PARTICLE_RENDER_SYSTEM_HPP
-#define PATRICLE_RENDER_SYSTEM_HPP
+#define PARTICLE_RENDER_SYSTEM_HPP
 
 // dix
-#include "Pipeline/EngineDevice/EngineDevice.hpp"
-#include "Utils/Class.hpp"
 #include <Rendering/RenderSystem/DixRenderSystem.hpp>
 #include <Pipeline/ComputePipeline/ComputePipeline.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
@@ -44,8 +42,7 @@ public:
         EngineDevice& engineDevice,
         VkRenderPass renderPass,
         VkDescriptorSetLayout globalSetLayout,
-        VkDescriptorSetLayout modelSetLayout,
-        DixDescriptorPool& descriptorPool
+        VkDescriptorSetLayout modelSetLayout
     );
 
     ~ParticleRenderSystem();
@@ -54,10 +51,11 @@ public:
         return "ParticleRenderSystem";
     }
 
-    static constexpr std::tuple<VulkanRenderSystemFlagType, VulkanRenderSystemFlagType> getVulkanFlags() {
+    static constexpr decltype(auto) getVulkanFlags() {
         return std::make_tuple(
             VulkanRenderSystemFlagType{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT },
-            VulkanRenderSystemFlagType{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_COMPUTE_BIT }
+            VulkanRenderSystemFlagType{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_COMPUTE_BIT },
+            VulkanRenderSystemFlagType{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_COMPUTE_BIT }
         );
     }
 
@@ -72,7 +70,7 @@ private:
     void createPipeline(VkRenderPass renderPass) override;
 
     void createComputePipeline(VkDescriptorSetLayout globalSetLayout, VkDescriptorSetLayout modelSetLayout);
-    void setupDescriptors();
+    // void setupDescriptors();
     void bindBuffers(VkCommandBuffer commandBuffer) const;
 
     std::unique_ptr<ComputePipeline> m_computePipeline;
@@ -85,7 +83,6 @@ private:
 
     ParticleSimulationParams m_simParams{};
     uint32_t m_particleCount{ 0 };
-    DixDescriptorPool& m_descriptorPool;
     static constexpr uint32_t MAX_PARTICLES = 10000;
 };  // ParticleRenderSystem
 }   // namespace dix

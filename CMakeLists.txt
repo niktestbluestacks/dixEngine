@@ -122,3 +122,14 @@ if(NOT WIN32)
         "localtime_s(tm_ptr, time_ptr)=localtime_r(time_ptr, tm_ptr)"
     )
 endif()
+
+target_compile_options(VulcanApp PRIVATE
+    -U__cplusplus
+    -D__cplusplus=202603L
+)
+
+# А этот флаг скармливаем ТОЛЬКО реальному компилятору GCC. 
+# Генератор compile_commands.json его просто не увидит!
+if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+    target_compile_options(VulcanApp PRIVATE -freflection)
+endif()

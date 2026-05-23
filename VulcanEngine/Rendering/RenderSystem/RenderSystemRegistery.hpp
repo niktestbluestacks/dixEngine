@@ -5,6 +5,10 @@
 #include <Rendering/RenderSystem/DixRenderSystem.hpp>
 #include <Utils/DixConcepts.hpp>
 
+
+#include <memory>
+#include <tuple>
+
 namespace dix {
 struct UboTypeInfo {
 	size_t size;
@@ -39,9 +43,19 @@ public:
 	std::tuple <RenderSystemDescription<RenderSystems>...>& getRenderSystemDescriptions() {
 		return m_renderSystems;
 	}
+
+	template <typename RenderSystem>
+	constexpr decltype(auto) getRenderSystem() {
+		static_assert(this->isRenderSystem<RenderSystem>(), "That RenderSystem was not found");
+		return *std::get<RenderSystemDescription<RenderSystem>>(m_renderSystems).renderSystem;
+	} 
+
+	template <typename RenderSystem>
+	consteval bool isRenderSystem() {
+		return (std::is_same_v<RenderSystem, RenderSystems> || ...);
+	}
 private:
 	std::tuple <RenderSystemDescription<RenderSystems>...> m_renderSystems;
-	//std::unordered_map<std::string, std::pair <std::unique_ptr<DixRenderSystem>, UboTypeInfo>> m_renderSystems;
 };
 }   // namepsace dix
 #endif // RENDER_SYSTEM_REGISTERY_HPP

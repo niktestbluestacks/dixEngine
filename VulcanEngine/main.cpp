@@ -7,6 +7,7 @@
 #include <exception>
 
 int main() {
+
 	dix::FirstApp app {};
 
 	try {

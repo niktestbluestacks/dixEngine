@@ -12,8 +12,7 @@ ParticleRenderSystem::ParticleRenderSystem(
     EngineDevice& engineDevice,
     VkRenderPass renderPass,
     VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout,
-    DixDescriptorPool& descriptorPool) :
+    VkDescriptorSetLayout modelSetLayout) :
     DixRenderSystem(
         engineDevice,
         renderPass,
@@ -25,8 +24,7 @@ ParticleRenderSystem::ParticleRenderSystem(
                 auto* particlePush = static_cast<ParticlePushConstantData*>(pushConstantData);
                 particlePush->modelMatrix = obj.transform.mat4();
         }
-    ),
-    m_descriptorPool(descriptorPool) {
+    ) {
 
         VkDeviceSize particleBufferSize = sizeof(uint32_t) + sizeof(Particle) * MAX_PARTICLES;
         m_particleBuffer = std::make_unique<DixBuffer>(
@@ -61,7 +59,6 @@ ParticleRenderSystem::ParticleRenderSystem(
         createPipelineLayout(globalSetLayout, modelSetLayout);
         createComputePipeline(globalSetLayout, modelSetLayout);
         createPipeline(renderPass);
-        setupDescriptors();
 }
 
 ParticleRenderSystem::~ParticleRenderSystem() {
@@ -219,28 +216,28 @@ void ParticleRenderSystem::createComputePipeline(VkDescriptorSetLayout globalSet
     );
 }
 
-void ParticleRenderSystem::setupDescriptors() {
-    assert((!m_particleBuffer || !m_simulationParamsBuffer) && "Particle buffers not created!");
+// void ParticleRenderSystem::setupDescriptors() {
+//     assert((m_particleBuffer && m_simulationParamsBuffer) && "Particle buffers not created!");
 
-    VkDescriptorBufferInfo particleBufferInfo{};
-    particleBufferInfo.buffer = m_particleBuffer->getBuffer();
-    particleBufferInfo.offset = sizeof(uint32_t); // Skip particle count
-    particleBufferInfo.range = sizeof(Particle) * MAX_PARTICLES;
+//     VkDescriptorBufferInfo particleBufferInfo{};
+//     particleBufferInfo.buffer = m_particleBuffer->getBuffer();
+//     particleBufferInfo.offset = sizeof(uint32_t); // Skip particle count
+//     particleBufferInfo.range = sizeof(Particle) * MAX_PARTICLES;
 
-    VkDescriptorBufferInfo simParamsBufferInfo{};
-    simParamsBufferInfo.buffer = m_simulationParamsBuffer->getBuffer();
-    simParamsBufferInfo.offset = 0;
-    simParamsBufferInfo.range = sizeof(ParticleSimulationParams);
+//     VkDescriptorBufferInfo simParamsBufferInfo{};
+//     simParamsBufferInfo.buffer = m_simulationParamsBuffer->getBuffer();
+//     simParamsBufferInfo.offset = 0;
+//     simParamsBufferInfo.range = sizeof(ParticleSimulationParams);
 
-    // Use DixDescriptorWriter to build the descriptor set
-    DixDescriptorWriter writer(*m_computeSetLayout, m_descriptorPool);
-    writer.writeBuffer(0, &particleBufferInfo);
-    writer.writeBuffer(1, &simParamsBufferInfo);
+//     // Use DixDescriptorWriter to build the descriptor set
+//     DixDescriptorWriter writer(*m_computeSetLayout, *m_descriptorPool);
+//     writer.writeBuffer(0, &particleBufferInfo);
+//     writer.writeBuffer(1, &simParamsBufferInfo);
 
-    if (!writer.build(m_particleDescriptorSet)) {
-        throw std::runtime_error("failed to allocate particle descriptor set");
-    }
-}
+//     if (!writer.build(m_particleDescriptorSet)) {
+//         throw std::runtime_error("failed to allocate particle descriptor set");
+//     }
+// }
 
 void ParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer, uint32_t particleCount) {
     if (particleCount == 0 || !m_computePipeline) {

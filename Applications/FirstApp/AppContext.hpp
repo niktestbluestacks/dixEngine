@@ -3,6 +3,7 @@
 
 // dix
 #include <FirstApp/AppInclude.hpp>
+#include <utility>
 
 namespace dix {
 
@@ -68,11 +69,15 @@ public:
 		m_uiRenderer.reset();
 	}
 
+	template <typename RenderSystem>
+	decltype(auto) getRenderSystem() {
+		return m_renderSystemRegistery.template getRenderSystem<RenderSystem>();
+	}
 private:
 	Window m_Window;
 	EngineDevice m_dixDevice;
 	Renderer m_dixRenderer;
-	
+
 	// rendering resources
 	std::unordered_map<std::string, std::unique_ptr<DixDescriptorPool>> m_systemPool;
 

@@ -12,6 +12,7 @@
 // std
 #include <memory>
 #include <vector>
+#include <array>
 
 namespace dix {
 
@@ -49,6 +50,18 @@ public:
 		FrameInfo& frameInfo, 
 		std::vector <GameObject>& gameObjects
 	) const;
+
+	void setDescriptorPool(std::unique_ptr<DixDescriptorPool> pool) {
+		m_descriptorPool = std::move(pool);
+	}
+
+	DixDescriptorPool& getDescriptorPool() {
+		return *m_descriptorPool;
+	}
+
+	const DixDescriptorPool& getDescriptorPool() const {
+		return *m_descriptorPool;
+	}
 protected:
     std::string m_vertShaderBinaryPath;
     std::string m_fragShaderBinaryPath;
@@ -58,6 +71,7 @@ protected:
 	VkPipelineLayout m_pipelineLayout;
     std::function<void(void*, GameObject&)> m_transformGameObject;
     static constexpr int m_sizeofPushConstantData = sizeof(PushConstantData);
+	std::unique_ptr<DixDescriptorPool> m_descriptorPool;
 };
 }	// namespace dix
 #endif // DIX_RENDER_SYSTEM_HPP

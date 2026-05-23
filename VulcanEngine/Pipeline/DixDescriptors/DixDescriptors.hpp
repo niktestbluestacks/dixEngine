@@ -37,6 +37,10 @@ public:
 
     VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
 
+    const std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding>& getBindings() const {
+        return bindings;
+    }
+
 private:
     EngineDevice& engineDevice;
     VkDescriptorSetLayout descriptorSetLayout;

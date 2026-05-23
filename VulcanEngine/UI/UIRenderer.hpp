@@ -27,23 +27,27 @@ public:
     UIRenderer(EngineDevice& device, VkRenderPass renderPass);
     ~UIRenderer();
 
-    // create texture from raw RGBA pixels
+    // Creates a texture from raw RGBA pixels (e.g. for font atlases).
     UITexture createTextureFromPixels(const unsigned char* pixels, int width, int height);
 
-    // helpers
+    // Binds the UI pipeline.  Must be called inside a render pass.
     void bindPipeline(VkCommandBuffer cb);
-    VkPipelineLayout getPipelineLayout() const { return m_pipelineLayout; }
-    DixDescriptorPool& getDescriptorPool() { return *m_descriptorPool; }
-    DixDescriptorSetLayout& getDescriptorSetLayout() { return *m_descriptorSetLayout; }
-    EngineDevice& getDevice() { return m_device; }
 
+    // Uploads the screen-size push constants required by the UI vertex shader.
+    // Call after bindPipeline and before issuing any UI draw calls.
+    void uploadPushConstants(VkCommandBuffer cb, VkExtent2D screenExtent);
+
+    VkPipelineLayout         getPipelineLayout() const { return m_pipelineLayout; }
+    DixDescriptorPool&       getDescriptorPool()       { return *m_descriptorPool; }
+    DixDescriptorSetLayout&  getDescriptorSetLayout()  { return *m_descriptorSetLayout; }
+    EngineDevice&            getDevice()               { return m_device; }
 
 private:
     EngineDevice& m_device;
     std::unique_ptr<DixDescriptorSetLayout> m_descriptorSetLayout;
-    std::unique_ptr<DixDescriptorPool> m_descriptorPool;
-    std::unique_ptr<Pipeline> m_pipeline;
-    VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
+    std::unique_ptr<DixDescriptorPool>      m_descriptorPool;
+    std::unique_ptr<Pipeline>               m_pipeline;
+    VkPipelineLayout                        m_pipelineLayout = VK_NULL_HANDLE;
 };
 
 } // namespace dix

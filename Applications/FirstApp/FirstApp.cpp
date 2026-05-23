@@ -99,9 +99,9 @@ void FirstApp::loadGameObjects() {
 	}
 
 	// particle emitter
-	// auto particleEmitter = GameObject::createGameObject();
-	// particleEmitter.transform.translation = glm::vec3{5.f, 5.f, 5.f};
-	// m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
+	auto particleEmitter = GameObject::createGameObject();
+	particleEmitter.transform.translation = glm::vec3{5.f, 5.f, 5.f};
+	m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
 	m_context->getRenderSystem<ParticleRenderSystem>()
 	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 500);
 }

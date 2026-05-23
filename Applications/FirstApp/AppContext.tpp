@@ -3,19 +3,48 @@
 
 namespace dix {
 
+namespace detail {
+
+// Returns true for any Vulkan descriptor type backed by a VkBuffer.
+inline constexpr bool isBufferDescriptorType(VkDescriptorType type) {
+    return type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+        || type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER
+        || type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC
+        || type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+}
+
+// Returns true for any Vulkan descriptor type backed by a VkImage / VkSampler.
+inline constexpr bool isImageDescriptorType(VkDescriptorType type) {
+    return type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+        || type == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE
+        || type == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE
+        || type == VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT
+        || type == VK_DESCRIPTOR_TYPE_SAMPLER;
+}
+
+// Maps a buffer-type descriptor to the appropriate VkBufferUsageFlags.
+inline constexpr VkBufferUsageFlags descriptorTypeToBufferUsage(VkDescriptorType type) {
+    switch (type) {
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
+        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
+            return VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+        default:
+            return VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+    }
+}
+
+} // namespace detail
+
 template <typename... RenderSystems>
 void AppContext<RenderSystems...>::drawFrame(
-		DixCamera& camera, 
-		float frameTime, 
-		std::unordered_map<std::string, std::vector<GameObject>>& gameObjects, 
-		const glm::vec3& playerPosition
-	) {
-    // if window is minimized or has zero area, skip rendering to avoid Vulkan errors
+        DixCamera& camera,
+        float frameTime,
+        std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+        const glm::vec3& playerPosition
+    ) {
     auto extent = m_Window.getExtent();
     if (extent.width == 0 || extent.height == 0) return;
 
-    // always update UI (do this before acquiring swapchain image) so UI logic
-    // runs even when swapchain recreation causes beginFrame() to return null
     AdditionalUIInfo additionalInfo{
         .playerPosition = playerPosition
     };
@@ -23,89 +52,110 @@ void AppContext<RenderSystems...>::drawFrame(
         m_uiManager->update(frameTime, additionalInfo);
     }
 
-    if (auto commandBuffer = beginFrame()) {
-        int frameIndex = getFrameIndex();
-        std::string uiSystemName = std::get<0>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystemName;
+    auto commandBuffer = beginFrame();
+    if (!commandBuffer) return;
 
-        FrameInfo uiFrameInfo{
-            frameIndex,
-            frameTime,
-            commandBuffer,
-            camera,
-            m_systemDescriptorSets[uiSystemName][frameIndex], // Ensure this key exists!
-            m_Window.getExtent()
-        };
-        // // allow UI elements to upload per-frame resources now that a frame and command buffer exist
-        if (m_uiManager) {
-            m_uiManager->upload(uiFrameInfo);
-        }
+    int frameIndex = getFrameIndex();
 
-        // render
-        beginSwapChainRenderPass(commandBuffer);
-
-        std::apply([&](auto&&... renderSystemDescs) {
-            (([&](auto&& desc) {
-                const auto& renderSystemName = desc.renderSystemName;
-
-                FrameInfo frameInfo{
-                    frameIndex,
-                    frameTime,
-                    commandBuffer,
-                    camera,
-                    m_systemDescriptorSets[renderSystemName][frameIndex],
-                    m_Window.getExtent()
-                };
-
-                // Update UBO for this system
-                int IndexOfWriteToIndex = 0;
-                int uboTypeIndex = 0;
-                std::apply([&](auto&&... uboArgs) {
-                    (([&](auto&& arg) {
-                        using UboType = std::remove_reference_t<decltype(arg)>;
-                        UboType ubo{};
-                        ubo.projectionView = camera.getProjection() * camera.getView();
-                        // Access: [renderSystemName][frameIndex][uboTypeIndex]
-                        m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->writeToBuffer(&ubo, sizeof(UboType));
-                        m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->flush();
-                        ++uboTypeIndex;
-                        }(std::get<0>(std::tuple<std::decay_t<decltype(uboArgs)>>{}))), ...);
-                }, desc.Ubos);
-
-                // Render geometry
-                desc.renderSystem->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
-
-            }(renderSystemDescs)), ...);
-        }, m_renderSystemRegistery.getRenderSystemDescriptions());
-
-        // render UI
-        if (m_uiManager && m_uiRenderer) {
-            m_uiRenderer->bindPipeline(commandBuffer);
-            // push screen size to UI vertex shader (vec2)
-            float screenSize[2] = { 
-                static_cast<float>(m_Window.getExtent().width),
-                static_cast<float>(m_Window.getExtent().height)
-            };
-            vkCmdPushConstants(
-                commandBuffer,
-                m_uiRenderer->getPipelineLayout(),
-                VK_SHADER_STAGE_VERTEX_BIT,
-                0,
-                sizeof(screenSize),
-                &screenSize);
-            m_uiManager->render(uiFrameInfo);
-        }
-        endSwapChainRenderPass(commandBuffer);
-        endFrame();
+    // UI data upload (CPU-side, no render pass required)-
+    // The UI system uses its own internal pipeline and does not
+    // participate in the render-system descriptor set machinery,
+    // so globalDescriptorSet is VK_NULL_HANDLE here.
+    FrameInfo uiFrameInfo{
+        frameIndex,
+        frameTime,
+        commandBuffer,
+        camera,
+        VK_NULL_HANDLE,
+        m_Window.getExtent()
+    };
+    if (m_uiManager) {
+        m_uiManager->upload(uiFrameInfo);
     }
+
+    // Compute pass — must run OUTSIDE the render pass.
+    // Each system's dispatchCompute() is a no-op when the
+    // system has no compute pipeline, so this is always safe.
+    // Each system is also responsible for inserting its own
+    // compute → graphics memory barrier inside dispatchCompute.
+    std::apply([&](auto&&... renderSystemDescs) {
+        (renderSystemDescs.renderSystem->dispatchCompute(commandBuffer), ...);
+    }, m_renderSystemRegistery.getRenderSystemDescriptions());
+
+    // Graphics pass
+    beginSwapChainRenderPass(commandBuffer);
+
+    std::apply([&](auto&&... renderSystemDescs) {
+        (([&](auto&& desc) {
+            const auto& renderSystemName = desc.renderSystemName;
+
+            FrameInfo frameInfo{
+                frameIndex,
+                frameTime,
+                commandBuffer,
+                camera,
+                m_systemDescriptorSets[renderSystemName][frameIndex],
+                m_Window.getExtent()
+            };
+
+            // Update each AppContext-managed buffer for this frame.
+            // Uses if-constexpr requires-checks so that only the fields
+            // actually present on each UBO type are populated — no
+            // hardcoded assumptions about field names.
+            int uboTypeIndex = 0;
+            std::apply([&](auto&&... uboArgs) {
+                (([&](auto&& arg) {
+                    using UboType = std::remove_reference_t<decltype(arg)>;
+                    UboType ubo{};
+
+                    if constexpr (requires { ubo.projectionView; }) {
+                        ubo.projectionView = camera.getProjection() * camera.getView();
+                    }
+
+                    m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->writeToBuffer(&ubo, sizeof(UboType));
+                    m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->flush();
+                    ++uboTypeIndex;
+                }(std::get<0>(std::tuple<std::decay_t<decltype(uboArgs)>>{}))), ...);
+            }, desc.Ubos);
+
+            desc.renderSystem->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
+
+        }(renderSystemDescs)), ...);
+    }, m_renderSystemRegistery.getRenderSystemDescriptions());
+
+    // UI render pass
+    // Push constants and pipeline binding are encapsulated in
+    // UIRenderer — AppContext does not know about UI internals.
+    if (m_uiManager && m_uiRenderer) {
+        m_uiRenderer->bindPipeline(commandBuffer);
+        m_uiRenderer->uploadPushConstants(commandBuffer, m_Window.getExtent());
+        m_uiManager->render(uiFrameInfo);
+    }
+
+    endSwapChainRenderPass(commandBuffer);
+    endFrame();
 }
 
-template <typename... RenderSystems> template <typename RenderSystemInfo>
+template <typename... RenderSystems>
+template <typename RenderSystemInfo>
 void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
+    using RenderSystemType = std::decay_t<decltype(*info.renderSystem)>;
+    constexpr auto flags   = RenderSystemType::getVulkanFlags();
     constexpr size_t uboCount = std::tuple_size_v<std::remove_reference_t<decltype(info.Ubos)>>;
 
-    // Resize outer vector: [frameIndex][uboTypeIndex]
+    // Build an ordered list of (binding, descriptorType) for every
+    // buffer-type flag.  Index i in this list corresponds to Ubos[i].
+    std::vector<std::pair<uint32_t, VkDescriptorType>> bufferBindings;
+    bufferBindings.reserve(uboCount);
+    std::apply([&](auto&&... flag) {
+        (([&](const auto& f) {
+            if (detail::isBufferDescriptorType(std::get<1>(f))) {
+                bufferBindings.emplace_back(std::get<0>(f), std::get<1>(f));
+            }
+        })(flag), ...);
+    }, flags);
+
     m_systemUboBuffers[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
-        // For each frame, create buffers for each UBO type
     for (auto& frameBuffers : m_systemUboBuffers[info.renderSystemName]) {
         frameBuffers.resize(uboCount);
 
@@ -113,14 +163,22 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
         std::apply([&](auto&&... uboTypes) {
             (([&](auto&& uboTypeInstance) {
                 using UboType = std::decay_t<decltype(uboTypeInstance)>;
-                VkDeviceSize bufferSize = sizeof(UboType);
+
+                // Pick usage flags from the matching buffer binding, or
+                // fall back to UNIFORM if the Ubos tuple is longer than
+                // the buffer-type flags (shouldn't happen with a correct
+                // render system, but guards against mistakes).
+                VkBufferUsageFlags usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+                if (uboTypeIndex < bufferBindings.size()) {
+                    usage = detail::descriptorTypeToBufferUsage(bufferBindings[uboTypeIndex].second);
+                }
 
                 frameBuffers[uboTypeIndex] = std::make_unique<DixBuffer>(
-                m_dixDevice,
-                bufferSize,
-                1,
-                VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+                    m_dixDevice,
+                    sizeof(UboType),
+                    1,
+                    usage,
+                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
                 );
                 frameBuffers[uboTypeIndex]->map();
                 ++uboTypeIndex;
@@ -134,44 +192,62 @@ template <typename RenderSystemInfo>
 void AppContext<RenderSystems...>::createSingleDescriptorSet(RenderSystemInfo&& info) {
     using RenderSystemType = std::decay_t<decltype(*info.renderSystem)>;
     constexpr auto flags = RenderSystemType::getVulkanFlags();
-    
+
     m_systemDescriptorSets[info.renderSystemName].resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
-    // Prepare a default image info just in case a binding requires it (fallback)
+    // Build binding -> buffer-array-index map.
+    // Buffer indices are assigned sequentially across buffer-type
+    // bindings only (skipping image/sampler bindings).
+    std::unordered_map<uint32_t, size_t> bindingToBufferIndex;
+    size_t bufferIdx = 0;
+    std::apply([&](auto&&... flag) {
+        (([&](const auto& f) {
+            if (detail::isBufferDescriptorType(std::get<1>(f))) {
+                bindingToBufferIndex[std::get<0>(f)] = bufferIdx++;
+            }
+        })(flag), ...);
+    }, flags);
+
     VkDescriptorImageInfo imageInfo{};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-    imageInfo.imageView = m_defaultTexture.getImageView();
-    imageInfo.sampler = m_defaultTexture.getSampler();
+    imageInfo.imageView   = m_defaultTexture.getImageView();
+    imageInfo.sampler     = m_defaultTexture.getSampler();
 
     for (size_t i = 0; i < m_systemDescriptorSets[info.renderSystemName].size(); ++i) {
-        DixDescriptorWriter writer(*m_systemSetLayouts[info.renderSystemName], *m_systemPool[info.renderSystemName]);
+        DixDescriptorWriter writer(
+            *m_systemSetLayouts[info.renderSystemName],
+            *m_systemPool[info.renderSystemName]);
 
-        // Iterate over the compile-time flags to write descriptors dynamically
         std::apply([&](auto&&... flag) {
             (([&](const auto& f) {
-                uint32_t binding = std::get<0>(f);
-                VkDescriptorType type = std::get<1>(f);
+                uint32_t        binding = std::get<0>(f);
+                VkDescriptorType type   = std::get<1>(f);
 
-                if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER || type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) {
-                    // Assume buffer index matches binding index for simplicity, 
-                    // or map binding -> buffer index if your strategy differs
-                    if (binding < m_systemUboBuffers[info.renderSystemName][i].size()) {
-                        auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][binding]->descriptorInfo();
-                        writer.writeBuffer(binding, &bufferInfo);
+                if (detail::isBufferDescriptorType(type)) {
+                    auto it = bindingToBufferIndex.find(binding);
+                    if (it != bindingToBufferIndex.end()) {
+                        size_t idx = it->second;
+                        if (idx < m_systemUboBuffers[info.renderSystemName][i].size()) {
+                            auto bufferInfo = m_systemUboBuffers[info.renderSystemName][i][idx]->descriptorInfo();
+                            writer.writeBuffer(binding, &bufferInfo);
+                        }
                     }
-                } else if (type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER || type == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE) {
+                } else if (detail::isImageDescriptorType(type)) {
                     writer.writeImage(binding, &imageInfo);
                 }
             })(flag), ...);
         }, flags);
 
         if (!writer.build(m_systemDescriptorSets[info.renderSystemName][i])) {
-            throw std::runtime_error("Failed to build descriptor set for " + static_cast <std::string>(info.renderSystemName));
+            throw std::runtime_error(
+                "Failed to build descriptor set for " +
+                static_cast<std::string>(info.renderSystemName));
         }
     }
 }
 
-template <typename... RenderSystems> template<size_t... Indices>
+template <typename... RenderSystems>
+template<size_t... Indices>
 void AppContext<RenderSystems...>::createRenderSystemsImpl(std::index_sequence<Indices...>) {
     (([&]() {
         using T = std::remove_reference_t<decltype(*std::get<Indices>(m_renderSystemRegistery.getRenderSystemDescriptions()).renderSystem)>;
@@ -185,11 +261,10 @@ void AppContext<RenderSystems...>::createRenderSystemsImpl(std::index_sequence<I
             m_modelSetLayout->getDescriptorSetLayout()
         );
 
-        // Transfer ownership of the descriptor pool to the render system
         renderSystemDesc.renderSystem->setDescriptorPool(std::move(m_systemPool[renderSystemName]));
     })(), ...);
 }
-	
+
 template <typename... RenderSystems>
 void AppContext<RenderSystems...>::createDescriptorPools() {
     std::apply([&](auto&&... args) {
@@ -197,13 +272,24 @@ void AppContext<RenderSystems...>::createDescriptorPools() {
     }, m_renderSystemRegistery.getRenderSystemDescriptions());
 }
 
-template <typename... RenderSystems> template <typename RenderSystemInfo>
+template <typename... RenderSystems>
+template <typename RenderSystemInfo>
 void AppContext<RenderSystems...>::createSingleDescriptorPool(RenderSystemInfo&& info) {
-    m_systemPool[info.renderSystemName] = DixDescriptorPool::Builder(m_dixDevice)
-        .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
-        .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, SwapChain::MAX_FRAMES_IN_FLIGHT)
-        .build();
+    using RenderSystemType = std::decay_t<decltype(*info.renderSystem)>;
+    constexpr auto flags   = RenderSystemType::getVulkanFlags();
+
+    auto builder = DixDescriptorPool::Builder(m_dixDevice)
+        .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
+
+    // Add one pool-size entry per binding declared in the flags.
+    // Duplicate types are additive in Vulkan pool size arrays.
+    std::apply([&](auto&&... flag) {
+        (([&](const auto& f) {
+            builder.addPoolSize(std::get<1>(f), SwapChain::MAX_FRAMES_IN_FLIGHT);
+        })(flag), ...);
+    }, flags);
+
+    m_systemPool[info.renderSystemName] = builder.build();
 }
 
 template <typename... RenderSystems>
@@ -214,7 +300,7 @@ void AppContext<RenderSystems...>::createSystemSetLayouts() {
         std::apply([&](auto&&... bindingTuples) {
             (std::apply([&](auto&&... args) {
                 builder.addBinding(std::forward<decltype(args)>(args)...);
-            }, bindingTuples), ...); 
+            }, bindingTuples), ...);
         }, vulkanFlags);
         m_systemSetLayouts[renderSystemDesc.renderSystemName] = builder.build();
     };
@@ -226,15 +312,47 @@ void AppContext<RenderSystems...>::createSystemSetLayouts() {
 
 template <typename... RenderSystems>
 void AppContext<RenderSystems...>::createModelDescriptorResources() {
-    m_modelSetLayout = DixDescriptorSetLayout::Builder(m_dixDevice)
-    .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
-    .build();
+    // Upper bound on the number of distinct model textures the
+    // pool can hold.  Increase if the scene has more textured models.
+    static constexpr uint32_t MAX_MODEL_DESCRIPTORS = 1000;
 
-    // Create a large pool for model descriptor sets
-    m_modelDescriptorPool = DixDescriptorPool::Builder(m_dixDevice)
-        .setMaxSets(1000)
-        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000)
-        .build();
+    // Collect every image-type binding declared across all render
+    // systems.  De-duplicate by binding index so the set layout has
+    // exactly one entry per binding slot.
+    auto layoutBuilder = DixDescriptorSetLayout::Builder(m_dixDevice);
+    std::unordered_set<uint32_t> addedBindings;
+
+    std::apply([&](auto&&... desc) {
+        (([&](auto&& d) {
+            using RS = std::decay_t<decltype(*d.renderSystem)>;
+            constexpr auto flags = RS::getVulkanFlags();
+            std::apply([&](auto&&... flag) {
+                (([&](const auto& f) {
+                    if (detail::isImageDescriptorType(std::get<1>(f))) {
+                        uint32_t binding = std::get<0>(f);
+                        if (addedBindings.insert(binding).second) {
+                            layoutBuilder.addBinding(
+                                binding,
+                                std::get<1>(f),
+                                std::get<2>(f));
+                        }
+                    }
+                })(flag), ...);
+            }, flags);
+        }(desc)), ...);
+    }, m_renderSystemRegistery.getRenderSystemDescriptions());
+
+    m_modelSetLayout = layoutBuilder.build();
+
+    // Build the pool from the bindings actually present in the layout.
+    auto poolBuilder = DixDescriptorPool::Builder(m_dixDevice)
+        .setMaxSets(MAX_MODEL_DESCRIPTORS);
+
+    for (auto& [binding, layoutBinding] : m_modelSetLayout->getBindings()) {
+        poolBuilder.addPoolSize(layoutBinding.descriptorType, MAX_MODEL_DESCRIPTORS);
+    }
+
+    m_modelDescriptorPool = poolBuilder.build();
 }
 
 template <typename... RenderSystems>
@@ -254,7 +372,8 @@ template <typename... RenderSystems>
 void AppContext<RenderSystems...>::createUBOs() {
     std::apply([this](auto&&... arg) {
         (createSingleUbo(std::forward<decltype(arg)>(arg)), ...);
-    }, m_renderSystemRegistery.getRenderSystemDescriptions());	
+    }, m_renderSystemRegistery.getRenderSystemDescriptions());
 }
+
 }   // namespace dix
 #endif // APP_CONTEXT_TPP

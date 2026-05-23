@@ -46,7 +46,10 @@ public:
 
 	template <typename RenderSystem>
 	constexpr decltype(auto) getRenderSystem() {
-		static_assert(this->isRenderSystem<RenderSystem>(), "That RenderSystem was not found");
+#ifndef __clang__
+		constexpr bool systemExists = isRenderSystem<RenderSystem>();
+		static_assert(systemExists, "That RenderSystem was not found");
+#endif	// __clang__
 		return *std::get<RenderSystemDescription<RenderSystem>>(m_renderSystems).renderSystem;
 	} 
 

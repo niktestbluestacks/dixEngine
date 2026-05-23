@@ -1,10 +1,10 @@
 #ifndef DIX_REFLECTION_HPP
 #define DIX_REFLECTION_HPP
 
-#ifdef __clang__
-#warning Clang compiler is not supported because clangd does to like reflection \
-Will be fixed when clangd will start supporting reflection
-#endif // clangd
+// #ifdef __clang__
+// #warning Clang compiler is not supported because clangd does to like reflection \
+// Will be fixed when clangd will start supporting reflection
+// #endif // clangd
 
 // dix
 #include <Utils/Hash.hpp>

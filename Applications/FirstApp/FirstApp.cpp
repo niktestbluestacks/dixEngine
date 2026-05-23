@@ -1,5 +1,4 @@
 // dix
-#include "Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp"
 #include <FirstApp/FirstApp.hpp>
 #include <FirstApp/AppContext.hpp>
 

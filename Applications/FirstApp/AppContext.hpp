@@ -73,6 +73,8 @@ public:
 	decltype(auto) getRenderSystem() {
 		return m_renderSystemRegistery.template getRenderSystem<RenderSystem>();
 	}
+
+	Window& getDixWindow() { return m_Window; }
 private:
 	Window m_Window;
 	EngineDevice m_dixDevice;

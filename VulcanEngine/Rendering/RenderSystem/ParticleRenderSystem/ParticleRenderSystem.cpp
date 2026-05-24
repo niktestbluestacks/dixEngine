@@ -32,11 +32,10 @@ ParticleRenderSystem::ParticleRenderSystem(
                 { 0, sizeof(Particle), VK_VERTEX_INPUT_RATE_VERTEX }
             },
             .vertexAttributes = {
-                { 0, 0, VK_FORMAT_R32G32B32_SFLOAT,    offsetof(Particle, position) },
-                { 1, 0, VK_FORMAT_R32_SFLOAT,          offsetof(Particle, lifetime) },
-                { 2, 0, VK_FORMAT_R32G32B32_SFLOAT,    offsetof(Particle, velocity) },
-                { 3, 0, VK_FORMAT_R32_SFLOAT,          offsetof(Particle, size)     },
-                { 4, 0, VK_FORMAT_R32G32B32A32_SFLOAT, offsetof(Particle, color)    },
+                { 0, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, positionLifetime) },
+                { 1, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, velocitySize) },     
+                { 2, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, color) },
+                { 3, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, initPosLife)     },
             },
 
             .transformGameObject = [](void* push, GameObject& obj) {
@@ -83,7 +82,7 @@ ParticleRenderSystem::ParticleRenderSystem(
         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
     );
-    m_simParams.deltaTime = 0.016f;
+    m_simParams.gravityDeltaTime.w = 0.016f;
     m_simulationParamsBuffer->map();
     m_simulationParamsBuffer->writeToBuffer(&m_simParams, sizeof(ParticleSimulationParams));
     m_simulationParamsBuffer->unmap();
@@ -102,8 +101,9 @@ void ParticleRenderSystem::buildComputeDescriptors() {
     // Particle SSBO: skip the leading uint32_t particle-count header.
     VkDescriptorBufferInfo particleInfo{};
     particleInfo.buffer = m_particleBuffer->getBuffer();
-    particleInfo.offset = sizeof(uint32_t);
-    particleInfo.range = sizeof(Particle) * MAX_PARTICLES;
+    particleInfo.offset = 0;
+    particleInfo.range =
+    sizeof(uint32_t) + sizeof(Particle) * MAX_PARTICLES;
 
     VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo();
 
@@ -212,13 +212,21 @@ void ParticleRenderSystem::renderGameObjects(
 }
 
 void ParticleRenderSystem::bindBuffers(VkCommandBuffer commandBuffer) const {
+    // VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
+    // VkDeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
+    // vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
     VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
-    VkDeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
+
+    // std430 alignment:
+    // uint particleCount -> 4 bytes
+    // next struct array aligned to 16 bytes
+    VkDeviceSize offsets[] = { 16 };
+
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 }
 
 void ParticleRenderSystem::updateParticles(float deltaTime) {
-    m_simParams.deltaTime = deltaTime;
+    m_simParams.gravityDeltaTime.w = deltaTime;
     m_simulationParamsBuffer->map();
     m_simulationParamsBuffer->writeToBuffer(&m_simParams, sizeof(ParticleSimulationParams));
     m_simulationParamsBuffer->unmap();
@@ -229,6 +237,8 @@ void ParticleRenderSystem::createParticleEmitter(glm::vec3 position, uint32_t co
         count = MAX_PARTICLES - m_particleCount;
     }
     if (count == 0) return;
+
+    m_simParams.particlesPosLife = glm::vec4(position, m_simParams.particlesPosLife.w);
 
     std::mt19937 gen{ std::random_device{}() };
     std::uniform_real_distribution<float> posDist(-0.5f,  0.5f);
@@ -245,13 +255,12 @@ void ParticleRenderSystem::createParticleEmitter(glm::vec3 position, uint32_t co
 
     for (uint32_t i = 0; i < count; ++i) {
         Particle& p = particles[m_particleCount + i];
-        p.position = position + glm::vec3(posDist(gen), posDist(gen), posDist(gen));
-        p.velocity = glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen));
-        p.lifetime = 1.0f;
-        p.size = 1.f;
+        p.positionLifetime = glm::vec4(position + glm::vec3(posDist(gen), posDist(gen), posDist(gen)),
+        m_simParams.particlesPosLife.w);
+        p.velocitySize = glm::vec4(glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen)), 1.f);
         p.color = glm::vec4(colDist(gen), colDist(gen), colDist(gen), 1.0f);
+        p.initPosLife = p.positionLifetime;
     }
-
     m_particleBuffer->unmap();
     m_particleCount += count;
 }

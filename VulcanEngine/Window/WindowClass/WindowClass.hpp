@@ -4,6 +4,8 @@
 // libs
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
+#define STD_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 // std
 #include <string>
@@ -29,6 +31,7 @@ public:
 
 	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface) const;
 
+	void setWindowIcon(const std::string& filepath);
 private:
 	int m_width;
 	int m_height;

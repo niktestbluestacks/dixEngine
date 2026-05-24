@@ -9,6 +9,7 @@
 #include <memory>
 
 // libs
+#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 
 namespace dix {

@@ -64,4 +64,13 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height
 	dixWindow->m_height = height;
 }
 
+void Window::setWindowIcon(const std::string& filepath) {
+	GLFWimage images[1];
+	images[0].pixels = stbi_load(filepath.c_str(), &images[0].width, &images[0].height, 0, 4);
+	if (images[0].pixels) {
+		glfwSetWindowIcon(m_window, 1, images);
+		stbi_image_free(images[0].pixels);
+	}
+}
+
 }	// namespace dix

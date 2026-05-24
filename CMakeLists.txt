@@ -10,26 +10,21 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Найти зависимости
 
-# ==========================================
 # 1. FIND DEPENDENCIES
-# ==========================================
 find_package(Vulkan REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
-find_package(glm REQUIRED)  # ← Добавить эту строку
+find_package(glm REQUIRED)
 
 # Find glslc
 if(Vulkan_GLSLC_EXECUTABLE)
     set(GLSLC ${Vulkan_GLSLC_EXECUTABLE})
 else()
-    # Если CMake его не нашел автоматически, ищем программу в системе
     find_program(GLSLC_PATH glslc)
     
     if(GLSLC_PATH)
         set(GLSLC ${GLSLC_PATH})
     else()
-        # Запасной вариант для Windows, если автоматический поиск не сработал
         set(GLSLC "C:/VulkanSDK/1.4.341.1/Bin/glslc.exe")
     endif()
 endif()
@@ -37,9 +32,7 @@ endif()
 message(STATUS "Shader compiler found: ${GLSLC}")
 
 
-# ==========================================
 # 2. SHADER COMPILATION
-# ==========================================
 set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/VulcanEngine/Shaders")
 set(SHADER_BINARY_DIR "${CMAKE_BINARY_DIR}/shaders")
 file(MAKE_DIRECTORY ${SHADER_BINARY_DIR})
@@ -74,7 +67,6 @@ endforeach()
 # Create shader target (ALL ensures it runs every build)
 add_custom_target(Shaders ALL DEPENDS ${SHADER_BINARIES})
 
-# Собрать все .cpp файлы
 file(GLOB_RECURSE ENGINE_SOURCES 
     "${CMAKE_SOURCE_DIR}/VulcanEngine/*.cpp"
     "${CMAKE_SOURCE_DIR}/VulcanEngine/*.tpp"
@@ -88,25 +80,30 @@ file(GLOB_RECURSE TPP_FILES
 )
 set_source_files_properties(${TPP_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
-# Создать исполняемый файл
-add_executable(VulcanApp ${ENGINE_SOURCES})
+if(WIN32)
+    set(RESOURCE_FILES "resources.rc")
+else()
+    # for now do nothing
+endif()
+
+add_executable(VulcanApp ${ENGINE_SOURCES} ${RESOURCE_FILES})
 
 set_target_properties(VulcanApp PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
 
-# Пути к заголовкам
+
 target_include_directories(VulcanApp PRIVATE
     ${CMAKE_SOURCE_DIR}/Applications
     ${CMAKE_SOURCE_DIR}/VulcanEngine
     ${CMAKE_SOURCE_DIR}/Dependecies
 )
 
-# Линковка
+
 target_link_libraries(VulcanApp PRIVATE
     Vulkan::Vulkan
     glfw
-    glm::glm  # ← Добавить эту строку (или просто glm)
+    glm::glm
 )
 
 # Copy compile_commands.json to project root for clangd
@@ -117,7 +114,6 @@ execute_process(
 )
 
 if(NOT WIN32)
-    # Автоматически подменяем вызовы localtime_s на уровне компилятора
     add_compile_definitions(
         "localtime_s(tm_ptr, time_ptr)=localtime_r(time_ptr, tm_ptr)"
     )
@@ -128,8 +124,6 @@ target_compile_options(VulcanApp PRIVATE
     -D__cplusplus=202603L
 )
 
-# А этот флаг скармливаем ТОЛЬКО реальному компилятору GCC. 
-# Генератор compile_commands.json его просто не увидит!
 if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
     target_compile_options(VulcanApp PRIVATE -freflection)
 endif()

@@ -4,11 +4,10 @@ layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
 // Match the c++ struct
 struct Particle {
-    vec3 position;
-    float lifetime;
-    vec3 velocity;
-    float size;
+    vec4 positionLife;
+    vec4 velocitySize;
     vec4 color;
+    vec4 initPosLife;
 };
 
 // Storage buffer for particle data (r/w)
@@ -18,12 +17,9 @@ layout(std430, binding = 0) buffer ParticleBuffer {
 } particleBuffer;
 
 layout(binding = 1) uniform SimulationParams {
-    vec3 gravity;
-    float deltaTime;
-    vec3 wind;
-    float dampling;
-    vec3 particlesPosition;
-    float particlesLifetime;
+    vec4 gravityDeltaTime;
+    vec4 windDamping;
+    vec4 particlesPosLife;
 } params;
 
 void main() {
@@ -34,24 +30,23 @@ void main() {
     Particle p = particleBuffer.particles[index];
 
     // Reset dead particles
-    if (p.lifetime <= 0.0) {
-        p.position = params.particlesPosition;  // emitter position (should be passed as uniform)
-        p.velocity = vec3(0.0);
-        p.lifetime = params.particlesLifetime;
+    if (p.positionLife.w <= 0.0) {
+        p.positionLife = p.initPosLife;  // emitter position (should be passed as uniform)
+        p.velocitySize.xyz = vec3(0.0);
         particleBuffer.particles[index] = p;
         return;
     }
 
     // Update velocity and forces
-    p.velocity += params.gravity * params.deltaTime;
-    p.velocity += params.wind * params.deltaTime;
-    p.velocity *= params.dampling;
+    p.velocitySize += vec4(params.gravityDeltaTime.xyz * params.gravityDeltaTime.w, 0.0);
+    p.velocitySize += vec4(params.windDamping.xyz * params.gravityDeltaTime.w, 0.0);
+    p.velocitySize.xyz *= params.windDamping.w;
 
     // upd position
-    p.position += p.velocity * params.deltaTime;
+    p.positionLife += vec4(p.velocitySize.xyz * params.gravityDeltaTime.w, 0.0);
 
     // upd lifetime
-    p.lifetime -= params.deltaTime;
+    p.positionLife.w -= params.gravityDeltaTime.w;
 
     // // Simple floor collision
     // if (p.position.y < 0.0) {

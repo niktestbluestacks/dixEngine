@@ -4,7 +4,7 @@
 namespace dix {
 
 namespace detail {
-
+    
 // Returns true for any Vulkan descriptor type backed by a VkBuffer.
 inline constexpr bool isBufferDescriptorType(VkDescriptorType type) {
     return type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER

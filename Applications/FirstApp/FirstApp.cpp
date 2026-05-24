@@ -107,6 +107,8 @@ void FirstApp::loadGameObjects() {
 }
 
 void FirstApp::loadUIElements(void) {
+	m_context->getDixWindow().setWindowIcon(toModelPath("Images/icon.ico"));
+
 	auto fps = std::make_unique<DixFpsCounter>(
 		DixUIInfo {
 		*m_context->getUIRenderer(),

@@ -2,11 +2,14 @@
     "cmake.sourceDirectory": "C:/Big_projects/Game_project/dixEngine",
     "makefile.configureOnOpen": false,
     "files.associations": {
-    "*.tpp": "cpp"
+    "*.tpp": "hlsl"
     },
     "clangd.arguments": [
         "--compile-commands-dir=build",
         "--background-index",
-        "--query-driver=C:/msys64/ucrt64/bin/g++.exe"
+        "--query-driver=C:/msys64/ucrt64/bin/g++.exe",
+        "--header-insertion=never",
+        "--enable-config",
+        "--experimental-modules-support"
     ]
 }

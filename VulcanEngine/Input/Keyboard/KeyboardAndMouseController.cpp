@@ -27,7 +27,7 @@ void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt, Gam
 	float yaw = gameObject.transform.rotation.y;
 	const glm::vec3 forwardDir{ glm::sin(yaw), 0.f, glm::cos(yaw) };
 	const glm::vec3 rightDir{ forwardDir.z, 0.f, -forwardDir.x };
-	const glm::vec3 upDir{ 0.f, -1.f, 0.f };
+	const glm::vec3 upDir{ 0.f, 1.f, 0.f };
 
 	glm::vec3 moveDir{ 0.f };
 	if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS) moveDir += forwardDir;
@@ -59,7 +59,7 @@ void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt, Gam
 		}
 
 		float xoffset = static_cast<float>(xpos - lastMouseX);
-		float yoffset = static_cast<float>(lastMouseY - ypos); // reversed: y ranges bottom->top
+		float yoffset = static_cast<float>(ypos - lastMouseY);
 		lastMouseX = xpos;
 		lastMouseY = ypos;
 

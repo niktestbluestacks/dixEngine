@@ -21,4 +21,5 @@ void main() {
 
     fragColor = inColor.rgb;
     fragSize = inVelocitySize.w;
+    gl_PointSize = fragSize;
 }

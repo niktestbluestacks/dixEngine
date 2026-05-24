@@ -61,7 +61,7 @@ ParticleRenderSystem::ParticleRenderSystem(
             },
         }) {
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
-    VkDeviceSize particleBufferSize = sizeof(uint32_t) + sizeof(Particle) * MAX_PARTICLES;
+    VkDeviceSize particleBufferSize = 16 + sizeof(Particle) * MAX_PARTICLES;
     m_particleBuffer = std::make_unique<DixBuffer>(
         engineDevice,
         particleBufferSize,
@@ -103,7 +103,7 @@ void ParticleRenderSystem::buildComputeDescriptors() {
     particleInfo.buffer = m_particleBuffer->getBuffer();
     particleInfo.offset = 0;
     particleInfo.range =
-    sizeof(uint32_t) + sizeof(Particle) * MAX_PARTICLES;
+    16 + sizeof(Particle) * MAX_PARTICLES;
 
     VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo();
 
@@ -251,13 +251,14 @@ void ParticleRenderSystem::createParticleEmitter(glm::vec3 position, uint32_t co
     *countPtr = m_particleCount + count;
 
     auto* particles = reinterpret_cast<Particle*>(
-        static_cast<uint8_t*>(m_particleBuffer->getMappedMemory()) + sizeof(uint32_t));
+        static_cast<uint8_t*>(m_particleBuffer->getMappedMemory()) + 16);
 
     for (uint32_t i = 0; i < count; ++i) {
         Particle& p = particles[m_particleCount + i];
         p.positionLifetime = glm::vec4(position + glm::vec3(posDist(gen), posDist(gen), posDist(gen)),
         m_simParams.particlesPosLife.w);
-        p.velocitySize = glm::vec4(glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen)), 1.f);
+        p.initVelocity = glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen));
+        p.velocitySize = glm::vec4(p.initVelocity, 3.f);
         p.color = glm::vec4(colDist(gen), colDist(gen), colDist(gen), 1.0f);
         p.initPosLife = p.positionLifetime;
     }

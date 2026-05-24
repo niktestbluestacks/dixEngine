@@ -15,12 +15,13 @@ struct Particle {
     alignas(16) glm::vec4 velocitySize;
     alignas(16) glm::vec4 color;
     alignas(16) glm::vec4 initPosLife;
+    alignas(16) glm::vec3 initVelocity;
 };
 
 struct ParticleSimulationParams {
     alignas(16) glm::vec4 gravityDeltaTime { 0.f, -.01f, 0.f, 0.f };
-    alignas(16) glm::vec4 windDamping { 0.01f, 0.f, 0.f, 0.99f };
-    alignas(16) glm::vec4 particlesPosLife { 0.f, 0.f, 0.f, 10.f };
+    alignas(16) glm::vec4 windDamping { 0.01f, 0.f, 0.f, .999f };
+    alignas(16) glm::vec4 particlesPosLife { 0.f, 0.f, 0.f, 100.f };
 };
 
 struct ParticleUbo {
@@ -83,7 +84,7 @@ private:
 
     ParticleSimulationParams m_simParams{};
     uint32_t m_particleCount{ 0 };
-    static constexpr uint32_t MAX_PARTICLES = 10000;
+    static constexpr uint32_t MAX_PARTICLES = 1'000'000;
 };
 
 }   // namespace dix

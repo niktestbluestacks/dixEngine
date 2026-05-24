@@ -8,6 +8,7 @@ struct Particle {
     vec4 velocitySize;
     vec4 color;
     vec4 initPosLife;
+    vec3 initVelocity;
 };
 
 // Storage buffer for particle data (r/w)
@@ -32,7 +33,7 @@ void main() {
     // Reset dead particles
     if (p.positionLife.w <= 0.0) {
         p.positionLife = p.initPosLife;  // emitter position (should be passed as uniform)
-        p.velocitySize.xyz = vec3(0.0);
+        p.velocitySize.xyz = p.initVelocity;
         particleBuffer.particles[index] = p;
         return;
     }
@@ -40,7 +41,7 @@ void main() {
     // Update velocity and forces
     p.velocitySize += vec4(params.gravityDeltaTime.xyz * params.gravityDeltaTime.w, 0.0);
     p.velocitySize += vec4(params.windDamping.xyz * params.gravityDeltaTime.w, 0.0);
-    p.velocitySize.xyz *= params.windDamping.w;
+    p.velocitySize.xyz *= pow(params.windDamping.w, params.gravityDeltaTime.w * 60.0);
 
     // upd position
     p.positionLife += vec4(p.velocitySize.xyz * params.gravityDeltaTime.w, 0.0);
@@ -48,10 +49,10 @@ void main() {
     // upd lifetime
     p.positionLife.w -= params.gravityDeltaTime.w;
 
-    // // Simple floor collision
-    // if (p.position.y < 0.0) {
-    //     p.position.y = 0.0;
-    //     p.velocity.y *= -0.5; // Bounce with energy loss
+    // Simple floor collision
+    // if (p.positionLife.y < 0.0) {
+    //     p.positionLife.y = 0.0;
+    //     p.velocitySize.y *= -0.5; // Bounce with energy loss
     // }
 
     // Write back updated particle

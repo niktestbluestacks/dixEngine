@@ -104,8 +104,7 @@ void FirstApp::loadGameObjects() {
 	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 100);
 
 	// skybox
-	const auto entry = toModelPath("cat_cube.obj");
-	
+	const auto entry = toModelPath("skybox.obj");
 	DixLogInfo("Skybox model is: {}", entry);
 
 	std::shared_ptr <Model> dixModel = Model::createModelFromFile(

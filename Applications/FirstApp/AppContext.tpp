@@ -114,6 +114,11 @@ void AppContext<RenderSystems...>::drawFrame(
                         ubo.projectionView = camera.getProjection() * camera.getView();
                     }
 
+                    if constexpr (requires { ubo.projection; ubo.view; }) {
+                        ubo.projection = camera.getProjection();
+                        ubo.view = camera.getView();
+                    }
+
                     m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->writeToBuffer(&ubo, sizeof(UboType));
                     m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]->flush();
                     ++uboTypeIndex;

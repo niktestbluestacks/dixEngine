@@ -160,9 +160,8 @@ void BouncyParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer) 
 }
 
 void BouncyParticleRenderSystem::renderGameObjects(
-    FrameInfo& frameInfo,
-    std::vector<GameObject>& gameObjects) const
-{
+        FrameInfo& frameInfo,
+        std::vector<GameObject>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
     bindBuffers(frameInfo.commandBuffer);
 
@@ -176,6 +175,8 @@ void BouncyParticleRenderSystem::renderGameObjects(
 
     VkRect2D scissor{ {0, 0}, frameInfo.screenExtent };
     vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);
+
+    updateParticles(frameInfo.frameTime);
 
     for (auto& obj : gameObjects) {
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};

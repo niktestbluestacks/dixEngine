@@ -20,7 +20,7 @@ struct BouncyParticle {
 
 struct BouncyParticleSimulationParams {
     alignas(16) glm::vec4 gravityDeltaTime { 0.f, -1.f, 0.f, 0.f };
-    alignas(16) glm::vec4 windDamping { 0.1f, 0.f, 0.f, .999f };
+    alignas(16) glm::vec4 windDamping { 0.f, 0.f, 0.f, .999f };
     alignas(16) glm::vec4 particlesPosLife { 0.f, 0.f, 0.f, 100.f };
 };
 
@@ -67,7 +67,7 @@ public:
     // Dispatches the compute shader. Call outside a render pass.
     void dispatchCompute(VkCommandBuffer commandBuffer) override;
 
-    void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) const override;
+    void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) override;
 
 protected:
     // Writes m_particleBuffer and m_simulationParamsBuffer into

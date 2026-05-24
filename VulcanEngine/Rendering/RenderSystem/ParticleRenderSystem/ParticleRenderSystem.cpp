@@ -161,8 +161,7 @@ void ParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer) {
 
 void ParticleRenderSystem::renderGameObjects(
     FrameInfo& frameInfo,
-    std::vector<GameObject>& gameObjects) const
-{
+    std::vector<GameObject>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
     bindBuffers(frameInfo.commandBuffer);
 
@@ -176,6 +175,8 @@ void ParticleRenderSystem::renderGameObjects(
 
     VkRect2D scissor{ {0, 0}, frameInfo.screenExtent };
     vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);
+
+    updateParticles(frameInfo.frameTime);
 
     for (auto& obj : gameObjects) {
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};

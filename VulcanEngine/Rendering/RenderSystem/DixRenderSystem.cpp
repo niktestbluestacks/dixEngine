@@ -149,6 +149,52 @@ void DixRenderSystem::renderGameObjects(
     }
 }
 
+void DixRenderSystem::renderGameObjects(
+    FrameInfo& frameInfo,
+    std::vector<GameObject>& gameObjects) {
+    m_pipeline->bind(frameInfo.commandBuffer);
+
+    for (auto& obj : gameObjects) {
+        // Use a fixed-size stack buffer — avoids heap allocation per object
+        // while supporting any push-constant size up to 256 bytes.
+        std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
+        m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
+
+        if (m_config.pushConstantSize > 0) {
+            vkCmdPushConstants(
+                frameInfo.commandBuffer,
+                m_pipelineLayout,
+                m_config.pushConstantStages,
+                0,
+                m_config.pushConstantSize,
+                pushBuffer.data()
+            );
+        }
+
+        std::array<VkDescriptorSet, 2> descriptorSets{
+            frameInfo.globalDescriptorSet,
+            VK_NULL_HANDLE
+        };
+        if (obj.model) {
+            descriptorSets[1] = obj.model->getDescriptorSet();
+        }
+
+        vkCmdBindDescriptorSets(
+            frameInfo.commandBuffer,
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipelineLayout,
+            0,
+            static_cast<uint32_t>(descriptorSets.size()),
+            descriptorSets.data(),
+            0, nullptr);
+
+        if (obj.model) {
+            obj.model->bind(frameInfo.commandBuffer);
+            obj.model->draw(frameInfo.commandBuffer);
+        }
+    }
+}
+
 void DixRenderSystem::initComputeFromConfig(const ComputePipelineConfig& cc) {
     // Build the descriptor-set layout from the declared bindings.
     auto builder = DixDescriptorSetLayout::Builder(m_dixDevice);

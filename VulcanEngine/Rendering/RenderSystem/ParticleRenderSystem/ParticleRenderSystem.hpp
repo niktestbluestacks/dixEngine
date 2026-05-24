@@ -67,7 +67,7 @@ public:
     // Dispatches the compute shader. Call outside a render pass.
     void dispatchCompute(VkCommandBuffer commandBuffer) override;
 
-    void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) const override;
+    void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) override;
 
 protected:
     // Writes m_particleBuffer and m_simulationParamsBuffer into

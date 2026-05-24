@@ -41,7 +41,7 @@ void main() {
     // Update velocity and forces
     p.velocitySize += vec4(params.gravityDeltaTime.xyz * params.gravityDeltaTime.w, 0.0);
     p.velocitySize += vec4(params.windDamping.xyz * params.gravityDeltaTime.w, 0.0);
-    p.velocitySize.xyz *= pow(params.windDamping.w, params.gravityDeltaTime.w * 60.0);
+    p.velocitySize.xyz *= pow(params.windDamping.w, params.gravityDeltaTime.w);
 
     // upd position
     p.positionLife += vec4(p.velocitySize.xyz * params.gravityDeltaTime.w, 0.0);

@@ -55,9 +55,6 @@ void FirstApp::run(void) {
 		float aspect = m_context->getAspectRatio();
 		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
 
-		m_context->getRenderSystem<ParticleRenderSystem>()
-		.updateParticles(frameTime);
-
 		try {
 			m_context->drawFrame(dixcamera, frameTime, m_gameObjects, playerPosition);
 		}
@@ -101,14 +98,14 @@ void FirstApp::loadGameObjects() {
 	particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
 	m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
 	m_context->getRenderSystem<ParticleRenderSystem>()
-	.createParticleEmitter(glm::vec3{0.f, 50.f, 0.f}, 1'000'000);
+	.createParticleEmitter(glm::vec3{0.f, 50.f, 0.f}, 50'000);
 
 	// bouncy particle emitter
 	auto bouncyParticleEmitter = GameObject::createGameObject();
 	particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
 	m_gameObjects["BouncyParticleRenderSystem"].push_back(std::move(particleEmitter));
 	m_context->getRenderSystem<BouncyParticleRenderSystem>()
-	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 1'000'000);
+	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 50'000);
 
 	// skybox
 	const auto entry = toModelPath("skybox.obj");

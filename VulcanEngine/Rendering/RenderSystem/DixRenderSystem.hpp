@@ -113,6 +113,11 @@ public:
         std::vector<GameObject>& gameObjects
     ) const;
 
+    virtual void renderGameObjects(
+        FrameInfo& frameInfo,
+        std::vector<GameObject>& gameObjects
+    );
+
     void setDescriptorPool(std::unique_ptr<DixDescriptorPool> pool) {
         m_descriptorPool = std::move(pool);
     }

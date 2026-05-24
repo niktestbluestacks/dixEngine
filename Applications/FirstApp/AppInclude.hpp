@@ -14,6 +14,7 @@
 #include <Rendering/Renderer/Renderer.hpp>
 #include <Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp>
 #include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
+#include <Rendering/RenderSystem/BoucyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
 #include <Rendering/RenderSystem/SkyboxRenderSystem/SkyboxRenderSystem.hpp>
 #include <Rendering/RenderSystem/RenderSystemRegistery.hpp>
 

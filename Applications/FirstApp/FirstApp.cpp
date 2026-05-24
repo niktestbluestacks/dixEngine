@@ -98,9 +98,16 @@ void FirstApp::loadGameObjects() {
 
 	// particle emitter
 	auto particleEmitter = GameObject::createGameObject();
-	particleEmitter.transform.translation = glm::vec3{5.f, 5.f, 5.f};
+	particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
 	m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
 	m_context->getRenderSystem<ParticleRenderSystem>()
+	.createParticleEmitter(glm::vec3{0.f, 50.f, 0.f}, 1'000'000);
+
+	// bouncy particle emitter
+	auto bouncyParticleEmitter = GameObject::createGameObject();
+	particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
+	m_gameObjects["BouncyParticleRenderSystem"].push_back(std::move(particleEmitter));
+	m_context->getRenderSystem<BouncyParticleRenderSystem>()
 	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 1'000'000);
 
 	// skybox

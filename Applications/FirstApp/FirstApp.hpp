@@ -4,6 +4,13 @@
 #include <FirstApp/AppContext.hpp>
 
 namespace dix {
+
+using CurrentAppContext = AppContext <
+	SimpleRenderSystem, 
+	ParticleRenderSystem
+	// SkyboxRenderSystem
+>;
+
 class FirstApp {
 private:
 	void loadGameObjects(void);
@@ -27,8 +34,8 @@ private:
 	glm::vec3 playerLookAt { 0.f, 0.f, 2.5f };
 	std::unordered_map<std::string, std::vector<GameObject>> m_gameObjects;
 	std::unordered_map<std::string, DixAudio> m_sounds;
-	std::unique_ptr <AppContext<SimpleRenderSystem, ParticleRenderSystem>> m_context{ 
-		std::make_unique<AppContext<SimpleRenderSystem, ParticleRenderSystem>>(
+	std::unique_ptr <CurrentAppContext> m_context{ 
+		std::make_unique<CurrentAppContext>(
 			WIDTH, 
 			HEIGHT, 
 			static_cast<std::string>("First Application")

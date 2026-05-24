@@ -38,7 +38,7 @@ ParticleRenderSystem::ParticleRenderSystem(
                 { 3, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, initPosLife)     },
             },
 
-            .transformGameObject = [](void* push, GameObject& obj) {
+            .transformGameObject = [](void* push, GameObject& obj, FrameInfo& frameInfo) {
                 auto* p       = static_cast<ParticlePushConstantData*>(push);
                 p->modelMatrix = obj.transform.mat4();
             },
@@ -179,7 +179,7 @@ void ParticleRenderSystem::renderGameObjects(
 
     for (auto& obj : gameObjects) {
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
-        m_config.transformGameObject(pushBuffer.data(), obj);
+        m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
 
         vkCmdPushConstants(
             frameInfo.commandBuffer,

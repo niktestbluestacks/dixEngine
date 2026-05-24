@@ -28,6 +28,8 @@ public:
         VkDescriptorSetLayout modelSetLayout
     );
 
+    ~SimpleRenderSystem() = default;
+
     static constexpr const char* Name() { return "SimpleRenderSystem"; }
 
     static constexpr std::tuple<VulkanRenderSystemFlagType, VulkanRenderSystemFlagType>

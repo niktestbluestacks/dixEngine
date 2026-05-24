@@ -103,15 +103,14 @@ void DixRenderSystem::createPipeline(VkRenderPass renderPass) {
 
 void DixRenderSystem::renderGameObjects(
     FrameInfo& frameInfo,
-    std::vector<GameObject>& gameObjects) const
-{
+    std::vector<GameObject>& gameObjects) const {
     m_pipeline->bind(frameInfo.commandBuffer);
 
     for (auto& obj : gameObjects) {
         // Use a fixed-size stack buffer — avoids heap allocation per object
         // while supporting any push-constant size up to 256 bytes.
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
-        m_config.transformGameObject(pushBuffer.data(), obj);
+        m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
 
         vkCmdPushConstants(
             frameInfo.commandBuffer,

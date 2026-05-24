@@ -1,6 +1,8 @@
 #ifndef APP_CONTEXT_TPP
 #define APP_CONTEXT_TPP
 
+#ifndef __clang__
+
 namespace dix {
 
 namespace detail {
@@ -376,4 +378,5 @@ void AppContext<RenderSystems...>::createUBOs() {
 }
 
 }   // namespace dix
+#endif // __clang__
 #endif // APP_CONTEXT_TPP

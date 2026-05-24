@@ -3,7 +3,6 @@
 
 // std
 #include <cassert>
-#include <limits>
 
 namespace dix {
 void DixCamera::setPerspectiveProjection(float fovy, float aspect, float near, float far) {

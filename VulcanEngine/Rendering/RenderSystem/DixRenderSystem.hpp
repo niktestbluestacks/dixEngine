@@ -18,6 +18,7 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <tuple>
 
 namespace dix {
 
@@ -75,7 +76,7 @@ struct DixRenderSystemConfig {
 
     // Per-object push-constant writer.
     // Signature: (pointer to push-constant block, game object)
-    std::function<void(void*, GameObject&)> transformGameObject;
+    std::function<void(void*, GameObject&, FrameInfo&)> transformGameObject;
 
     // Size (bytes) of the push-constant block for this system.
     // Defaults to sizeof(BasePushConstantData).

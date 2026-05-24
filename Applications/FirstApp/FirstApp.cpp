@@ -20,8 +20,6 @@ FirstApp::~FirstApp(void) {
 	DixLogInfo("FirstApp closed successfully!");
 }
 
-constexpr const char ParticleRS[] = "ParticleRenderSystem";
-
 void FirstApp::run(void) {
 	DixCamera dixcamera{};
 	dixcamera.setViewTarget(playerPosition, playerLookAt);
@@ -104,6 +102,21 @@ void FirstApp::loadGameObjects() {
 	m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
 	m_context->getRenderSystem<ParticleRenderSystem>()
 	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 1'000'000);
+
+	// skybox
+	const auto entry = getRandomFile(toModelPath(""));
+	
+	std::shared_ptr <Model> dixModel = Model::createModelFromFile(
+		m_context->device(), 
+		std::filesystem::absolute(entry).string(),
+		m_context->getDescriptorPool(),
+		m_context->getModelSetLayout()
+	);
+
+	auto Skybox = GameObject::createGameObject();
+	Skybox.model = dixModel;
+	dixModel.reset();
+	m_gameObjects["SkyboxRenderSystem"].push_back(std::move(Skybox));
 }
 
 void FirstApp::loadUIElements(void) {

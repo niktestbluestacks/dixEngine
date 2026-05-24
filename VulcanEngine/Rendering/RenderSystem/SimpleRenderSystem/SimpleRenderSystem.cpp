@@ -18,7 +18,7 @@ SimpleRenderSystem::SimpleRenderSystem(
             .fragShaderPath = "SimpleShader/simple_shader.frag.spv",
             // Default topology (TRIANGLE_LIST) — no override needed.
             // Default vertex input — Model::bind() provides buffers at draw time.
-            .transformGameObject = [](void* push, GameObject& obj) {
+            .transformGameObject = [](void* push, GameObject& obj, FrameInfo& frameInfo) {
                 auto* p = static_cast<SimplePushConstantData*>(push);
                 p->modelMatrix = obj.transform.mat4();
                 p->normalMatrix = obj.transform.normalMatrix();

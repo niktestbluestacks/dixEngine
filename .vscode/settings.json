@@ -2,7 +2,7 @@
     "cmake.sourceDirectory": "C:/Big_projects/Game_project/dixEngine",
     "makefile.configureOnOpen": false,
     "files.associations": {
-    "*.tpp": "hlsl"
+    "*.tpp": "cpp"
     },
     "clangd.arguments": [
         "--compile-commands-dir=build",

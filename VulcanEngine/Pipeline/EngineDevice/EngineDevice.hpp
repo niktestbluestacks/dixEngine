@@ -74,6 +74,8 @@ public:
 
     void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
 
+    void recreateSurface();
+    VkPhysicalDevice getPhysicalDevice() const { return physicalDevice; }
 private:
     void createInstance();
     void setupDebugMessenger();

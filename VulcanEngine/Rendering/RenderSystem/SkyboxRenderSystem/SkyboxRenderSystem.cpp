@@ -23,7 +23,7 @@ SkyboxRenderSystem::SkyboxRenderSystem(
                 p->modelMatrix = glm::mat4{1.f};
                 p->normalMatrix = glm::mat4{1.f};
             },
-            .pushConstantSize = 0,
+            .pushConstantSize = sizeof(SkyboxPushContstantData),
     }) {
     
 }

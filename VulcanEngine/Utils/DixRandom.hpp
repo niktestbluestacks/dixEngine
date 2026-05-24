@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <vector>
+#include <random>
 
 namespace dix {
 namespace fs = std::filesystem;
@@ -19,7 +20,6 @@ inline std::string getRandomFile(std::string filepath = toAudioPath("")) {
         if (fs::is_regular_file(entry.status())) files.push_back(entry.path());
     }
 
-    std::srand(static_cast<unsigned>(std::chrono::steady_clock::now().time_since_epoch().count()));
     std::size_t idx = static_cast<std::size_t>(std::rand()) % files.size();
 
     return files[idx].string();

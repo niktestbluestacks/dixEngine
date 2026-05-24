@@ -206,6 +206,11 @@ void EngineDevice::createCommandPool() {
 
 void EngineDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
 
+void EngineDevice::recreateSurface() {
+    vkDestroySurfaceKHR(instance, surface_, nullptr);
+    createSurface();
+}
+
 bool EngineDevice::isDeviceSuitable(VkPhysicalDevice device) {
     QueueFamilyIndices indices = findQueueFamilies(device);
 

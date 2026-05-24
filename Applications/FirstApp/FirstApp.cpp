@@ -101,11 +101,13 @@ void FirstApp::loadGameObjects() {
 	particleEmitter.transform.translation = glm::vec3{5.f, 5.f, 5.f};
 	m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
 	m_context->getRenderSystem<ParticleRenderSystem>()
-	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 1'000'000);
+	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 100);
 
 	// skybox
 	const auto entry = getRandomFile(toModelPath(""));
 	
+	DixLogInfo("Skybox model is: {}", entry);
+
 	std::shared_ptr <Model> dixModel = Model::createModelFromFile(
 		m_context->device(), 
 		std::filesystem::absolute(entry).string(),

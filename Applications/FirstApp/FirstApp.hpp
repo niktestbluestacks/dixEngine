@@ -7,8 +7,8 @@ namespace dix {
 
 using CurrentAppContext = AppContext <
 	SimpleRenderSystem, 
-	ParticleRenderSystem
-	// SkyboxRenderSystem
+	ParticleRenderSystem,
+	SkyboxRenderSystem
 >;
 
 class FirstApp {

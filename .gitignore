@@ -21,4 +21,3 @@ VulcanApp
 cmake_install.cmake
 VulcanApp
 .clangd
-*.tga

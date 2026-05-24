@@ -11,8 +11,7 @@ struct SkyboxUbo {
 };
 
 struct SkyboxPushContstantData {
-    glm::mat4 modelMatrix;
-    glm::mat4 normalMatrix;
+    // Empty - skybox doesn't need push constants anymore
 };
 
 class SkyboxRenderSystem : public DixRenderSystem {

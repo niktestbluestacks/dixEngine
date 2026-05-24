@@ -54,12 +54,7 @@ DixRenderSystem::~DixRenderSystem() {
 
 void DixRenderSystem::createPipelineLayout(
     VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout)
-{
-    VkPushConstantRange pushConstantRange{};
-    pushConstantRange.stageFlags = m_config.pushConstantStages;
-    pushConstantRange.offset = 0;
-    pushConstantRange.size = m_config.pushConstantSize;
+    VkDescriptorSetLayout modelSetLayout) {
 
     std::vector<VkDescriptorSetLayout> setLayouts{ globalSetLayout, modelSetLayout };
 
@@ -67,8 +62,18 @@ void DixRenderSystem::createPipelineLayout(
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
     layoutInfo.pSetLayouts = setLayouts.data();
-    layoutInfo.pushConstantRangeCount = 1;
-    layoutInfo.pPushConstantRanges = &pushConstantRange;
+
+    VkPushConstantRange pushConstantRange{};
+    if (m_config.pushConstantSize > 0) {
+        pushConstantRange.stageFlags = m_config.pushConstantStages;
+        pushConstantRange.offset = 0;
+        pushConstantRange.size = m_config.pushConstantSize;
+        layoutInfo.pushConstantRangeCount = 1;
+        layoutInfo.pPushConstantRanges = &pushConstantRange;
+    } else {
+        layoutInfo.pushConstantRangeCount = 0;
+        layoutInfo.pPushConstantRanges = nullptr;
+    }
 
     if (vkCreatePipelineLayout(m_dixDevice.device(), &layoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("DixRenderSystem: failed to create pipeline layout");
@@ -112,13 +117,16 @@ void DixRenderSystem::renderGameObjects(
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
         m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
 
-        vkCmdPushConstants(
-            frameInfo.commandBuffer,
-            m_pipelineLayout,
-            m_config.pushConstantStages,
-            0,
-            m_config.pushConstantSize,
-            pushBuffer.data());
+        if (m_config.pushConstantSize > 0) {
+            vkCmdPushConstants(
+                frameInfo.commandBuffer,
+                m_pipelineLayout,
+                m_config.pushConstantStages,
+                0,
+                m_config.pushConstantSize,
+                pushBuffer.data()
+            );
+        }
 
         std::array<VkDescriptorSet, 2> descriptorSets{
             frameInfo.globalDescriptorSet,

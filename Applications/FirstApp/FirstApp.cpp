@@ -104,7 +104,7 @@ void FirstApp::loadGameObjects() {
 	.createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 100);
 
 	// skybox
-	const auto entry = getRandomFile(toModelPath(""));
+	const auto entry = toModelPath("cat_cube.obj");
 	
 	DixLogInfo("Skybox model is: {}", entry);
 

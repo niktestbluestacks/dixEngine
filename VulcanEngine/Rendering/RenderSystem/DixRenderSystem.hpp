@@ -90,6 +90,7 @@ struct DixRenderSystemConfig {
     // The subclass must still call buildComputeDescriptors() after
     // creating its data buffers.
     std::optional<ComputePipelineConfig> compute = std::nullopt;
+    PipelineConfigInfo pipelineConfigInfo{};
 };
 
 class DixRenderSystem {

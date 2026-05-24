@@ -84,25 +84,22 @@ void DixRenderSystem::createPipeline(VkRenderPass renderPass) {
     assert(m_pipelineLayout != VK_NULL_HANDLE &&
            "createPipelineLayout must be called before createPipeline");
 
-    PipelineConfigInfo cfg{};
-    Pipeline::defaultPipelineConfigInfo(cfg);
-
-    cfg.inputAssemblyInfo.topology = m_config.topology;
-    cfg.renderPass = renderPass;
-    cfg.pipelineLayout = m_pipelineLayout;
+    m_config.pipelineConfigInfo.inputAssemblyInfo.topology = m_config.topology;
+    m_config.pipelineConfigInfo.renderPass = renderPass;
+    m_config.pipelineConfigInfo.pipelineLayout = m_pipelineLayout;
 
     if (!m_config.vertexBindings.empty()) {
-        cfg.vertexBindingDescriptions = m_config.vertexBindings;
+        m_config.pipelineConfigInfo.vertexBindingDescriptions = m_config.vertexBindings;
     }
     if (!m_config.vertexAttributes.empty()) {
-        cfg.vertexAttributeDescriptions = m_config.vertexAttributes;
+        m_config.pipelineConfigInfo.vertexAttributeDescriptions = m_config.vertexAttributes;
     }
 
     m_pipeline = std::make_unique<Pipeline>(
         m_dixDevice,
         toShaderPath(m_config.vertShaderPath),
         toShaderPath(m_config.fragShaderPath),
-        cfg
+        m_config.pipelineConfigInfo
     );
 }
 

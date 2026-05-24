@@ -24,7 +24,12 @@ SkyboxRenderSystem::SkyboxRenderSystem(
                 // p->normalMatrix = glm::mat4{1.f};
             },
             .pushConstantSize = 0,
-            .pushConstantStages = 0
+            .pushConstantStages = 0,
+            .pipelineConfigInfo = std::move([]() -> PipelineConfigInfo {
+                PipelineConfigInfo conf{};
+                conf.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+                return conf;
+            }())
     }) {
     
 }

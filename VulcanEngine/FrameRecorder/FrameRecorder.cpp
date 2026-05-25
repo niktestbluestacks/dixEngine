@@ -1,6 +1,7 @@
 // dix
 #include <FrameRecorder/FrameRecorder.hpp>
 #include <Model/GameObject/GameObject.hpp>
+#include <Model/Model.hpp>
 #include <Logger/Logger.hpp>
 
 // std
@@ -30,7 +31,9 @@ void FrameRecorder::startRecording(const std::string& filename) {
     m_filename = filename;
     m_outputStream.open(filename, std::ios::trunc);
     if (!m_outputStream.is_open()) {
-        throw std::runtime_error("Failed to open recording file: " + filename);
+        DixLogErr("Failed to open recording file: {}", filename);
+        m_isRecording = false;
+        return;
     }
     m_isRecording = true;
     m_isPlaying = false;
@@ -57,6 +60,13 @@ void FrameRecorder::stopRecording() {
 
     m_outputStream.close();
     m_isRecording = false;
+
+    // Clear recording state but don't crash - allow program to continue
+    m_frames.clear();
+    m_prevTranslations.clear();
+    m_prevRotations.clear();
+    m_prevScales.clear();
+    m_initialStructure.gameObjectsByRenderSystem.clear();
 }
 
 void FrameRecorder::recordInitialStructure(
@@ -231,7 +241,11 @@ void FrameRecorder::startPlayback(
     m_filename = filename;
     m_inputStream.open(filename);
     if (!m_inputStream.is_open()) {
-        throw std::runtime_error("Failed to open recording file: " + filename);
+        DixLogErr("Failed to open recording file: {}", filename);
+        // Don't throw - just return and let program continue
+        m_isPlaying = false;
+        m_isRecording = false;
+        return;
     }
 
     m_isPlaying = true;
@@ -239,12 +253,29 @@ void FrameRecorder::startPlayback(
     m_currentFrameIndex = 0;
     m_frames.clear();
 
+    // Clear previous mappings
+    m_playbackIdMap.clear();
+    m_idToLocationMap.clear();
+
     // Read initial structure and recreate game objects
     if (!readInitialStructure()) {
-        throw std::runtime_error("Failed to read initial structure from recording");
+        DixLogErr("Failed to read initial structure from recording");
+        m_isPlaying = false;
+        m_inputStream.close();
+        return;
     }
 
     // Apply initial structure to gameObjects - preserve order exactly as recorded
+    // BUG FIX A: Store original models before clearing, then reassign them
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Model>>> originalModels;
+    for (const auto& [renderSystemName, objects] : gameObjects) {
+        auto& models = originalModels[renderSystemName];
+        models.reserve(objects.size());
+        for (const auto& obj : objects) {
+            models.push_back(obj.model);  // Save the model shared_ptr
+        }
+    }
+
     gameObjects.clear();
     for (const auto& [renderSystemName, recordedObjects] : m_initialStructure.gameObjectsByRenderSystem) {
         auto& objects = gameObjects[renderSystemName];
@@ -257,6 +288,13 @@ void FrameRecorder::startPlayback(
             obj.transform.translation = recorded.translation;
             obj.transform.rotation = recorded.rotation;
             obj.transform.scale = recorded.scale;
+
+            // Try to restore the original model if available
+            auto modelsIt = originalModels.find(renderSystemName);
+            if (modelsIt != originalModels.end() && objectIndex < modelsIt->second.size()) {
+                obj.model = modelsIt->second[objectIndex];
+            }
+
             // Store the recorded ID mapping: index -> recorded ID
             m_playbackIdMap[{renderSystemName, objectIndex}] = recorded.id;
             objects.push_back(std::move(obj));
@@ -272,12 +310,21 @@ void FrameRecorder::startPlayback(
 }
 
 void FrameRecorder::stopPlayback() {
+    if (!m_isPlaying) {
+        return;  // Already stopped, don't crash
+    }
+
     if (m_inputStream.is_open()) {
         m_inputStream.close();
     }
     m_isPlaying = false;
     m_currentFrameIndex = 0;
-    m_frames.clear();
+    // Don't clear frames here - they may still be needed by caller
+    // m_frames.clear();
+
+    // Clear the ID mapping so next playback starts fresh
+    m_playbackIdMap.clear();
+    m_idToLocationMap.clear();
 }
 
 bool FrameRecorder::updatePlayback(

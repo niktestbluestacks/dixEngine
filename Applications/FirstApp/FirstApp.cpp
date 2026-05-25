@@ -84,7 +84,8 @@ void FirstApp::run(void) {
 			recorder.recordFrame(
 				m_gameObjects,
 				playerPosition,
-				playerLookAt
+				playerLookAt,
+				frameTime
 			);
 		}
 
@@ -214,7 +215,7 @@ void FirstApp::handleRecorderInput(float frameTime) {
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
 		if (!m_recording && !m_playing) {
 			m_recording = true;
-			getFrameRecorder().startRecording("recording.bin");
+			getFrameRecorder().startRecording("recording.txt");
 			DixLogInfo("Recording started - press R again to stop");
 			keyCooldown = 0.3f; // 300ms cooldown
 		} else if (m_recording) {
@@ -229,7 +230,12 @@ void FirstApp::handleRecorderInput(float frameTime) {
 	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
 		if (!m_playing && !m_recording) {
 			m_playing = true;
-			getFrameRecorder().startPlayback("recording.bin", m_gameObjects, playerPosition, playerLookAt);
+			getFrameRecorder().startPlayback(
+				"recording.txt", 
+				m_gameObjects, 
+				playerPosition, 
+				playerLookAt
+			);
 			DixLogInfo("Playback started - press P again to stop");
 			keyCooldown = 0.3f;
 		} else if (m_playing) {

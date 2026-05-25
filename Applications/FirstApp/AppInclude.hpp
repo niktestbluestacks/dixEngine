@@ -4,7 +4,7 @@
 // dix
 // LOGGING
 #include <Logger/Logger.hpp>
-#include <Debug/FrameRecorder.hpp>
+#include <FrameRecorder/FrameRecorder.hpp>
 
 // PIPELINE
 #include <Pipeline/Buffer/DixBuffer.hpp>

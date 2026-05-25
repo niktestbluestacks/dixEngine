@@ -7,8 +7,8 @@ void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt, Gam
 	glm::vec3 rotate{ 0.f };
 	if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
 	if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;
-	if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) rotate.x += 1.f;
-	if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) rotate.x -= 1.f;
+	if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) rotate.x -= 1.f;
+	if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) rotate.x += 1.f;
 
 	if (glfwGetKey(window, keys.speedUp) == GLFW_PRESS){
 		moveSpeed = std::min(maxMoveSpeed, moveSpeed + AccelerationCoefficient * dt);

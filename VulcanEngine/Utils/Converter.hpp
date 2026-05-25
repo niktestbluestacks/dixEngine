@@ -16,7 +16,10 @@ inline constexpr std::string toModelPath(const std::string& modelFilepath) {
 inline constexpr std::string toAudioPath(const std::string& audioFilepath) {
 	return std::string(static_cast <std::string> ("../dixEngine/Applications/audio/") + audioFilepath);
 }
-	
+
+inline constexpr std::string toRecordingPath(const std::string& recordingFilepath) {
+	return std::string(static_cast <std::string>("../dixEngine/recording/") + recordingFilepath);
+}
 }	// dix
 
 #endif // CONVERTER_HPP

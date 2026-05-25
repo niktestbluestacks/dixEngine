@@ -16,6 +16,7 @@ class FirstApp {
 private:
 	void loadGameObjects(void);
 	void loadUIElements(void);
+	void handleRecorderInput(float frameTime);
 public:
 	static constexpr int WIDTH = 800;
 	static constexpr int HEIGHT = 600;
@@ -41,6 +42,9 @@ private:
 			HEIGHT, 
 			static_cast<std::string>("First Application")
 	) };
+
+	bool m_recording = false;
+	bool m_playing = false;
 };
 }	// namespace dix
 

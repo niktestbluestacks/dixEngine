@@ -4,6 +4,7 @@
 // dix
 // LOGGING
 #include <Logger/Logger.hpp>
+#include <Debug/FrameRecorder.hpp>
 
 // PIPELINE
 #include <Pipeline/Buffer/DixBuffer.hpp>
@@ -16,7 +17,7 @@
 #include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
 #include <Rendering/RenderSystem/BoucyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
 #include <Rendering/RenderSystem/SkyboxRenderSystem/SkyboxRenderSystem.hpp>
-#include <Rendering/RenderSystem/ShadowMappingRenderSystem/ShadowMappingRenderSystem.hpp>
+// #include <Rendering/RenderSystem/ShadowMappingRenderSystem/ShadowMappingRenderSystem.hpp>
 #include <Rendering/RenderSystem/RenderSystemRegistery.hpp>
 
 // UI

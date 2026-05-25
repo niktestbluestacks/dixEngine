@@ -33,10 +33,12 @@ void FirstApp::run(void) {
 
 	DixLogInfo("Background theme: {}", sound);
 
-	m_sounds["Background theme"] = 
+	m_sounds["Background theme"] =
 		DixAudio(sound);
 
 	m_sounds["Background theme"].play(true);
+
+	bool initialStructureRecorded = false;
 
 	while (!m_context->shouldClose()) {
 		m_context->pollEvents();
@@ -47,13 +49,44 @@ void FirstApp::run(void) {
 
 		frameTime = glm::min(frameTime, MAX_FRAME_TIME);
 
-		cameraController.moveInPlaneXZ(m_context->getGLFWwindow(), frameTime, viewerObject);
-		playerPosition = viewerObject.transform.translation;
-		playerLookAt = viewerObject.transform.rotation;
-		dixcamera.setViewYXZ(playerPosition, playerLookAt);
+		// Handle recorder input (R to record, P to playback)
+		handleRecorderInput(frameTime);
+
+		// If playing back, use recorded camera data and object states
+		if (m_playing) {
+			auto& recorder = getFrameRecorder();
+			if (!recorder.updatePlayback(m_gameObjects, playerPosition, playerLookAt)) {
+				DixLogInfo("Playback finished");
+				m_playing = false;
+				recorder.stopPlayback();
+			} else {
+				frameTime = recorder.getCurrentFrame()->frameTime;
+				dixcamera.setViewYXZ(playerPosition, playerLookAt);
+			}
+		} else {
+			cameraController.moveInPlaneXZ(m_context->getGLFWwindow(), frameTime, viewerObject);
+			playerPosition = viewerObject.transform.translation;
+			playerLookAt = viewerObject.transform.rotation;
+			dixcamera.setViewYXZ(playerPosition, playerLookAt);
+		}
 
 		float aspect = m_context->getAspectRatio();
 		dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
+
+		// Record frame if recording
+		if (m_recording) {
+			auto& recorder = getFrameRecorder();
+			// Record initial structure once at the start of recording
+			if (!initialStructureRecorded) {
+				recorder.recordInitialStructure(m_gameObjects);
+				initialStructureRecorded = true;
+			}
+			recorder.recordFrame(
+				m_gameObjects,
+				playerPosition,
+				playerLookAt
+			);
+		}
 
 		try {
 			m_context->drawFrame(dixcamera, frameTime, m_gameObjects, playerPosition);
@@ -63,13 +96,19 @@ void FirstApp::run(void) {
 			break;
 		}
 	}
+
+	// Stop recording if app closes while recording
+	if (m_recording) {
+			getFrameRecorder().stopRecording();
+			m_recording = false;
+	}
 }
 
 void FirstApp::loadGameObjects() {
 	std::random_device rd;
-    
+
     std::mt19937 gen(rd());
-    
+
     std::uniform_real_distribution<float> dist(0.0f, 10.0f);
 
 	for (const auto& entry : std::filesystem::directory_iterator(MODEL_FILEPATH_RELATIVE)) {
@@ -80,7 +119,7 @@ void FirstApp::loadGameObjects() {
 		}
 		DixLogDebug("Loading model: {}", std::filesystem::absolute(entry).string());
 		std::shared_ptr <Model> dixModel = Model::createModelFromFile(
-			m_context->device(), 
+			m_context->device(),
 			std::filesystem::absolute(entry).string(),
 			m_context->getDescriptorPool(),
 			m_context->getModelSetLayout()
@@ -112,7 +151,7 @@ void FirstApp::loadGameObjects() {
 	DixLogInfo("Skybox model is: {}", entry);
 
 	std::shared_ptr <Model> dixModel = Model::createModelFromFile(
-		m_context->device(), 
+		m_context->device(),
 		std::filesystem::absolute(entry).string(),
 		m_context->getDescriptorPool(),
 		m_context->getModelSetLayout()
@@ -125,25 +164,25 @@ void FirstApp::loadGameObjects() {
 }
 
 void FirstApp::loadUIElements(void) {
-	m_context->getDixWindow().setWindowIcon(toModelPath("Images/icon.ico"));
+        m_context->getDixWindow().setWindowIcon(toModelPath("Images/icon.ico"));
 
-	auto fps = std::make_unique<DixFpsCounter>(
-		DixUIInfo {
-		*m_context->getUIRenderer(),
-		m_context->getExtent()
-		// "",
-		// "UI/font.txt",
-		// "UI/font02.tga"
+        auto fps = std::make_unique<DixFpsCounter>(
+			DixUIInfo {
+			*m_context->getUIRenderer(),
+			m_context->getExtent()
+			// "",
+			// "UI/font.txt",
+			// "UI/font02.tga"
         }
     );
 	m_context->addUIElement(std::move(fps));
     auto timeCounter = std::make_unique<DixTimeCounter>(
         DixUIInfo {
-            *m_context->getUIRenderer(),
+			*m_context->getUIRenderer(),
 			m_context->getExtent(),
 			// "",
 			// "UI/font.txt",
-			// "UI/font02.tga" 
+			// "UI/font02.tga"
 		}
     );
     m_context->addUIElement(std::move(timeCounter));
@@ -154,11 +193,52 @@ void FirstApp::loadUIElements(void) {
 			m_context->getExtent(),
 			// "",
 			// "UI/font.txt",
-			// "UI/font02.tga" 
+			// "UI/font02.tga"
 		},
 		playerPosition
 	);
 	m_context->addUIElement(std::move(playerInfo));
+}
+
+void FirstApp::handleRecorderInput(float frameTime) {
+	static float keyCooldown = 0.f;
+	keyCooldown -= frameTime;
+
+	if (keyCooldown > 0.f) {
+		return;
+	}
+
+	GLFWwindow* window = m_context->getGLFWwindow();
+
+	// Press R to start/stop recording
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		if (!m_recording && !m_playing) {
+			m_recording = true;
+			getFrameRecorder().startRecording("recording.bin");
+			DixLogInfo("Recording started - press R again to stop");
+			keyCooldown = 0.3f; // 300ms cooldown
+		} else if (m_recording) {
+			m_recording = false;
+			getFrameRecorder().stopRecording();
+			DixLogInfo("Recording stopped");
+			keyCooldown = 0.3f;
+		}
+	}
+
+	// Press P to start/stop playback
+	if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+		if (!m_playing && !m_recording) {
+			m_playing = true;
+			getFrameRecorder().startPlayback("recording.bin", m_gameObjects, playerPosition, playerLookAt);
+			DixLogInfo("Playback started - press P again to stop");
+			keyCooldown = 0.3f;
+		} else if (m_playing) {
+			m_playing = false;
+			getFrameRecorder().stopPlayback();
+			DixLogInfo("Playback stopped");
+			keyCooldown = 0.3f;
+		}
+	}
 }
 
 } // namespace dix

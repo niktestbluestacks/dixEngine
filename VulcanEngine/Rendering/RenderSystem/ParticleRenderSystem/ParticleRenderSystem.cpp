@@ -105,7 +105,9 @@ void ParticleRenderSystem::buildComputeDescriptors() {
     particleInfo.range =
     16 + sizeof(Particle) * MAX_PARTICLES;
 
-    VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo();
+    VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo(
+        sizeof(ParticleSimulationParams), 0
+    );
 
     bool ok = DixDescriptorWriter(*m_computeSetLayout, *m_computeDescriptorPool)
         .writeBuffer(0, &particleInfo)

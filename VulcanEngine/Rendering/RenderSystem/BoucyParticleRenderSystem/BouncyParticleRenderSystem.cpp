@@ -105,7 +105,9 @@ void BouncyParticleRenderSystem::buildComputeDescriptors() {
     particleInfo.range =
     16 + sizeof(BouncyParticle) * MAX_PARTICLES;
 
-    VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo();
+    VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo(
+        sizeof(BouncyParticleSimulationParams), 0
+    );
 
     bool ok = DixDescriptorWriter(*m_computeSetLayout, *m_computeDescriptorPool)
         .writeBuffer(0, &particleInfo)

@@ -60,7 +60,9 @@ void FirstApp::run(void) {
 				m_playing = false;
 				recorder.stopPlayback();
 			} else {
-				frameTime = recorder.getCurrentFrame()->frameTime;
+				if (recorder.getCurrentFrame()) {
+					frameTime = recorder.getCurrentFrame()->frameTime;
+				}
 				dixcamera.setViewYXZ(playerPosition, playerLookAt);
 			}
 		} else {

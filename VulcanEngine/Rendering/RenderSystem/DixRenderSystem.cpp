@@ -52,8 +52,6 @@ DixRenderSystem::~DixRenderSystem() {
     if (m_computePipelineLayout != VK_NULL_HANDLE) {
         vkDestroyPipelineLayout(m_dixDevice.device(), m_computePipelineLayout, nullptr);
     }
-    m_computeDescriptorPool->~DixDescriptorPool();
-
     // Ensure device is idle before destroying resources
     vkDeviceWaitIdle(m_dixDevice.device());
 }

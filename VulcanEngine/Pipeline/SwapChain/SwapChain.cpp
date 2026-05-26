@@ -3,6 +3,9 @@
 
 #include <Logger/Logger.hpp>
 
+// libs
+#include <vulkan/vk_enum_string_helper.h>
+
 // std
 #include <array>
 #include <cstdlib>
@@ -180,7 +183,8 @@ void SwapChain::createSwapChain() {
 
     auto result = vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain);
     if (result != VK_SUCCESS) {
-        throw std::runtime_error("failed to create swap chain!");
+        throw std::runtime_error(std::string("failed to create swap chain!: ") +
+        std::string(string_VkResult(result)));
     }
 
     // we only specified a minimum number of images in the swap chain, so the implementation is
@@ -389,20 +393,20 @@ VkSurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(
 
 VkPresentModeKHR SwapChain::chooseSwapPresentMode(
         const std::vector<VkPresentModeKHR>& availablePresentModes) {
-    for (const auto& availablePresentMode : availablePresentModes) {
-        if (availablePresentMode == VK_PRESENT_MODE_FIFO_LATEST_READY_EXT) {
-            DixLogInfo("Present mode: Fifo latest ready ext");
-            return availablePresentMode;
-        }
-    }
-
-
-    // for (const auto &availablePresentMode : availablePresentModes) {
-    //    if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-    //        DixLogInfo("Present mode: Immediate");
-    //        return availablePresentMode;
-    //    }
+    // for (const auto& availablePresentMode : availablePresentModes) {
+    //     if (availablePresentMode == VK_PRESENT_MODE_FIFO_LATEST_READY_EXT) {
+    //         DixLogInfo("Present mode: Fifo latest ready ext");
+    //         return availablePresentMode;
+    //     }
     // }
+
+
+    for (const auto &availablePresentMode : availablePresentModes) {
+       if (availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+           DixLogInfo("Present mode: Immediate");
+           return availablePresentMode;
+       }
+    }
     DixLogInfo("Present mode: V-Sync");
     return VK_PRESENT_MODE_FIFO_KHR;
 }

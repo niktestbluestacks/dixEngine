@@ -39,20 +39,20 @@ void Logger::log(LogLevel level, const std::string message) {
             break;
         case ERR:
             std::cerr << oss.str() << "\n";
-            std::cerr << "The program had been running for " + std::to_string(
-                std::chrono::duration_cast<std::chrono::seconds>(
-                    std::chrono::system_clock::now() - start_time).count()
-                ) + " seconds and had been termitated in: ";
-            auto timeT = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-            std::tm nowTmStorage;
-            std::tm* nowTm = &nowTmStorage;
-            localtime_s(nowTm, &timeT);
-            std::cerr << std::to_string(nowTm->tm_year + 1900) + "-" +
-                        std::to_string(nowTm->tm_mon + 1) + "-" +
-                        std::to_string(nowTm->tm_mday) + "--" +
-                        std::to_string(nowTm->tm_hour) + ":" + 
-                        std::to_string(nowTm->tm_min) + ":" + 
-                        std::to_string(nowTm->tm_sec);
+            // std::cerr << "The program had been running for " + std::to_string(
+            //     std::chrono::duration_cast<std::chrono::seconds>(
+            //         std::chrono::system_clock::now() - start_time).count()
+            //     ) + " seconds and had been termitated in: ";
+            // auto timeT = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+            // std::tm nowTmStorage;
+            // std::tm* nowTm = &nowTmStorage;
+            // localtime_s(nowTm, &timeT);
+            // std::cerr << std::to_string(nowTm->tm_year + 1900) + "-" +
+            //             std::to_string(nowTm->tm_mon + 1) + "-" +
+            //             std::to_string(nowTm->tm_mday) + "--" +
+            //             std::to_string(nowTm->tm_hour) + ":" + 
+            //             std::to_string(nowTm->tm_min) + ":" + 
+            //             std::to_string(nowTm->tm_sec);
             break;
     }
 }

@@ -32,6 +32,9 @@ public:
 
     void bind(VkCommandBuffer commandBuffer);
 
+    VkPipeline& getPipeline() {
+        return m_computePipeline;
+    } 
 private:
     static std::vector <char> readFile(const std::string& filepath);
 

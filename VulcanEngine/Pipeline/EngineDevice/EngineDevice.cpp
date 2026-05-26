@@ -3,6 +3,10 @@
 
 #include <Logger/Logger.hpp>
 
+// libs
+#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan_to_string.hpp>
+
 // std
 #include <cstring>
 #include <set>
@@ -18,7 +22,36 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
         void* pUserData
     ) {
-    DixLogWarn("validation layer: ");
+    const char* messageId = pCallbackData->pMessageIdName ? pCallbackData->pMessageIdName : "UNKNOWN";
+
+    switch(messageSeverity) {
+    case (VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT):
+    case (VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT):
+        DixLogInfo("validation layer: {}, {}, message ID: {}, message:",
+            vk::to_string(static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(messageSeverity)), 
+            vk::to_string(static_cast <vk::DebugUtilsMessageTypeFlagsEXT>(messageType)),
+            messageId,
+            pCallbackData->pMessage
+        );
+        break;
+    case (VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT):
+        DixLogWarn("validation layer: {}, {}, message ID: {}, message:",
+            vk::to_string(static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(messageSeverity)), 
+            vk::to_string(static_cast <vk::DebugUtilsMessageTypeFlagsEXT>(messageType)),
+            messageId,
+            pCallbackData->pMessage
+        );
+        break;
+    case (VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT):
+    case (VK_DEBUG_UTILS_MESSAGE_SEVERITY_FLAG_BITS_MAX_ENUM_EXT):
+        DixLogErr("validation layer: {}, {}, message ID: {}, message:",
+            vk::to_string(static_cast<vk::DebugUtilsMessageSeverityFlagBitsEXT>(messageSeverity)), 
+            vk::to_string(static_cast <vk::DebugUtilsMessageTypeFlagsEXT>(messageType)),
+            messageId,
+            pCallbackData->pMessage
+        );
+        break;
+    }
 
     return VK_FALSE;
 }

@@ -106,6 +106,8 @@ void FirstApp::run(void) {
 }
 
 void FirstApp::loadGameObjects() {
+	DixLogDebug("Maximum allocation size for physical device: {}", 
+		m_context->device().getMaximumAllocationSize());
 	std::random_device rd;
 
     std::mt19937 gen(rd());
@@ -165,16 +167,16 @@ void FirstApp::loadGameObjects() {
 }
 
 void FirstApp::loadUIElements(void) {
-        m_context->getDixWindow().setWindowIcon(toModelPath("Images/icon.ico"));
+	m_context->getDixWindow().setWindowIcon(toModelPath("Images/icon.ico"));
 
-        auto fps = std::make_unique<DixFpsCounter>(
-			DixUIInfo {
-			*m_context->getUIRenderer(),
-			m_context->getExtent()
-			// "",
-			// "UI/font.txt",
-			// "UI/font02.tga"
-        }
+	auto fps = std::make_unique<DixFpsCounter>(
+		DixUIInfo {
+		*m_context->getUIRenderer(),
+		m_context->getExtent()
+		// "",
+		// "UI/font.txt",
+		// "UI/font02.tga"
+		}
     );
 	m_context->addUIElement(std::move(fps));
     auto timeCounter = std::make_unique<DixTimeCounter>(

@@ -93,7 +93,9 @@ DixDescriptorPool::DixDescriptorPool(
 }
 
 DixDescriptorPool::~DixDescriptorPool() {
-    vkDestroyDescriptorPool(engineDevice.device(), descriptorPool, nullptr);
+    if (descriptorPool != VK_NULL_HANDLE) {
+        vkDestroyDescriptorPool(engineDevice.device(), descriptorPool, nullptr);
+    }
 }
 
 bool DixDescriptorPool::allocateDescriptorSet(

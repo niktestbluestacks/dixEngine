@@ -4,6 +4,7 @@
 // dix
 #include <Window/WindowClass/WindowClass.hpp>
 #include <Utils/Class.hpp>
+#include <Logger/Logger.hpp>
 
 // std
 #include <vector>
@@ -26,11 +27,13 @@ struct QueueFamilyIndices {
 
 class EngineDevice {
 public:
-#if !defined(NDEBUG) || !defined(_WIN32)
-    const bool enableValidationLayers = false;
-#else
+// #if !defined(NDEBUG) || !defined(_WIN32)
+//     const bool enableValidationLayers = false;
+// #else
+//     const bool enableValidationLayers = true;
+// #endif
+
     const bool enableValidationLayers = true;
-#endif
 
     EngineDevice(Window& window);
     ~EngineDevice();
@@ -70,12 +73,18 @@ public:
         VkImage& image,
         VkDeviceMemory& imageMemory);
 
-    VkPhysicalDeviceProperties properties;
+    const VkPhysicalDeviceProperties& getProperties() const {
+        return properties;
+    }
 
     void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
 
     void recreateSurface();
     VkPhysicalDevice getPhysicalDevice() const { return physicalDevice; }
+
+    size_t getMaximumAllocationSize() const {
+        return static_cast <size_t> (properties.limits.maxMemoryAllocationCount);
+    }
 private:
     void createInstance();
     void setupDebugMessenger();
@@ -94,6 +103,7 @@ private:
     bool checkDeviceExtensionSupport(VkPhysicalDevice device);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 
+    VkPhysicalDeviceProperties properties;
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -105,7 +115,7 @@ private:
     VkQueue graphicsQueue_;
     VkQueue presentQueue_;
 
-    const std::vector<const char*> validationLayers = { /*"VK_LAYER_KHRONOS_validation"*/ };
+    const std::vector<const char*> validationLayers = { "VK_LAYER_KHRONOS_validation" };
     const std::vector<const char*> deviceExtensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 };
 

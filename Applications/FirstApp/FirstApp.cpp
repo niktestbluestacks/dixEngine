@@ -100,8 +100,8 @@ void FirstApp::run(void) {
 
 	// Stop recording if app closes while recording
 	if (m_recording) {
-			getFrameRecorder().stopRecording();
-			m_recording = false;
+		getFrameRecorder().stopRecording();
+		m_recording = false;
 	}
 }
 

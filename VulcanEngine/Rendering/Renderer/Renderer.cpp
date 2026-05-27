@@ -48,7 +48,7 @@ void Renderer::createCommandBuffers(void) {
         m_commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
         vk::CommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.sType = vk::StructureType::eCommandBufferAllocateInfo;
         allocInfo.level = vk::CommandBufferLevel::ePrimary;
         allocInfo.commandPool = m_dixDevice.getCommandPool();
         allocInfo.commandBufferCount = static_cast <uint32_t> (m_commandBuffers.size());
@@ -79,12 +79,12 @@ vk::CommandBuffer Renderer::beginFrame(void) {
         assert(!m_isFrameStarted && "Can't call begin frame while already in progress");
         auto result = m_dixSwapChain->acquireNextImage(&m_currentImageIndex);
 
-        if (result == vk::Result::eErrorOutOfDateKhr) {
+        if (result == vk::Result::eErrorOutOfDateKHR) {
                 recreateSwapChain();
                 return nullptr;
         }
 
-        if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKhr) {
+        if (result != vk::Result::eSuccess && result != vk::Result::eSuboptimalKHR) {
                 throw std::runtime_error("failed to acquire swap chain image!");
         }
 
@@ -93,7 +93,7 @@ vk::CommandBuffer Renderer::beginFrame(void) {
         auto commandBuffer = getCurrentCommandBuffer();
 
         vk::CommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.sType = vk::StructureType::eCommandBufferBeginInfo;
 
         if (commandBuffer.begin(
                 &beginInfo) !=
@@ -109,13 +109,11 @@ void Renderer::endFrame(void) {
         assert(m_isFrameStarted && "Can't call endFrame while frame is not in progress");
         auto commandBuffer = getCurrentCommandBuffer();
 
-        if (commandBuffer.end() != vk::Result::eSuccess) {
-                throw std::runtime_error("failed to record command buffer!");
-        }
+        commandBuffer.end();
 
     auto result = m_dixSwapChain->submitCommandBuffers(&commandBuffer, &m_currentImageIndex);
-        if (result == vk::Result::eErrorOutOfDateKhr ||
-                result == vk::Result::eSuboptimalKhr ||
+        if (result == vk::Result::eErrorOutOfDateKHR ||
+                result == vk::Result::eSuboptimalKHR ||
                 m_Window.wasWindowResized()) {
                 m_Window.resetWindowResizedFlag();
                 recreateSwapChain();
@@ -135,16 +133,16 @@ void Renderer::beginSwapChainRenderPass(vk::CommandBuffer commandBuffer) {
 
 
         vk::RenderPassBeginInfo renderPassInfo{};
-        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.sType = vk::StructureType::eRenderPassBeginInfo;
         renderPassInfo.renderPass = m_dixSwapChain->getRenderPass();
         renderPassInfo.framebuffer = m_dixSwapChain->getFrameBuffer(m_currentImageIndex);
 
-        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.offset = vk::Offset2D{ 0, 0 };
         renderPassInfo.renderArea.extent = m_dixSwapChain->getSwapChainExtent();
 
         std::array <vk::ClearValue, 2> clearValues{};
         clearValues[0].color = { 0.01f, 0.01f, 0.01f, 1.0f };
-        clearValues[1].depthStencil = { 1.0f, 0 };
+        clearValues[1].depthStencil = vk::ClearDepthStencilValue{ 1.0f, 0 };
         renderPassInfo.clearValueCount = static_cast <uint32_t> (clearValues.size());
         renderPassInfo.pClearValues = clearValues.data();
 

@@ -126,15 +126,11 @@ void EngineDevice::createInstance() {
 
     vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo;
     if (enableValidationLayers) {
-        createInfo.setEnabledLayerCount(static_cast<uint32_t>(validationLayers.size()))
-            .setPpEnabledLayerNames(validationLayers.data());
-
         populateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.setPNext(reinterpret_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugCreateInfo));
     }
     else {
-        createInfo.setEnabledLayerCount(0)
-            .setPNext(nullptr);
+        createInfo.setPNext(nullptr);
     }
 
     instance = vk::createInstance(createInfo);
@@ -194,15 +190,7 @@ void EngineDevice::createLogicalDevice() {
         .setEnabledExtensionCount(static_cast<uint32_t>(deviceExtensions.size()))
         .setPpEnabledExtensionNames(deviceExtensions.data());
 
-    // might not really be necessary anymore because device specific validation layers
-    // have been deprecated
-    if (enableValidationLayers) {
-        createInfo.setEnabledLayerCount(static_cast<uint32_t>(validationLayers.size()))
-            .setPpEnabledLayerNames(validationLayers.data());
-    }
-    else {
-        createInfo.setEnabledLayerCount(0);
-    }
+    // device specific validation layers have been deprecated, so we don't set enabled layer count anymore
 
     device_ = physicalDevice.createDevice(createInfo);
 
@@ -220,7 +208,7 @@ void EngineDevice::createCommandPool() {
     commandPool = device_.createCommandPool(poolInfo);
 }
 
-void EngineDevice::createSurface() { window.createWindowSurface(static_cast<VkInstance>(instance), reinterpret_cast<VkSurfaceKHR*>(&surface_)); }
+void EngineDevice::createSurface() { window.createWindowSurface(instance, &surface_); }
 
 void EngineDevice::recreateSurface() {
     instance.destroySurfaceKHR(surface_);

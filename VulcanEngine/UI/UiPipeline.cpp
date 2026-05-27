@@ -20,7 +20,7 @@ UiPipeline::UiPipeline(EngineDevice& device, vk::RenderPass renderPass) : m_devi
 
     // create an empty pipeline layout (no descriptor sets) for this simple pipeline
     vk::PipelineLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layoutInfo.sType = vk::StructureType::ePipelineLayoutCreateInfo;
     layoutInfo.setLayoutCount = 0;
     layoutInfo.pSetLayouts = nullptr;
     layoutInfo.pushConstantRangeCount = 0;

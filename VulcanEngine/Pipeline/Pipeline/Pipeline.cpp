@@ -69,7 +69,7 @@ void Pipeline::createGraphicsPipeline(
     shaderStages[0].stage = vk::ShaderStageFlagBits::eVertex;
     shaderStages[0].module = vertShaderModule;
     shaderStages[0].pName = "main";
-    shaderStages[0].flags = 0;
+    shaderStages[0].flags = vk::PipelineShaderStageCreateFlags{};
     shaderStages[0].pNext = nullptr;
     shaderStages[0].pSpecializationInfo = nullptr;
 
@@ -77,7 +77,7 @@ void Pipeline::createGraphicsPipeline(
     shaderStages[1].stage = vk::ShaderStageFlagBits::eFragment;
     shaderStages[1].module = fragShaderModule;
     shaderStages[1].pName = "main";
-    shaderStages[1].flags = 0;
+    shaderStages[1].flags = vk::PipelineShaderStageCreateFlags{};
     shaderStages[1].pNext = nullptr;
     shaderStages[1].pSpecializationInfo = nullptr;
 
@@ -151,40 +151,40 @@ void Pipeline::bind(vk::CommandBuffer commandBuffer) {
 
 void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
 
-    configInfo.inputAssemblyInfo.sType = vk::StructureType::eInputAssemblyState;
+    configInfo.inputAssemblyInfo.sType = vk::StructureType::ePipelineInputAssemblyStateCreateInfo;
     configInfo.inputAssemblyInfo.topology = vk::PrimitiveTopology::eTriangleList;
-    configInfo.inputAssemblyInfo.primitiveRestartEnable = vk::False;
+    configInfo.inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-    configInfo.viewportInfo.sType = vk::StructureType::eViewportState;
+    configInfo.viewportInfo.sType = vk::StructureType::ePipelineViewportStateCreateInfo;
     configInfo.viewportInfo.viewportCount = 1;
     configInfo.viewportInfo.pViewports = nullptr;
     configInfo.viewportInfo.scissorCount = 1;
     configInfo.viewportInfo.pScissors = nullptr;
 
-    configInfo.rasterizetionInfo.sType = vk::StructureType::eRasterizationState;
-    configInfo.rasterizetionInfo.depthClampEnable = vk::False;
-    configInfo.rasterizetionInfo.rasterizerDiscardEnable = vk::False;
+    configInfo.rasterizetionInfo.sType = vk::StructureType::ePipelineRasterizationStateCreateInfo;
+    configInfo.rasterizetionInfo.depthClampEnable = VK_FALSE;
+    configInfo.rasterizetionInfo.rasterizerDiscardEnable = VK_FALSE;
     configInfo.rasterizetionInfo.polygonMode = vk::PolygonMode::eFill;
     configInfo.rasterizetionInfo.lineWidth = 1.0f;
     configInfo.rasterizetionInfo.cullMode = vk::CullModeFlagBits::eNone;
     configInfo.rasterizetionInfo.frontFace = vk::FrontFace::eClockwise;
-    configInfo.rasterizetionInfo.depthBiasEnable = vk::False;
+    configInfo.rasterizetionInfo.depthBiasEnable = VK_FALSE;
     configInfo.rasterizetionInfo.depthBiasConstantFactor = 0.0f;      // optional
     configInfo.rasterizetionInfo.depthBiasClamp = 0.0f;               // optional
     configInfo.rasterizetionInfo.depthBiasSlopeFactor = 0.0f;         // optional
 
-    configInfo.multisampleStateInfo.sType = vk::StructureType::eMultisampleState;
-    configInfo.multisampleStateInfo.sampleShadingEnable = vk::False;
+    configInfo.multisampleStateInfo.sType = vk::StructureType::ePipelineMultisampleStateCreateInfo;
+    configInfo.multisampleStateInfo.sampleShadingEnable = VK_FALSE;
     configInfo.multisampleStateInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
     configInfo.multisampleStateInfo.minSampleShading = 1.0f;          // optional
     configInfo.multisampleStateInfo.pSampleMask = nullptr;            // optional
-    configInfo.multisampleStateInfo.alphaToCoverageEnable = vk::False;    // optional
-    configInfo.multisampleStateInfo.alphaToOneEnable = vk::False;     // optional
+    configInfo.multisampleStateInfo.alphaToCoverageEnable = VK_FALSE;    // optional
+    configInfo.multisampleStateInfo.alphaToOneEnable = VK_FALSE;     // optional
 
     configInfo.colorBlendAttachment.colorWriteMask =
         vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB |
         vk::ColorComponentFlagBits::eA;
-    configInfo.colorBlendAttachment.blendEnable = vk::False;
+    configInfo.colorBlendAttachment.blendEnable = VK_FALSE;
     configInfo.colorBlendAttachment.srcColorBlendFactor = vk::BlendFactor::eOne;   // optional
     configInfo.colorBlendAttachment.dstColorBlendFactor = vk::BlendFactor::eZero;  // optional
     configInfo.colorBlendAttachment.colorBlendOp = vk::BlendOp::eAdd;              // optional
@@ -192,8 +192,8 @@ void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
     configInfo.colorBlendAttachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;  // optional
     configInfo.colorBlendAttachment.alphaBlendOp = vk::BlendOp::eAdd;              // optional
 
-    configInfo.colorBlendInfo.sType = vk::StructureType::eColorBlendState;
-    configInfo.colorBlendInfo.logicOpEnable = vk::False;
+    configInfo.colorBlendInfo.sType = vk::StructureType::ePipelineColorBlendStateCreateInfo;
+    configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;
     configInfo.colorBlendInfo.logicOp = vk::LogicOp::eCopy;    // optional
     configInfo.colorBlendInfo.attachmentCount = 1;
     configInfo.colorBlendInfo.pAttachments = &configInfo.colorBlendAttachment;
@@ -202,22 +202,22 @@ void Pipeline::defaultPipelineConfigInfo(PipelineConfigInfo& configInfo) {
     configInfo.colorBlendInfo.blendConstants[2] = 0.0f;        // optional
     configInfo.colorBlendInfo.blendConstants[3] = 0.0f;        // optional
 
-    configInfo.depthStencilInfo.sType = vk::StructureType::eDepthStencilState;
-    configInfo.depthStencilInfo.depthTestEnable = vk::True;
-    configInfo.depthStencilInfo.depthWriteEnable = vk::True;
+    configInfo.depthStencilInfo.sType = vk::StructureType::ePipelineDepthStencilStateCreateInfo;
+    configInfo.depthStencilInfo.depthTestEnable = VK_TRUE;
+    configInfo.depthStencilInfo.depthWriteEnable = VK_TRUE;
     configInfo.depthStencilInfo.depthCompareOp = vk::CompareOp::eLess;
-    configInfo.depthStencilInfo.depthBoundsTestEnable = vk::False;
+    configInfo.depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
     configInfo.depthStencilInfo.minDepthBounds = 0.0f;   // optional
     configInfo.depthStencilInfo.maxDepthBounds = 1.0f;   // optional
-    configInfo.depthStencilInfo.stencilTestEnable = vk::False;
-    configInfo.depthStencilInfo.front = {};              // optional
-    configInfo.depthStencilInfo.back = {};               // optional
+    configInfo.depthStencilInfo.stencilTestEnable = VK_FALSE;
+    configInfo.depthStencilInfo.front = vk::StencilOpState{};              // optional
+    configInfo.depthStencilInfo.back = vk::StencilOpState{};               // optional
 
     configInfo.dynamicStateEnables = { vk::DynamicState::eViewport, vk::DynamicState::eScissor };
-    configInfo.dynamicStateInfo.sType = vk::StructureType::eDynamicState;
+    configInfo.dynamicStateInfo.sType = vk::StructureType::ePipelineDynamicStateCreateInfo;
     configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
     configInfo.dynamicStateInfo.dynamicStateCount =
         static_cast <uint32_t> (configInfo.dynamicStateEnables.size());
-    configInfo.dynamicStateInfo.flags = 0;
+    configInfo.dynamicStateInfo.flags = vk::PipelineDynamicStateCreateFlags{};
 }
 } // namespace dix

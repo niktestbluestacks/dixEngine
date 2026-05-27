@@ -27,8 +27,8 @@ DixUIElement::DixUIElement(const DixUIInfo& info) :
             m_uiRenderer.getDevice(),
             sizeof(DixUIVert),
             m_vertexCapacity,
-            VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+            vk::BufferUsageFlagBits::eVertexBuffer,
+            vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostCoherent)
         );
         m_vertexBuffers[i]->map();
     }
@@ -172,8 +172,8 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
                 m_uiRenderer.getDevice(),
                 sizeof(DixUIVert),
                 m_vertexCapacity,
-                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+                vk::BufferUsageFlagBits::eVertexBuffer,
+                vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostCoherent)
             );
             m_vertexBuffers[i]->map();
         }
@@ -215,8 +215,8 @@ void DixUIElement::buildVerticesForText(const std::string& text, float x, float 
                 m_uiRenderer.getDevice(),
                 sizeof(DixUIVert),
                 m_vertexCapacity,
-                VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+                vk::BufferUsageFlagBits::eVertexBuffer,
+                vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostCoherent)
             );
             m_vertexBuffers[i]->map();
         }

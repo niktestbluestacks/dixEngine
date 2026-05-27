@@ -18,7 +18,7 @@ UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass) : m_devi
 
     m_descriptorPool = DixDescriptorPool::Builder(m_device)
         .setMaxSets(10)
-        .addPoolSize(vk::ShaderStageFlagBits::eCombinedImageSampler, 10)
+        .addPoolSize(vk::DescriptorType::eCombinedImageSampler, 10)
         .build();
 
     // Pipeline layout: one descriptor set + vec2 push constant for screen size
@@ -29,7 +29,7 @@ UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass) : m_devi
     pushRange.size       = sizeof(float) * 2; // vec2 screenSize
 
     vk::PipelineLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    layoutInfo.sType = vk::StructureType::ePipelineLayoutCreateInfo;
     layoutInfo.setLayoutCount         = 1;
     layoutInfo.pSetLayouts            = &descLayout;
     layoutInfo.pushConstantRangeCount = 1;
@@ -103,7 +103,7 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
     staging.flush();
 
     vk::ImageCreateInfo imageInfo{};
-    imageInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.sType = vk::StructureType::eImageCreateInfo;
     imageInfo.imageType     = vk::ImageType::e2D;
     imageInfo.extent.width  = static_cast<uint32_t>(width);
     imageInfo.extent.height = static_cast<uint32_t>(height);
@@ -121,7 +121,7 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
     m_device.copyBufferToImage(staging.getBuffer(), t.image, width, height, 1);
 
     vk::ImageViewCreateInfo viewInfo{};
-    viewInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.sType = vk::StructureType::eImageViewCreateInfo;
     viewInfo.image                           = t.image;
     viewInfo.viewType                        = vk::ImageViewType::e2D;
     viewInfo.format                          = vk::Format::eR8G8B8A8Unorm;
@@ -136,7 +136,7 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
     }
 
     vk::SamplerCreateInfo samplerInfo{};
-    samplerInfo.sType            = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    samplerInfo.sType = vk::StructureType::eSamplerCreateInfo;
     samplerInfo.magFilter        = vk::Filter::eLinear;
     samplerInfo.minFilter        = vk::Filter::eLinear;
     samplerInfo.addressModeU     = vk::SamplerAddressMode::eClampToEdge;

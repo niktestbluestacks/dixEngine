@@ -98,17 +98,14 @@ vk::Result SwapChain::submitCommandBuffers(
               .setCommandBufferCount(1)
               .setPCommandBuffers(buffers)
               .setSignalSemaphoreCount(1)
-              .setPSignalSemaphores({renderFinishedSemaphores[currentFrame]});
+              .setPSignalSemaphores(&renderFinishedSemaphores[currentFrame]);
 
     device.device().resetFences(inFlightFences[currentFrame]);
-    vk::Result submitRes = device.graphicsQueue().submit(submitInfo, inFlightFences[currentFrame]);
-    if (submitRes != vk::Result::eSuccess) {
-        return submitRes;
-    }
+    device.graphicsQueue().submit(submitInfo, inFlightFences[currentFrame]);
 
     vk::PresentInfoKHR presentInfo{};
     presentInfo.setWaitSemaphoreCount(1)
-               .setPWaitSemaphores({renderFinishedSemaphores[currentFrame]})
+               .setPWaitSemaphores(&renderFinishedSemaphores[currentFrame])
                .setSwapchainCount(1)
                .setPSwapchains(&swapChain)
                .setPImageIndices(imageIndex);

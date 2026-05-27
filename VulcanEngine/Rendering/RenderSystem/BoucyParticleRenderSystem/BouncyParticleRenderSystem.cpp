@@ -190,7 +190,8 @@ void BouncyParticleRenderSystem::renderGameObjects(
             m_config.pushConstantStages,
             0,
             m_config.pushConstantSize,
-            pushBuffer.data());
+            pushBuffer.data()
+        );
 
         // set 0: global UBO (camera / projection)
         // set 1: BouncyParticle compute set (SSBO + sim-params)

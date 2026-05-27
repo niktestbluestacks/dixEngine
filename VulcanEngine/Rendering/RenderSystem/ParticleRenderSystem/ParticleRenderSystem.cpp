@@ -190,7 +190,8 @@ void ParticleRenderSystem::renderGameObjects(
             m_config.pushConstantStages,
             0,
             m_config.pushConstantSize,
-            pushBuffer.data());
+            pushBuffer.data()
+        );
 
         // set 0: global UBO (camera / projection)
         // set 1: particle compute set (SSBO + sim-params)
@@ -210,7 +211,7 @@ void ParticleRenderSystem::renderGameObjects(
         );
 
         if (m_particleCount > 0) {
-            vkCmdDraw(frameInfo.commandBuffer, m_particleCount, 1, 0, 0);
+            vkCmdDraw(frameInfo.commandBuffer, m_particleCount, 1, 0, 0);  
         }
     }
 }

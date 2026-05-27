@@ -21,7 +21,7 @@ public:
     ShaderModule& operator=(const ShaderModule&) = delete;
 
     vk::ShaderModule getModule() const { return module_; }
-    bool isValid() const { return module_ != nullptr; }
+    bool isValid() const { return module_ != vk::ShaderModule{}; }
 
 private:
     std::vector<char> readFile(const std::string& filepath) const;

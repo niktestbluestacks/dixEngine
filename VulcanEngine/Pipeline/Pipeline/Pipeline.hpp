@@ -17,40 +17,40 @@ namespace dix {
 
 struct PipelineConfigInfo {
     PipelineConfigInfo() {
-        this->inputAssemblyInfo.sType = vk::StructureType::eInputAssemblyState;
+        this->inputAssemblyInfo.sType = vk::StructureType::ePipelineInputAssemblyStateCreateInfo;
         this->inputAssemblyInfo.topology = vk::PrimitiveTopology::eTriangleList;
-        this->inputAssemblyInfo.primitiveRestartEnable = vk::False;
+        this->inputAssemblyInfo.primitiveRestartEnable = VK_FALSE;
 
-        this->viewportInfo.sType = vk::StructureType::eViewportState;
+        this->viewportInfo.sType = vk::StructureType::ePipelineViewportStateCreateInfo;
         this->viewportInfo.viewportCount = 1;
         this->viewportInfo.pViewports = nullptr;
         this->viewportInfo.scissorCount = 1;
         this->viewportInfo.pScissors = nullptr;
 
-        this->rasterizetionInfo.sType = vk::StructureType::eRasterizationState;
-        this->rasterizetionInfo.depthClampEnable = vk::False;
-        this->rasterizetionInfo.rasterizerDiscardEnable = vk::False;
+        this->rasterizetionInfo.sType = vk::StructureType::ePipelineRasterizationStateCreateInfo;
+        this->rasterizetionInfo.depthClampEnable = VK_FALSE;
+        this->rasterizetionInfo.rasterizerDiscardEnable = VK_FALSE;
         this->rasterizetionInfo.polygonMode = vk::PolygonMode::eFill;
         this->rasterizetionInfo.lineWidth = 1.0f;
         this->rasterizetionInfo.cullMode = vk::CullModeFlagBits::eNone;
         this->rasterizetionInfo.frontFace = vk::FrontFace::eClockwise;
-        this->rasterizetionInfo.depthBiasEnable = vk::False;
+        this->rasterizetionInfo.depthBiasEnable = VK_FALSE;
         this->rasterizetionInfo.depthBiasConstantFactor = 0.0f;      // optional
         this->rasterizetionInfo.depthBiasClamp = 0.0f;              // optional
         this->rasterizetionInfo.depthBiasSlopeFactor = 0.0f;        // optional
 
-        this->multisampleStateInfo.sType = vk::StructureType::eMultisampleState;
-        this->multisampleStateInfo.sampleShadingEnable = vk::False;
+        this->multisampleStateInfo.sType = vk::StructureType::ePipelineMultisampleStateCreateInfo;
+        this->multisampleStateInfo.sampleShadingEnable = VK_FALSE;
         this->multisampleStateInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
         this->multisampleStateInfo.minSampleShading = 1.0f;         // optional
         this->multisampleStateInfo.pSampleMask = nullptr;           // optional
-        this->multisampleStateInfo.alphaToCoverageEnable = vk::False;   // optional
-        this->multisampleStateInfo.alphaToOneEnable = vk::False;        // optional
+        this->multisampleStateInfo.alphaToCoverageEnable = VK_FALSE;   // optional
+        this->multisampleStateInfo.alphaToOneEnable = VK_FALSE;        // optional
 
         this->colorBlendAttachment.colorWriteMask =
             vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB |
             vk::ColorComponentFlagBits::eA;
-        this->colorBlendAttachment.blendEnable = vk::False;
+        this->colorBlendAttachment.blendEnable = VK_FALSE;
         this->colorBlendAttachment.srcColorBlendFactor = vk::BlendFactor::eOne;   // optional
         this->colorBlendAttachment.dstColorBlendFactor = vk::BlendFactor::eZero;  // optional
         this->colorBlendAttachment.colorBlendOp = vk::BlendOp::eAdd;              // optional
@@ -58,8 +58,8 @@ struct PipelineConfigInfo {
         this->colorBlendAttachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;  // optional
         this->colorBlendAttachment.alphaBlendOp = vk::BlendOp::eAdd;              // optional
 
-        this->colorBlendInfo.sType = vk::StructureType::eColorBlendState;
-        this->colorBlendInfo.logicOpEnable = vk::False;
+        this->colorBlendInfo.sType = vk::StructureType::ePipelineColorBlendStateCreateInfo;
+        this->colorBlendInfo.logicOpEnable = VK_FALSE;
         this->colorBlendInfo.logicOp = vk::LogicOp::eCopy;    // optional
         this->colorBlendInfo.attachmentCount = 1;
         this->colorBlendInfo.pAttachments = &this->colorBlendAttachment;
@@ -68,23 +68,23 @@ struct PipelineConfigInfo {
         this->colorBlendInfo.blendConstants[2] = 0.0f;        // optional
         this->colorBlendInfo.blendConstants[3] = 0.0f;        // optional
 
-        this->depthStencilInfo.sType = vk::StructureType::eDepthStencilState;
-        this->depthStencilInfo.depthTestEnable = vk::True;
-        this->depthStencilInfo.depthWriteEnable = vk::True;
+        this->depthStencilInfo.sType = vk::StructureType::ePipelineDepthStencilStateCreateInfo;
+        this->depthStencilInfo.depthTestEnable = VK_TRUE;
+        this->depthStencilInfo.depthWriteEnable = VK_TRUE;
         this->depthStencilInfo.depthCompareOp = vk::CompareOp::eLessOrEqual;
-        this->depthStencilInfo.depthBoundsTestEnable = vk::False;
+        this->depthStencilInfo.depthBoundsTestEnable = VK_FALSE;
         this->depthStencilInfo.minDepthBounds = 0.0f;   // optional
         this->depthStencilInfo.maxDepthBounds = 1.0f;   // optional
-        this->depthStencilInfo.stencilTestEnable = vk::False;
-        this->depthStencilInfo.front = {};              // optional
-        this->depthStencilInfo.back = {};               // optional
+        this->depthStencilInfo.stencilTestEnable = VK_FALSE;
+        this->depthStencilInfo.front = vk::StencilOpState{};              // optional
+        this->depthStencilInfo.back = vk::StencilOpState{};               // optional
 
         this->dynamicStateEnables = { vk::DynamicState::eViewport, vk::DynamicState::eScissor };
-        this->dynamicStateInfo.sType = vk::StructureType::eDynamicState;
+        this->dynamicStateInfo.sType = vk::StructureType::ePipelineDynamicStateCreateInfo;
         this->dynamicStateInfo.pDynamicStates = this->dynamicStateEnables.data();
         this->dynamicStateInfo.dynamicStateCount =
             static_cast <uint32_t> (this->dynamicStateEnables.size());
-        this->dynamicStateInfo.flags = 0;
+        this->dynamicStateInfo.flags = vk::PipelineDynamicStateCreateFlags{};
     }
 
     PipelineConfigInfo(const PipelineConfigInfo&) = delete;

@@ -41,7 +41,7 @@ Model::Model(
 
         // copy texture handles from builder into the model so renderer can access them
         // if builder has valid texture, use it; otherwise use default
-        if (builder.texture.getImageView() != nullptr && builder.texture.getSampler() != nullptr) {
+        if (builder.texture.getImageView() && builder.texture.getSampler()) {
                         m_textureInfo.view = builder.texture.getImageView();
                         m_textureInfo.sampler = builder.texture.getSampler();
         } else {
@@ -286,8 +286,9 @@ void Model::Builder::loadModel(const std::string& filepath, EngineDevice& dixDev
 
                         this->texture = createTextureFromFile(texPath, dixDevice);
 
-                        DixLogDebug("Texture loaded successfully - ImageView: {}", std::to_string(reinterpret_cast<uint64_t>(texture.getImageView())));
-                        DixLogDebug("Texture loaded successfully - Sampler: {}", std::to_string(reinterpret_cast<uint64_t>(texture.getSampler())));
+                        DixLogDebug("Texture loaded successfully - ImageView: {}, Sampler: {}",
+                            static_cast<void*>(texture.getImageView()),
+                            static_cast<void*>(texture.getSampler()));
 
 
                 } else {

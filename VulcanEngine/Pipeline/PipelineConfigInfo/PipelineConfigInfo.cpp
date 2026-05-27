@@ -33,8 +33,8 @@ std::pair<vk::Viewport, vk::Rect2D> createViewportAndScissor(int width, int heig
     viewport.maxDepth = 1.0f;
 
     vk::Rect2D scissor{};
-    scissor.offset = { 0, 0 };
-    scissor.extent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+    scissor.offset = vk::Offset2D{ 0, 0 };
+    scissor.extent = vk::Extent2D{ static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
     return std::make_pair(viewport, scissor);
 }

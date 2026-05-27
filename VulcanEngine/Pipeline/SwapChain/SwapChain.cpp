@@ -69,7 +69,7 @@ SwapChain::~SwapChain() {
 }
 
 vk::Result SwapChain::acquireNextImage(uint32_t* imageIndex) {
-    device.device().waitForFences(inFlightFences[currentFrame], vk::True, std::numeric_limits<uint64_t>::max());
+    auto res1 = device.device().waitForFences({inFlightFences[currentFrame]}, vk::True, std::numeric_limits<uint64_t>::max());
 
     vk::Result result = device.device().acquireNextImageKHR(
         swapChain,
@@ -84,7 +84,7 @@ vk::Result SwapChain::acquireNextImage(uint32_t* imageIndex) {
 vk::Result SwapChain::submitCommandBuffers(
     const vk::CommandBuffer* buffers, uint32_t* imageIndex) {
     if (imagesInFlight[*imageIndex] != nullptr) {
-        device.device().waitForFences(imagesInFlight[*imageIndex], vk::True, UINT64_MAX);
+        auto res2 =device.device().waitForFences({imagesInFlight[*imageIndex]}, vk::True, UINT64_MAX);
     }
     imagesInFlight[*imageIndex] = inFlightFences[currentFrame];
 
@@ -140,7 +140,7 @@ void SwapChain::createSwapChain() {
               .setImageColorSpace(surfaceFormat.colorSpace)
               .setImageExtent(extent)
               .setImageArrayLayers(1)
-              .setImageUsage(vk::ImageUsageFlagBits::eColorAttachmentBit);
+              .setImageUsage(vk::ImageUsageFlagBits::eColorAttachment);
 
     QueueFamilyIndices indices = device.findPhysicalQueueFamilies();
     uint32_t queueFamilyIndices[] = { indices.graphicsFamily, indices.presentFamily };
@@ -155,7 +155,7 @@ void SwapChain::createSwapChain() {
     }
 
     createInfo.setPreTransform(swapChainSupport.capabilities.currentTransform)
-              .setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaqueBitKHR)
+              .setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque)
               .setPresentMode(presentMode)
               .setClipped(vk::True)
               .setOldSwapchain(oldSwapChain == nullptr ? nullptr : oldSwapChain->swapChain);
@@ -183,7 +183,7 @@ void SwapChain::createImageViews() {
         viewInfo.setImage(swapChainImages[i])
               .setViewType(vk::ImageViewType::e2D)
               .setFormat(swapChainImageFormat)
-              .setSubresourceRange({vk::ImageAspectFlagBits::eColorBit, 0, 1, 0, 1});
+              .setSubresourceRange({vk::ImageAspectFlagBits::eColor, 0, 1, 0, 1});
 
         try {
             swapChainImageViews[i] = device.device().createImageView(viewInfo);

@@ -77,7 +77,8 @@ vk::Result DixBuffer::flush(vk::DeviceSize size, vk::DeviceSize offset) {
     mappedRange.memory = m_memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
-    return m_dixDevice.device().flushMappedMemoryRanges(mappedRange);
+    m_dixDevice.device().flushMappedMemoryRanges({mappedRange});
+    return vk::Result::eSuccess;
 }
 
 vk::Result DixBuffer::invalidate(vk::DeviceSize size, vk::DeviceSize offset) {
@@ -85,7 +86,8 @@ vk::Result DixBuffer::invalidate(vk::DeviceSize size, vk::DeviceSize offset) {
     mappedRange.memory = m_memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
-    return m_dixDevice.device().invalidateMappedMemoryRanges(mappedRange);
+    m_dixDevice.device().invalidateMappedMemoryRanges({mappedRange});
+    return vk::Result::eSuccess;
 }
 
 vk::DescriptorBufferInfo DixBuffer::descriptorInfo(vk::DeviceSize size, vk::DeviceSize offset) {

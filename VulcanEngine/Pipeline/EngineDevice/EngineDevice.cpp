@@ -43,7 +43,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
         );
         break;
     case (vk::DebugUtilsMessageSeverityFlagBitsEXT::eError):
-    case (vk::DebugUtilsMessageSeverityFlagBitsEXT::eFlagBitsMaxEnum):
         DixLogErr("validation layer: {}, {}, message ID: {}, message:",
             vk::to_string(messageSeverity),
             vk::to_string(messageType),

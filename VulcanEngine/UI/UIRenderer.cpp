@@ -13,12 +13,12 @@ namespace dix {
 UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device(device) {
     // Descriptor layout: binding 0 = font/sprite texture sampler
     m_descriptorSetLayout = DixDescriptorSetLayout::Builder(m_device)
-        .addBinding(0, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+        .addBinding(0, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
         .build();
 
     m_descriptorPool = DixDescriptorPool::Builder(m_device)
         .setMaxSets(10)
-        .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 10)
+        .addPoolSize(vk::ShaderStageFlagBits::eCombinedImageSampler, 10)
         .build();
 
     // Pipeline layout: one descriptor set + vec2 push constant for screen size
@@ -61,12 +61,12 @@ UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device
 
     // Alpha blending for UI elements
     config.colorBlendAttachment.blendEnable         = VK_TRUE;
-    config.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-    config.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    config.colorBlendAttachment.colorBlendOp        = VK_BLEND_OP_ADD;
-    config.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-    config.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    config.colorBlendAttachment.alphaBlendOp        = VK_BLEND_OP_ADD;
+    config.colorBlendAttachment.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
+    config.colorBlendAttachment.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+    config.colorBlendAttachment.colorBlendOp        = vk::BlendOp::eAdd;
+    config.colorBlendAttachment.srcAlphaBlendFactor = vk::BlendFactor::eOne;
+    config.colorBlendAttachment.dstAlphaBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+    config.colorBlendAttachment.alphaBlendOp        = vk::BlendOp::eAdd;
 
     config.pipelineLayout = m_pipelineLayout;
     config.renderPass     = renderPass;
@@ -94,14 +94,15 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
         m_device,
         1,
         static_cast<uint32_t>(imageSize),
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        vk::BufferUsageFlagBits::eTransferSrc,
+        vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) |
+        vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostCoherent)
     };
     staging.map();
     staging.writeToBuffer((void*)pixels, imageSize, 0);
     staging.flush();
 
-    VkImageCreateInfo imageInfo{};
+    vk::ImageCreateInfo imageInfo{};
     imageInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType     = VK_IMAGE_TYPE_2D;
     imageInfo.extent.width  = static_cast<uint32_t>(width);
@@ -116,10 +117,10 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
     imageInfo.samples       = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
 
-    m_device.createImageWithInfo(imageInfo, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, t.image, t.memory);
+    m_device.createImageWithInfo(imageInfo, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal), t.image, t.memory);
     m_device.copyBufferToImage(staging.getBuffer(), t.image, width, height, 1);
 
-    VkImageViewCreateInfo viewInfo{};
+    vk::ImageViewCreateInfo viewInfo{};
     viewInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.image                           = t.image;
     viewInfo.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
@@ -134,7 +135,7 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
         throw std::runtime_error("failed to create UI texture image view");
     }
 
-    VkSamplerCreateInfo samplerInfo{};
+    vk::SamplerCreateInfo samplerInfo{};
     samplerInfo.sType            = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.magFilter        = VK_FILTER_LINEAR;
     samplerInfo.minFilter        = VK_FILTER_LINEAR;
@@ -152,7 +153,7 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
         throw std::runtime_error("failed to create UI texture sampler");
     }
 
-    VkDescriptorImageInfo imageInfoDesc{};
+    vk::DescriptorImageInfo imageInfoDesc{};
     imageInfoDesc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
     imageInfoDesc.imageView   = t.view;
     imageInfoDesc.sampler     = t.sampler;

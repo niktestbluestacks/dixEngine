@@ -44,10 +44,10 @@ DixDescriptorSetLayout::DixDescriptorSetLayout(
     descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
     auto result = engineDevice.device().createDescriptorSetLayout(descriptorSetLayoutInfo);
-    if (result.result != vk::Result::eSuccess) {
-        throw std::runtime_error("failed to create descriptor set layout!");
-    }
-    descriptorSetLayout = result.value;
+    // if (result != vk::Result::eSuccess) {
+    //     throw std::runtime_error("failed to create descriptor set layout!");
+    // }
+    descriptorSetLayout = result;
 }
 
 DixDescriptorSetLayout::~DixDescriptorSetLayout() {
@@ -87,10 +87,10 @@ DixDescriptorPool::DixDescriptorPool(
     descriptorPoolInfo.flags = poolFlags;
 
     auto result = engineDevice.device().createDescriptorPool(descriptorPoolInfo);
-    if (result.result != vk::Result::eSuccess) {
-        throw std::runtime_error("failed to create descriptor pool!");
-    }
-    descriptorPool = result.value;
+    // if (result != vk::Result::eSuccess) {
+    //     throw std::runtime_error("failed to create descriptor pool!");
+    // }
+    descriptorPool = result;
 }
 
 DixDescriptorPool::~DixDescriptorPool() {
@@ -109,10 +109,10 @@ bool DixDescriptorPool::allocateDescriptorSet(
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
     auto result = engineDevice.device().allocateDescriptorSets(allocInfo);
-    if (result.result != vk::Result::eSuccess) {
-        return false;
-    }
-    descriptor = result.value.front();
+    // if (result != vk::Result::eSuccess) {
+    //     return false;
+    // }
+    descriptor = result.front();
     return true;
 }
 

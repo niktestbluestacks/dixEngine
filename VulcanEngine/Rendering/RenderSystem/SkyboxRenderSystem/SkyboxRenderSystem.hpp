@@ -1,45 +1,44 @@
-#ifndef SIMPLE_RENDER_SYSTEM_HPP
-#define SIMPLE_RENDER_SYSTEM_HPP
+#ifndef SKYBOX_RENDER_SYSTEM_HPP
+#define SKYBOX_RENDER_SYSTEM_HPP
 
-// dix
 #include <Rendering/RenderSystem/DixRenderSystem.hpp>
 
 namespace dix {
 
-struct SimpleUbo {
-    alignas(16) glm::mat4 projectionView{ 1.f };
-    alignas(16) glm::vec3 lightDirection = glm::normalize(glm::vec3{ 100.f, 300.f, -100.f });
+struct SkyboxUbo {
+    glm::mat4 projection;
+    glm::mat4 view;
 };
 
-struct SimplePushConstantData {
-    glm::mat4 modelMatrix{ 1.f };
-    glm::mat4 normalMatrix{ 1.f };
+struct SkyboxPushContstantData {
+    // Empty - skybox doesn't need push constants anymore
 };
 
-using SimpleRenderSystemBindings = std::tuple<
-    UniformBinding<SimpleUbo, 0, vk::ShaderStageFlagBits::eVertex>,
+using SkyboxRenderSystemBindings = std::tuple<
+    UniformBinding<SkyboxUbo, 0, vk::ShaderStageFlagBits::eVertex>,
     SamplerBinding<1,            vk::ShaderStageFlagBits::eFragment>
 >;
 
-class SimpleRenderSystem:
+class SkyboxRenderSystem:
     public DixRenderSystem,
-    public RenderSystemTraits<SimpleRenderSystemBindings> {
+    public RenderSystemTraits<SkyboxRenderSystemBindings> {
 public:
-    using PushConstantData = SimplePushConstantData;
-
-    SimpleRenderSystem(
-        EngineDevice& engineDevice,
+    using PushConstantData = SkyboxPushContstantData;
+    using DixRenderSystem::DixRenderSystem;
+    SkyboxRenderSystem(
+        EngineDevice& device,
         vk::RenderPass renderPass,
         vk::DescriptorSetLayout globalSetLayout,
         vk::DescriptorSetLayout modelSetLayout
     );
+    DIX_DISABLE_COPY(SkyboxRenderSystem)
+    ~SkyboxRenderSystem() = default;
 
-    ~SimpleRenderSystem() = default;
+    static constexpr const char* Name() {
+        return "SkyboxRenderSystem";
+    }
 
-    static constexpr const char* Name() { return "SimpleRenderSystem"; }
-
-    DIX_DISABLE_COPY(SimpleRenderSystem)
 };
-
 }   // namespace dix
-#endif // SIMPLE_RENDER_SYSTEM_HPP
+
+#endif // SKYBOX_RENDER_SYSTEM_HPP

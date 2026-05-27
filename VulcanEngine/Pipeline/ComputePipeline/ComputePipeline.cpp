@@ -81,10 +81,10 @@ void ComputePipeline::createShaderModule(const std::vector<char>& code, vk::Shad
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     auto result = m_dixDevice.device().createShaderModule(createInfo);
-    if (result.result != vk::Result::eSuccess) {
-        throw std::runtime_error("failed to create shader module!");
-    }
-    *shaderModule = result.value;
+    // if (result != vk::Result::eSuccess) {
+    //     throw std::runtime_error("failed to create shader module!");
+    // }
+    *shaderModule = result;
 }
 
 void ComputePipeline::bind(vk::CommandBuffer commandBuffer) {

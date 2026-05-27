@@ -58,8 +58,7 @@ void DixImage::createImage(
     imgInfo.samples    = vk::SampleCountFlagBits::e1;
     imgInfo.sharingMode = vk::SharingMode::eExclusive;
 
-    auto result = device.device().createImage(imgInfo, nullptr, &m_image);
-    checkVulkanResult(result, "Failed to create image");
+    m_image = device.device().createImage(imgInfo, nullptr);
 }
 
 void DixImage::allocateMemory(
@@ -73,8 +72,7 @@ void DixImage::allocateMemory(
     allocInfo.allocationSize  = memReq.size;
     allocInfo.memoryTypeIndex = dixDevice.findMemoryType(memReq.memoryTypeBits, properties);
 
-    auto result = dixDevice.device().allocateMemory(allocInfo, nullptr, &m_memory);
-    checkVulkanResult(result, "Failed to allocate image memory");
+    m_memory = dixDevice.device().allocateMemory(allocInfo, nullptr);
 
     dixDevice.device().bindImageMemory(m_image, m_memory, 0);
 }
@@ -90,8 +88,7 @@ void DixImage::createImageView(EngineDevice& device, vk::Format format) {
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount    = 1;
 
-    auto result = device.device().createImageView(viewInfo, nullptr, &m_view);
-    checkVulkanResult(result, "Failed to create image view");
+    m_view = device.device().createImageView(viewInfo, nullptr);
 }
 
 std::tuple<vk::Image, vk::DeviceMemory, vk::ImageView> DixImage::releaseOwnership() {

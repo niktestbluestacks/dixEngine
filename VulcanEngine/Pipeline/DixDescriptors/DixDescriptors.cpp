@@ -12,6 +12,7 @@ DixDescriptorSetLayout::Builder& DixDescriptorSetLayout::Builder::addBinding(
     VkDescriptorType descriptorType,
     VkShaderStageFlags stageFlags,
     uint32_t count) {
+
     assert(!bindings.contains(binding) && "Binding already in use");
     VkDescriptorSetLayoutBinding layoutBinding{};
     layoutBinding.binding = binding;
@@ -128,6 +129,8 @@ void DixDescriptorPool::resetPool() {
 
 DixDescriptorWriter::DixDescriptorWriter(DixDescriptorSetLayout& setLayout, DixDescriptorPool& pool)
     : setLayout{ setLayout }, pool{ pool } {
+    bufferInfos.reserve(sizeof(VkDescriptorBufferInfo) * 16);
+    imageInfos.reserve(sizeof(VkDescriptorImageInfo) * 16);
 }
 
 DixDescriptorWriter& DixDescriptorWriter::writeBuffer(

@@ -190,7 +190,8 @@ void DixRenderSystem::renderGameObjects(
             0,
             static_cast<uint32_t>(descriptorSets.size()),
             descriptorSets.data(),
-            0, nullptr);
+            0, nullptr
+        );
 
         if (obj.model) {
             obj.model->bind(frameInfo.commandBuffer);
@@ -213,8 +214,9 @@ void DixRenderSystem::initComputeFromConfig(const ComputePipelineConfig& cc) {
 
 void DixRenderSystem::initComputeLayout(
     std::unique_ptr<DixDescriptorSetLayout> setLayout,
-    const std::vector<VkPushConstantRange>& pushRanges)
-{
+    const std::vector<VkPushConstantRange>& pushRanges) {
+
+
     m_computeSetLayout = std::move(setLayout);
 
     VkDescriptorSetLayout vkLayout = m_computeSetLayout->getDescriptorSetLayout();

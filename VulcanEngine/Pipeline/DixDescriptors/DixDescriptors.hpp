@@ -77,7 +77,8 @@ public:
     DixDescriptorPool& operator=(const DixDescriptorPool&) = delete;
 
     bool allocateDescriptorSet(
-        const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const;
+        const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor
+    ) const;
 
     void freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
 

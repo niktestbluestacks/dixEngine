@@ -18,8 +18,6 @@
 
 namespace dix {
 
-class GameObject;
-
 struct RecordedGameObject {
     GameObject::id_t id;
     glm::vec3 translation;

@@ -5,7 +5,6 @@ layout(location = 1) in vec4 inVelocitySize;
 layout(location = 2) in vec4 inColor;
 
 layout(location = 0) out vec3 fragColor;
-layout(location = 1) out float fragSize;
 
 layout(binding = 0) uniform ParticleUbo {
     mat4 projectionView;
@@ -20,6 +19,5 @@ void main() {
     gl_Position = ubo.projectionView * worldPosition;
 
     fragColor = inColor.rgb;
-    fragSize = inVelocitySize.w;
-    gl_PointSize = fragSize;
+    gl_PointSize = inVelocitySize.w;
 }

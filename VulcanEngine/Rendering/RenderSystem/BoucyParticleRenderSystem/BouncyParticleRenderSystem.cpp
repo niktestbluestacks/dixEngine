@@ -194,9 +194,9 @@ void BouncyParticleRenderSystem::renderGameObjects(
 
         // set 0: global UBO (camera / projection)
         // set 1: BouncyParticle compute set (SSBO + sim-params)
-        std::array<VkDescriptorSet, 2> descriptorSets{
+        std::array<VkDescriptorSet, 1> descriptorSets{
             frameInfo.globalDescriptorSet,
-            m_computeDescriptorSet
+            // m_computeDescriptorSet
         };
 
         vkCmdBindDescriptorSets(
@@ -206,7 +206,8 @@ void BouncyParticleRenderSystem::renderGameObjects(
             0,
             static_cast<uint32_t>(descriptorSets.size()),
             descriptorSets.data(),
-            0, nullptr);
+            0, nullptr
+        );
 
         if (m_particleCount > 0) {
             vkCmdDraw(frameInfo.commandBuffer, m_particleCount, 1, 0, 0);

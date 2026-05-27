@@ -122,8 +122,7 @@ void Renderer::endFrame(void) {
 		m_Window.wasWindowResized()) {
 		m_Window.resetWindowResizedFlag();
 		recreateSwapChain();
-	}
-    else if (result != VK_SUCCESS) {
+	} else if (result != VK_SUCCESS) {
 		// try to recover by recreating the swapchain for any non-success result
 		m_Window.resetWindowResizedFlag();
 		recreateSwapChain();

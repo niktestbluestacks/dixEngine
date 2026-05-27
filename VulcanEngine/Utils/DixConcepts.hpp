@@ -9,7 +9,7 @@
 
 //libs
 
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 namespace dix {
 
@@ -40,11 +40,11 @@ template <typename T, typename Y>
 struct same_tuple_type_as : std::false_type {};
 
 template <typename T, typename... Args>
-struct same_tuple_type_as <T, std::tuple <Args...>> : 
+struct same_tuple_type_as <T, std::tuple <Args...>> :
     std::conditional_t<
-        (... && std::same_as<T, Args>), 
-        std::true_type,                 
-        std::false_type                 
+        (... && std::same_as<T, Args>),
+        std::true_type,
+        std::false_type
     > {};
 
 template <typename T>
@@ -52,8 +52,8 @@ concept HasVulkanFlags = requires (T t) {
     { T::getVulkanFlags() };
     requires []<typename... InnerTuples>(std::tuple<InnerTuples...>) {
         // Проверяем каждый внутренний элемент через свертку (fold expression)
-        return (... && std::same_as<InnerTuples, std::tuple<uint32_t, VkDescriptorType, VkShaderStageFlags>>);
-    }(decltype(T::getVulkanFlags()){}); 
+        return (... && std::same_as<InnerTuples, std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>>);
+    }(decltype(T::getVulkanFlags()){});
 };
 }   // namespace dix
 

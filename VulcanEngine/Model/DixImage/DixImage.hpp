@@ -10,6 +10,7 @@
 // std
 #include <string>
 #include <stdexcept>
+#include <tuple>
 
 namespace dix {
 class DixImage {
@@ -18,42 +19,42 @@ public:
 
     DixImage(
         EngineDevice& dixDevice,
-        VkFormat format,
+        vk::Format format,
         uint32_t width,
         uint32_t height,
-        VkImageTiling tiling,
-        VkImageUsageFlags usage,
-        VkMemoryPropertyFlags properties
+        vk::ImageTiling tiling,
+        vk::ImageUsageFlags usage,
+        vk::MemoryPropertyFlags properties
     );
 
     ~DixImage();
 
-    VkImage& getImage() { return m_image; };
-    VkDeviceMemory& getMemory() { return m_memory; };
-    VkImageView& getImageView() { return m_view; };
+    vk::Image& getImage() { return m_image; };
+    vk::DeviceMemory& getMemory() { return m_memory; };
+    vk::ImageView& getImageView() { return m_view; };
 
-    std::tuple<VkImage, VkDeviceMemory, VkImageView> releaseOwnership();
+    std::tuple<vk::Image, vk::DeviceMemory, vk::ImageView> releaseOwnership();
 
 private:
     void createImage(
         EngineDevice& device,
-        VkFormat format,
+        vk::Format format,
         uint32_t width,
         uint32_t height,
-        VkImageTiling tiling,
-        VkImageUsageFlags usage
+        vk::ImageTiling tiling,
+        vk::ImageUsageFlags usage
     );
 
     void allocateMemory(
         EngineDevice& device,
-        VkMemoryPropertyFlags properties
+        vk::MemoryPropertyFlags properties
     );
 
-    void createImageView(EngineDevice& device, VkFormat format);
+    void createImageView(EngineDevice& device, vk::Format format);
 
-    VkImage m_image;
-    VkDeviceMemory m_memory;
-    VkImageView m_view;
+    vk::Image m_image;
+    vk::DeviceMemory m_memory;
+    vk::ImageView m_view;
 
     uint32_t m_width;
     uint32_t m_height;

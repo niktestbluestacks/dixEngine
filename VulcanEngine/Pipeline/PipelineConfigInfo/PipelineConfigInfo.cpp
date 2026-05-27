@@ -4,9 +4,9 @@
 
 namespace dix {
 
-VkPipelineVertexInputStateCreateInfo createVertexInputState(const std::vector<VkVertexInputBindingDescription>& bindingDescriptions, const std::vector<VkVertexInputAttributeDescription>& attributeDescriptions) {
-    VkPipelineVertexInputStateCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+vk::PipelineVertexInputStateCreateInfo createVertexInputState(const std::vector<vk::VertexInputBindingDescription>& bindingDescriptions, const std::vector<vk::VertexInputAttributeDescription>& attributeDescriptions) {
+    vk::PipelineVertexInputStateCreateInfo createInfo{};
+    createInfo.sType = vk::StructureType::ePipelineVertexInputStateCreateInfo;
     createInfo.vertexBindingDescriptionCount = static_cast<uint32_t>(bindingDescriptions.size());
     createInfo.pVertexBindingDescriptions = bindingDescriptions.data();
     createInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -15,16 +15,16 @@ VkPipelineVertexInputStateCreateInfo createVertexInputState(const std::vector<Vk
     return createInfo;
 }
 
-VkPipelineInputAssemblyStateCreateInfo createInputAssemblyState(VkPrimitiveTopology topology) {
-    VkPipelineInputAssemblyStateCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+vk::PipelineInputAssemblyStateCreateInfo createInputAssemblyState(vk::PrimitiveTopology topology) {
+    vk::PipelineInputAssemblyStateCreateInfo createInfo{};
+    createInfo.sType = vk::StructureType::ePipelineInputAssemblyStateCreateInfo;
     createInfo.topology = topology;
 
     return createInfo;
 }
 
-std::pair<VkViewport, VkRect2D> createViewportAndScissor(int width, int height) {
-    VkViewport viewport{};
+std::pair<vk::Viewport, vk::Rect2D> createViewportAndScissor(int width, int height) {
+    vk::Viewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
     viewport.width = static_cast<float>(width);
@@ -32,78 +32,78 @@ std::pair<VkViewport, VkRect2D> createViewportAndScissor(int width, int height) 
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
-    VkRect2D scissor{};
+    vk::Rect2D scissor{};
     scissor.offset = { 0, 0 };
     scissor.extent = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
 
     return std::make_pair(viewport, scissor);
 }
 
-VkPipelineRasterizationStateCreateInfo createRasterizationState(VkPolygonMode polygonMode, bool cullModeBack) {
-    VkPipelineRasterizationStateCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-    createInfo.depthClampEnable = VK_FALSE;
-    createInfo.rasterizerDiscardEnable = VK_FALSE;
+vk::PipelineRasterizationStateCreateInfo createRasterizationState(vk::PolygonMode polygonMode, bool cullModeBack) {
+    vk::PipelineRasterizationStateCreateInfo createInfo{};
+    createInfo.sType = vk::StructureType::ePipelineRasterizationStateCreateInfo;
+    createInfo.depthClampEnable = vk::False;
+    createInfo.rasterizerDiscardEnable = vk::False;
     createInfo.polygonMode = polygonMode;
     createInfo.lineWidth = 1.0f;
-    createInfo.cullMode = cullModeBack ? VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
-    createInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
-    createInfo.depthBiasEnable = VK_FALSE;
+    createInfo.cullMode = cullModeBack ? vk::CullModeFlagBits::eBack : vk::CullModeFlagBits::eNone;
+    createInfo.frontFace = vk::FrontFace::eClockwise;
+    createInfo.depthBiasEnable = vk::False;
 
     return createInfo;
 }
 
-VkPipelineMultisampleStateCreateInfo createMultisampleState() {
-    VkPipelineMultisampleStateCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    createInfo.sampleShadingEnable = VK_FALSE;
-    createInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+vk::PipelineMultisampleStateCreateInfo createMultisampleState() {
+    vk::PipelineMultisampleStateCreateInfo createInfo{};
+    createInfo.sType = vk::StructureType::ePipelineMultisampleStateCreateInfo;
+    createInfo.sampleShadingEnable = vk::False;
+    createInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
 
     return createInfo;
 }
 
-VkPipelineDepthStencilStateCreateInfo createDepthStencilState(bool enableDepthTesting, bool enableDepthWriting, VkCompareOp compareOp) {
-    VkPipelineDepthStencilStateCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    createInfo.depthTestEnable = enableDepthTesting ? VK_TRUE : VK_FALSE;
-    createInfo.depthWriteEnable = enableDepthWriting ? VK_TRUE : VK_FALSE;
+vk::PipelineDepthStencilStateCreateInfo createDepthStencilState(bool enableDepthTesting, bool enableDepthWriting, vk::CompareOp compareOp) {
+    vk::PipelineDepthStencilStateCreateInfo createInfo{};
+    createInfo.sType = vk::StructureType::ePipelineDepthStencilStateCreateInfo;
+    createInfo.depthTestEnable = enableDepthTesting ? vk::True : vk::False;
+    createInfo.depthWriteEnable = enableDepthWriting ? vk::True : vk::False;
     createInfo.depthCompareOp = compareOp;
     createInfo.minDepthBounds = 0.0f; // Optional
     createInfo.maxDepthBounds = 1.0f; // Optional
-    createInfo.stencilTestEnable = VK_FALSE;
+    createInfo.stencilTestEnable = vk::False;
 
     return createInfo;
 }
 
-VkPipelineColorBlendAttachmentState createColorBlendAttachmentState(bool blendEnable) {
-    VkPipelineColorBlendAttachmentState attachment{};
-    attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    attachment.blendEnable = blendEnable ? VK_TRUE : VK_FALSE;
+vk::PipelineColorBlendAttachmentState createColorBlendAttachmentState(bool blendEnable) {
+    vk::PipelineColorBlendAttachmentState attachment{};
+    attachment.colorWriteMask = vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA;
+    attachment.blendEnable = blendEnable ? vk::True : vk::False;
 
     if (blendEnable) {
-        attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-        attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-        attachment.colorBlendOp = VK_BLEND_OP_ADD;
-        attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-        attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-        attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        attachment.srcColorBlendFactor = vk::BlendFactor::eSrcAlpha;
+        attachment.dstColorBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+        attachment.colorBlendOp = vk::BlendOp::eAdd;
+        attachment.srcAlphaBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+        attachment.dstAlphaBlendFactor = vk::BlendFactor::eOneMinusSrcAlpha;
+        attachment.alphaBlendOp = vk::BlendOp::eAdd;
     } else {
-        attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
-        attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-        attachment.colorBlendOp = VK_BLEND_OP_ADD;
-        attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
-        attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-        attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+        attachment.srcColorBlendFactor = vk::BlendFactor::eOne;
+        attachment.dstColorBlendFactor = vk::BlendFactor::eZero;
+        attachment.colorBlendOp = vk::BlendOp::eAdd;
+        attachment.srcAlphaBlendFactor = vk::BlendFactor::eOne;
+        attachment.dstAlphaBlendFactor = vk::BlendFactor::eZero;
+        attachment.alphaBlendOp = vk::BlendOp::eAdd;
     }
 
     return attachment;
 }
 
-VkPipelineColorBlendStateCreateInfo createColorBlendState(const std::vector<VkPipelineColorBlendAttachmentState>& attachments) {
-    VkPipelineColorBlendStateCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-    createInfo.logicOpEnable = VK_FALSE;
-    createInfo.logicOp = VK_LOGIC_OP_COPY;
+vk::PipelineColorBlendStateCreateInfo createColorBlendState(const std::vector<vk::PipelineColorBlendAttachmentState>& attachments) {
+    vk::PipelineColorBlendStateCreateInfo createInfo{};
+    createInfo.sType = vk::StructureType::ePipelineColorBlendStateCreateInfo;
+    createInfo.logicOpEnable = vk::False;
+    createInfo.logicOp = vk::LogicOp::eCopy;
     createInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
     createInfo.pAttachments = attachments.data();
     createInfo.blendConstants[0] = 0.0f;

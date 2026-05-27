@@ -12,9 +12,9 @@ namespace dix {
 
 BouncyParticleRenderSystem::BouncyParticleRenderSystem(
     EngineDevice& engineDevice,
-    VkRenderPass renderPass,
-    VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout)
+    vk::RenderPass renderPass,
+    vk::DescriptorSetLayout globalSetLayout,
+    vk::DescriptorSetLayout modelSetLayout)
     : DixRenderSystem(
         engineDevice,
         renderPass,
@@ -25,17 +25,17 @@ BouncyParticleRenderSystem::BouncyParticleRenderSystem(
             .fragShaderPath = "BouncyParticleShader/bouncy_particle.frag.spv",
 
             // Point-list: each BouncyParticle is a screen-space point / sprite.
-            .topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+            .topology = vk::PrimitiveTopology::ePointList,
 
             // Vertex layout mirrors the BouncyParticle struct.
             .vertexBindings = {
-                { 0, sizeof(BouncyParticle), VK_VERTEX_INPUT_RATE_VERTEX }
+                { 0, sizeof(BouncyParticle), vk::VertexInputRate::eVertex }
             },
             .vertexAttributes = {
-                { 0, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(BouncyParticle, positionLifetime) },
-                { 1, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(BouncyParticle, velocitySize) },     
-                { 2, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(BouncyParticle, color) },
-                { 3, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(BouncyParticle, initPosLife)     },
+                { 0, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(BouncyParticle, positionLifetime) },
+                { 1, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(BouncyParticle, velocitySize) },
+                { 2, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(BouncyParticle, color) },
+                { 3, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(BouncyParticle, initPosLife)     },
             },
 
             .transformGameObject = [](void* push, GameObject& obj, FrameInfo& frameInfo) {
@@ -52,22 +52,22 @@ BouncyParticleRenderSystem::BouncyParticleRenderSystem(
                 .shaderPath = "BouncyParticleShader/bouncy_particle.comp.spv",
                 .bindings   = {
                     // binding 0: BouncyParticle SSBO (read/write by vertex + compute)
-                    { 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                      VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_VERTEX_BIT },
+                    { 0, vk::DescriptorType::eStorageBuffer,
+                      vk::ShaderStageFlagBits::eCompute | vk::ShaderStageFlagBits::eVertex },
                     // binding 1: simulation params UBO (compute only)
-                    { 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                      VK_SHADER_STAGE_COMPUTE_BIT },
+                    { 1, vk::DescriptorType::eUniformBuffer,
+                      vk::ShaderStageFlagBits::eCompute },
                 },
             },
         }) {
     // 1. BouncyParticle storage buffer  [uint32_t count | BouncyParticle × MAX]
-    VkDeviceSize particleBufferSize = 16 + sizeof(BouncyParticle) * MAX_PARTICLES;
+    vk::DeviceSize particleBufferSize = 16 + sizeof(BouncyParticle) * MAX_PARTICLES;
     m_particleBuffer = std::make_unique<DixBuffer>(
         engineDevice,
         particleBufferSize,
         1,
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eVertexBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
     );
     m_particleBuffer->map();
     uint32_t zeroCount = 0;
@@ -79,8 +79,8 @@ BouncyParticleRenderSystem::BouncyParticleRenderSystem(
         engineDevice,
         sizeof(BouncyParticleSimulationParams),
         1,
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        vk::BufferUsageFlagBits::eUniformBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
     );
     m_simParams.gravityDeltaTime.w = 0.016f;
     m_simulationParamsBuffer->map();
@@ -99,13 +99,13 @@ void BouncyParticleRenderSystem::buildComputeDescriptors() {
     assert(m_computeDescriptorPool  && "Compute descriptor pool not initialised");
 
     // BouncyParticle SSBO: skip the leading uint32_t BouncyParticle-count header.
-    VkDescriptorBufferInfo particleInfo{};
+    vk::DescriptorBufferInfo particleInfo{};
     particleInfo.buffer = m_particleBuffer->getBuffer();
     particleInfo.offset = 0;
     particleInfo.range =
     16 + sizeof(BouncyParticle) * MAX_PARTICLES;
 
-    VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo(
+    vk::DescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo(
         sizeof(BouncyParticleSimulationParams), 0
     );
 
@@ -126,39 +126,36 @@ void BouncyParticleRenderSystem::buildComputeDescriptors() {
 // GPU sees the updated SSBO contents during the subsequent
 // graphics pass.  Must be called OUTSIDE a render pass.
 
-void BouncyParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer) {
+void BouncyParticleRenderSystem::dispatchCompute(vk::CommandBuffer commandBuffer) {
     if (m_particleCount == 0 || !hasComputePipeline()) return;
 
     m_computePipeline->bind(commandBuffer);
 
-    vkCmdBindDescriptorSets(
-        commandBuffer,
-        VK_PIPELINE_BIND_POINT_COMPUTE,
+    commandBuffer.bindDescriptorSets(
+        vk::PipelineBindPoint::eCompute,
         m_computePipelineLayout,
-        0, 1, &m_computeDescriptorSet,
-        0, nullptr);
+        0, m_computeDescriptorSet,
+        {});
 
     // local_size_x = 64 in the compute shader
     uint32_t workGroups = (m_particleCount + 63) / 64;
-    vkCmdDispatch(commandBuffer, workGroups, 1, 1);
+    commandBuffer.dispatch(workGroups, 1, 1);
 
     // Barrier: wait for the compute shader's SSBO writes to be visible
     // to the vertex input stage and the vertex shader (which reads the
     // BouncyParticle SSBO bound at set 1, binding 0).
-    VkMemoryBarrier barrier{};
-    barrier.sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
-    barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
-    barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT
-                          | VK_ACCESS_SHADER_READ_BIT;
+    vk::MemoryBarrier barrier{};
+    barrier.srcAccessMask = vk::AccessFlagBits::eShaderWrite;
+    barrier.dstAccessMask = vk::AccessFlagBits::eVertexAttributeRead
+                          | vk::AccessFlagBits::eShaderRead;
 
-    vkCmdPipelineBarrier(
-        commandBuffer,
-        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
-        0,
-        1, &barrier,
-        0, nullptr,
-        0, nullptr);
+    commandBuffer.pipelineBarrier(
+        vk::PipelineStageFlagBits::eComputeShader,
+        vk::PipelineStageFlagBits::eVertexInput | vk::PipelineStageFlagBits::eVertexShader,
+        {},
+        barrier,
+        {},
+        {});
 }
 
 void BouncyParticleRenderSystem::renderGameObjects(

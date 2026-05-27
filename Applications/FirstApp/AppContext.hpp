@@ -38,13 +38,13 @@ public:
 	std::unique_ptr<UIRenderer>& getUIRenderer() { return m_uiRenderer; }
 	// renderer helpers
 	float getAspectRatio() { return m_dixRenderer.getAspectRatio(); }
-	VkRenderPass getSwapChainRenderPass() { return m_dixRenderer.getSwapChainRenderPass(); }
-	VkCommandBuffer beginFrame() { return m_dixRenderer.beginFrame(); }
+	vk::RenderPass getSwapChainRenderPass() { return m_dixRenderer.getSwapChainRenderPass(); }
+	vk::CommandBuffer beginFrame() { return m_dixRenderer.beginFrame(); }
 	void endFrame() { m_dixRenderer.endFrame(); }
-	void beginSwapChainRenderPass(VkCommandBuffer cb) { m_dixRenderer.beginSwapChainRenderPass(cb); }
-	void endSwapChainRenderPass(VkCommandBuffer cb) { m_dixRenderer.endSwapChainRenderPass(cb); }
+	void beginSwapChainRenderPass(vk::CommandBuffer cb) { m_dixRenderer.beginSwapChainRenderPass(cb); }
+	void endSwapChainRenderPass(vk::CommandBuffer cb) { m_dixRenderer.endSwapChainRenderPass(cb); }
 	int getFrameIndex() { return m_dixRenderer.getFrameIndex(); }
-	VkExtent2D getExtent() { return m_Window.getExtent(); }
+	vk::Extent2D getExtent() { return m_Window.getExtent(); }
 	// device access for resource creation
 	EngineDevice& device() { return m_dixDevice; }
 
@@ -87,7 +87,7 @@ private:
 
 	std::unordered_map<std::string, std::vector<std::vector<std::unique_ptr<DixBuffer>>>> m_systemUboBuffers;
 	std::unordered_map<std::string, std::unique_ptr<DixDescriptorSetLayout>> m_systemSetLayouts;
-	std::unordered_map<std::string, std::vector<VkDescriptorSet>> m_systemDescriptorSets;
+        std::unordered_map<std::string, std::vector<vk::DescriptorSet>> m_systemDescriptorSets;
 
  	// per-model descriptor resources
 	std::unique_ptr<DixDescriptorPool> m_modelDescriptorPool;

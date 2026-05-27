@@ -15,22 +15,22 @@ struct PipelineConfigInfo {
     PipelineConfigInfo(const PipelineConfigInfo&) = delete;
     PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
-    VkPipelineViewportStateCreateInfo viewportInfo{};
-    VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
-    VkPipelineRasterizationStateCreateInfo rasterizationInfo{};
-    VkPipelineMultisampleStateCreateInfo multisampleStateInfo{};
-    VkPipelineColorBlendAttachmentState colorBlendAttachment{};
-    VkPipelineColorBlendStateCreateInfo colorBlendInfo{};
-    VkPipelineDepthStencilStateCreateInfo depthStencilInfo{};
-    std::vector<VkDynamicState> dynamicStateEnables;
-    VkPipelineDynamicStateCreateInfo dynamicStateInfo{};
-    VkPipelineLayout pipelineLayout = VK_NULL_HANDLE;
-    VkRenderPass renderPass = VK_NULL_HANDLE;
+    vk::PipelineViewportStateCreateInfo viewportInfo{};
+    vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo{};
+    vk::PipelineRasterizationStateCreateInfo rasterizationInfo{};
+    vk::PipelineMultisampleStateCreateInfo multisampleStateInfo{};
+    vk::PipelineColorBlendAttachmentState colorBlendAttachment{};
+    vk::PipelineColorBlendStateCreateInfo colorBlendInfo{};
+    vk::PipelineDepthStencilStateCreateInfo depthStencilInfo{};
+    std::vector<vk::DynamicState> dynamicStateEnables;
+    vk::PipelineDynamicStateCreateInfo dynamicStateInfo{};
+    vk::PipelineLayout pipelineLayout = nullptr;
+    vk::RenderPass renderPass = nullptr;
     uint32_t subpass = 0;
 
     // Optional custom vertex input descriptions
-    std::vector<VkVertexInputBindingDescription> vertexBindingDescriptions;
-    std::vector<VkVertexInputAttributeDescription> vertexAttributeDescriptions;
+    std::vector<vk::VertexInputBindingDescription> vertexBindingDescriptions;
+    std::vector<vk::VertexInputAttributeDescription> vertexAttributeDescriptions;
 };
 
 }  // namespace dix

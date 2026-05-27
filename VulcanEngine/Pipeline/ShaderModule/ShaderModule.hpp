@@ -14,20 +14,20 @@ namespace dix {
 class ShaderModule {
 public:
     ShaderModule() = default;
-    ShaderModule(VkDevice device, const std::string& spirvFilepath);
+    ShaderModule(vk::Device device, const std::string& spirvFilepath);
     ~ShaderModule();
 
     ShaderModule(const ShaderModule&) = delete;
     ShaderModule& operator=(const ShaderModule&) = delete;
 
-    VkShaderModule getModule() const { return module_; }
-    bool isValid() const { return module_ != VK_NULL_HANDLE; }
+    vk::ShaderModule getModule() const { return module_; }
+    bool isValid() const { return module_ != nullptr; }
 
 private:
     std::vector<char> readFile(const std::string& filepath) const;
 
-    VkDevice device_ = VK_NULL_HANDLE;
-    VkShaderModule module_ = VK_NULL_HANDLE;
+    vk::Device device_ = nullptr;
+    vk::ShaderModule module_ = nullptr;
 };
 
 } // namespace dix

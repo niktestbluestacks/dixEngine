@@ -20,21 +20,22 @@ std::vector<char> ShaderModule::readFile(const std::string& filepath) const {
     return buffer;
 }
 
-ShaderModule::ShaderModule(VkDevice device, const std::string& spirvFilepath) : device_(device) {
+ShaderModule::ShaderModule(vk::Device device, const std::string& spirvFilepath) : device_(device) {
     auto code = readFile(spirvFilepath);
-    VkShaderModuleCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    createInfo.codeSize = code.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    vk::ShaderModuleCreateInfo createInfo{};
+    createInfo.setCodeSize(code.size());
+    createInfo.setPCode(reinterpret_cast<const uint32_t*>(code.data()));
 
-    if (vkCreateShaderModule(device_, &createInfo, nullptr, &module_) != VK_SUCCESS) {
-        module_ = VK_NULL_HANDLE;
+    try {
+        module_ = device_.createShaderModule(createInfo);
+    } catch (...) {
+        module_ = nullptr;
     }
 }
 
 ShaderModule::~ShaderModule() {
-    if (module_ != VK_NULL_HANDLE && device_ != VK_NULL_HANDLE) {
-        vkDestroyShaderModule(device_, module_, nullptr);
+    if (module_ != nullptr && device_ != nullptr) {
+        device_.destroyShaderModule(module_);
     }
 }
 

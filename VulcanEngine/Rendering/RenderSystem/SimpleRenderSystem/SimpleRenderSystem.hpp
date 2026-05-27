@@ -17,8 +17,8 @@ struct SimplePushConstantData {
 };
 
 using SimpleRenderSystemBindings = std::tuple<
-    UniformBinding<SimpleUbo, 0, VK_SHADER_STAGE_VERTEX_BIT>,
-    SamplerBinding<1,            VK_SHADER_STAGE_FRAGMENT_BIT>
+    UniformBinding<SimpleUbo, 0, vk::ShaderStageFlagBits::eVertex>,
+    SamplerBinding<1,            vk::ShaderStageFlagBits::eFragment>
 >;
 
 class SimpleRenderSystem:
@@ -29,9 +29,9 @@ public:
 
     SimpleRenderSystem(
         EngineDevice& engineDevice,
-        VkRenderPass renderPass,
-        VkDescriptorSetLayout globalSetLayout,
-        VkDescriptorSetLayout modelSetLayout
+        vk::RenderPass renderPass,
+        vk::DescriptorSetLayout globalSetLayout,
+        vk::DescriptorSetLayout modelSetLayout
     );
 
     ~SimpleRenderSystem() = default;

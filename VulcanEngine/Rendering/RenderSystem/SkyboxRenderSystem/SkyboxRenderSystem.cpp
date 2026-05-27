@@ -4,9 +4,9 @@ namespace dix {
 
 SkyboxRenderSystem::SkyboxRenderSystem(
         EngineDevice& device,
-        VkRenderPass renderPass,
-        VkDescriptorSetLayout globalSetLayout,
-        VkDescriptorSetLayout modelSetLayout
+        vk::RenderPass renderPass,
+        vk::DescriptorSetLayout globalSetLayout,
+        vk::DescriptorSetLayout modelSetLayout
     ):
     DixRenderSystem(
         device,
@@ -24,13 +24,13 @@ SkyboxRenderSystem::SkyboxRenderSystem(
                 // p->normalMatrix = glm::mat4{1.f};
             },
             .pushConstantSize = 0,
-            .pushConstantStages = 0,
+            .pushConstantStages = vk::ShaderStageFlags{},
             .pipelineConfigInfo = std::move([]() -> PipelineConfigInfo {
                 PipelineConfigInfo conf{};
-                conf.depthStencilInfo.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
+                conf.depthStencilInfo.depthCompareOp = vk::CompareOp::eLessOrEqual;
                 return conf;
             }())
     }) {
-    
+
 }
 }   // namespace dix

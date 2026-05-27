@@ -1,12 +1,15 @@
 // dix
 #include <Pipeline/Buffer/DixBuffer.hpp>
 
- // std
+// libs
+#include <vulkan/vulkan.hpp>
+
+// std
 #include <cassert>
 #include <cstring>
 
 namespace dix {
-VkDeviceSize DixBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) {
+vk::DeviceSize DixBuffer::getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignment) {
     if (minOffsetAlignment > 0) {
         return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
     }
@@ -15,11 +18,11 @@ VkDeviceSize DixBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize min
 
 DixBuffer::DixBuffer(
         EngineDevice& device,
-        VkDeviceSize instanceSize,
+        vk::DeviceSize instanceSize,
         uint32_t instanceCount,
-        VkBufferUsageFlags usageFlags,
-        VkMemoryPropertyFlags memoryPropertyFlags,
-        VkDeviceSize minOffsetAlignment)
+        vk::BufferUsageFlags usageFlags,
+        vk::MemoryPropertyFlags memoryPropertyFlags,
+        vk::DeviceSize minOffsetAlignment)
         : m_dixDevice { device },
         instanceSize{ instanceSize },
         instanceCount{ instanceCount },
@@ -32,16 +35,16 @@ DixBuffer::DixBuffer(
 
 DixBuffer::~DixBuffer() {
     if (m_mapped && m_buffer) {
-        vkUnmapMemory(m_dixDevice.device(), m_memory);
+        m_dixDevice.device().unmapMemory(m_memory);
         m_mapped = nullptr;
-        vkDestroyBuffer(m_dixDevice.device(), m_buffer, nullptr);
-        vkFreeMemory(m_dixDevice.device(), m_memory, nullptr);
+        m_dixDevice.device().destroyBuffer(m_buffer);
+        m_dixDevice.device().freeMemory(m_memory);
     }
 }
 
-VkResult DixBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
+vk::Result DixBuffer::map(vk::DeviceSize size, vk::DeviceSize offset) {
     assert(m_buffer && m_memory && "Called map on buffer before create");
-    return vkMapMemory(m_dixDevice.device(), m_memory, offset, size, 0, &m_mapped);
+    return m_dixDevice.device().mapMemory(m_memory, offset, size, {}, &m_mapped);
 }
 
 /**
@@ -51,12 +54,12 @@ VkResult DixBuffer::map(VkDeviceSize size, VkDeviceSize offset) {
 */
 void DixBuffer::unmap() {
     if (m_mapped) {
-        vkUnmapMemory(m_dixDevice.device(), m_memory);
+        m_dixDevice.device().unmapMemory(m_memory);
         m_mapped = nullptr;
     }
 }
 
-void DixBuffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset) {
+void DixBuffer::writeToBuffer(void* data, vk::DeviceSize size, vk::DeviceSize offset) {
     assert(m_mapped && "Cannot copy to unmapped buffer");
 
     if (size == VK_WHOLE_SIZE) {
@@ -69,26 +72,24 @@ void DixBuffer::writeToBuffer(void* data, VkDeviceSize size, VkDeviceSize offset
     }
 }
 
-VkResult DixBuffer::flush(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+vk::Result DixBuffer::flush(vk::DeviceSize size, vk::DeviceSize offset) {
+    vk::MappedMemoryRange mappedRange{};
     mappedRange.memory = m_memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
-    return vkFlushMappedMemoryRanges(m_dixDevice.device(), 1, &mappedRange);
+    return m_dixDevice.device().flushMappedMemoryRanges(mappedRange);
 }
 
-VkResult DixBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset) {
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+vk::Result DixBuffer::invalidate(vk::DeviceSize size, vk::DeviceSize offset) {
+    vk::MappedMemoryRange mappedRange{};
     mappedRange.memory = m_memory;
     mappedRange.offset = offset;
     mappedRange.size = size;
-    return vkInvalidateMappedMemoryRanges(m_dixDevice.device(), 1, &mappedRange);
+    return m_dixDevice.device().invalidateMappedMemoryRanges(mappedRange);
 }
 
-VkDescriptorBufferInfo DixBuffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) {
-    return VkDescriptorBufferInfo{
+vk::DescriptorBufferInfo DixBuffer::descriptorInfo(vk::DeviceSize size, vk::DeviceSize offset) {
+    return vk::DescriptorBufferInfo{
         m_buffer,
         offset,
         size,
@@ -99,13 +100,13 @@ void DixBuffer::writeToIndex(void* data, int index) {
     writeToBuffer(data, instanceSize, index * alignmentSize);
 }
 
-VkResult DixBuffer::flushIndex(int index) { return flush(alignmentSize, index * alignmentSize); }
+vk::Result DixBuffer::flushIndex(int index) { return flush(alignmentSize, index * alignmentSize); }
 
-VkDescriptorBufferInfo DixBuffer::descriptorInfoForIndex(int index) {
+vk::DescriptorBufferInfo DixBuffer::descriptorInfoForIndex(int index) {
     return descriptorInfo(alignmentSize, index * alignmentSize);
 }
 
-VkResult DixBuffer::invalidateIndex(int index) {
+vk::Result DixBuffer::invalidateIndex(int index) {
     return invalidate(alignmentSize, index * alignmentSize);
 }
 

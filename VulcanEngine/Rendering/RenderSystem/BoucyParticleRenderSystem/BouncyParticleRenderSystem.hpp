@@ -33,7 +33,7 @@ struct BouncyParticlePushConstantData {
 };
 
 using BouncyParticleRenderSystemBindings = std::tuple<
-    UniformBinding<BouncyParticleUbo, 0, VK_SHADER_STAGE_VERTEX_BIT>
+    UniformBinding<BouncyParticleUbo, 0, vk::ShaderStageFlagBits::eVertex>
 >;
 
 class BouncyParticleRenderSystem:
@@ -44,9 +44,9 @@ public:
 
     BouncyParticleRenderSystem(
         EngineDevice& engineDevice,
-        VkRenderPass renderPass,
-        VkDescriptorSetLayout globalSetLayout,
-        VkDescriptorSetLayout modelSetLayout
+        vk::RenderPass renderPass,
+        vk::DescriptorSetLayout globalSetLayout,
+        vk::DescriptorSetLayout modelSetLayout
     );
     ~BouncyParticleRenderSystem() override = default;
 
@@ -59,7 +59,7 @@ public:
     void createParticleEmitter(glm::vec3 position, uint32_t count);
 
     // Dispatches the compute shader. Call outside a render pass.
-    void dispatchCompute(VkCommandBuffer commandBuffer) override;
+    void dispatchCompute(vk::CommandBuffer commandBuffer) override;
 
     void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) override;
 
@@ -69,7 +69,7 @@ protected:
     void buildComputeDescriptors() override;
 
 private:
-    void bindBuffers(VkCommandBuffer commandBuffer) const;
+    void bindBuffers(vk::CommandBuffer commandBuffer) const;
 
     // BouncyParticle storage buffer: [uint32_t count | BouncyParticle[MAX_PARTICLES]]
     std::unique_ptr<DixBuffer> m_particleBuffer;

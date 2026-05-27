@@ -5,9 +5,9 @@ namespace dix {
 
 SimpleRenderSystem::SimpleRenderSystem(
     EngineDevice& engineDevice,
-    VkRenderPass renderPass,
-    VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout)
+    vk::RenderPass renderPass,
+    vk::DescriptorSetLayout globalSetLayout,
+    vk::DescriptorSetLayout modelSetLayout)
     : DixRenderSystem(
         engineDevice,
         renderPass,

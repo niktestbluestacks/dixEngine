@@ -1,6 +1,9 @@
 // dix
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 
+// libs
+#include <vulkan/vulkan.hpp>
+
 // std
 #include <cassert>
 #include <stdexcept>
@@ -9,12 +12,12 @@ namespace dix {
 
 DixDescriptorSetLayout::Builder& DixDescriptorSetLayout::Builder::addBinding(
     uint32_t binding,
-    VkDescriptorType descriptorType,
-    VkShaderStageFlags stageFlags,
+    vk::DescriptorType descriptorType,
+    vk::ShaderStageFlags stageFlags,
     uint32_t count) {
 
     assert(!bindings.contains(binding) && "Binding already in use");
-    VkDescriptorSetLayoutBinding layoutBinding{};
+    vk::DescriptorSetLayoutBinding layoutBinding{};
     layoutBinding.binding = binding;
     layoutBinding.descriptorType = descriptorType;
     layoutBinding.descriptorCount = count;
@@ -29,39 +32,36 @@ std::unique_ptr<DixDescriptorSetLayout> DixDescriptorSetLayout::Builder::build()
 
 
 DixDescriptorSetLayout::DixDescriptorSetLayout(
-    EngineDevice& engineDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings)
+    EngineDevice& engineDevice, std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings)
     : engineDevice{ engineDevice }, bindings{ bindings } {
-    std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
+    std::vector<vk::DescriptorSetLayoutBinding> setLayoutBindings{};
     for (const auto& kv : bindings) {
         setLayoutBindings.push_back(kv.second);
     }
 
-    VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo{};
-    descriptorSetLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    vk::DescriptorSetLayoutCreateInfo descriptorSetLayoutInfo{};
     descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
     descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
-    if (vkCreateDescriptorSetLayout(
-        engineDevice.device(),
-        &descriptorSetLayoutInfo,
-        nullptr,
-        &descriptorSetLayout) != VK_SUCCESS) {
+    auto result = engineDevice.device().createDescriptorSetLayout(descriptorSetLayoutInfo);
+    if (result.result != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
+    descriptorSetLayout = result.value;
 }
 
 DixDescriptorSetLayout::~DixDescriptorSetLayout() {
-    vkDestroyDescriptorSetLayout(engineDevice.device(), descriptorSetLayout, nullptr);
+    engineDevice.device().destroyDescriptorSetLayout(descriptorSetLayout);
 }
 
 DixDescriptorPool::Builder& DixDescriptorPool::Builder::addPoolSize(
-    VkDescriptorType descriptorType, uint32_t count) {
+    vk::DescriptorType descriptorType, uint32_t count) {
     poolSizes.push_back({ descriptorType, count });
     return *this;
 }
 
 DixDescriptorPool::Builder& DixDescriptorPool::Builder::setPoolFlags(
-    VkDescriptorPoolCreateFlags flags) {
+    vk::DescriptorPoolCreateFlags flags) {
     poolFlags = flags;
     return *this;
 }
@@ -77,64 +77,61 @@ std::unique_ptr<DixDescriptorPool> DixDescriptorPool::Builder::build() const {
 DixDescriptorPool::DixDescriptorPool(
     EngineDevice& engineDevice,
     uint32_t maxSets,
-    VkDescriptorPoolCreateFlags poolFlags,
-    const std::vector<VkDescriptorPoolSize>& poolSizes)
+    vk::DescriptorPoolCreateFlags poolFlags,
+    const std::vector<vk::DescriptorPoolSize>& poolSizes)
     : engineDevice{ engineDevice } {
-    VkDescriptorPoolCreateInfo descriptorPoolInfo{};
-    descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    vk::DescriptorPoolCreateInfo descriptorPoolInfo{};
     descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     descriptorPoolInfo.pPoolSizes = poolSizes.data();
     descriptorPoolInfo.maxSets = maxSets;
     descriptorPoolInfo.flags = poolFlags;
 
-    if (vkCreateDescriptorPool(engineDevice.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
-        VK_SUCCESS) {
+    auto result = engineDevice.device().createDescriptorPool(descriptorPoolInfo);
+    if (result.result != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create descriptor pool!");
     }
+    descriptorPool = result.value;
 }
 
 DixDescriptorPool::~DixDescriptorPool() {
-    if (descriptorPool != VK_NULL_HANDLE) {
-        vkDestroyDescriptorPool(engineDevice.device(), descriptorPool, nullptr);
+    if (descriptorPool) {
+        engineDevice.device().destroyDescriptorPool(descriptorPool);
     }
 }
 
 bool DixDescriptorPool::allocateDescriptorSet(
-    const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor) const {
-    VkDescriptorSetAllocateInfo allocInfo{};
-    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+    const vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorSet& descriptor) const {
+    vk::DescriptorSetAllocateInfo allocInfo{};
     allocInfo.descriptorPool = descriptorPool;
     allocInfo.pSetLayouts = &descriptorSetLayout;
     allocInfo.descriptorSetCount = 1;
 
     // Might want to create a "DescriptorPoolManager" class that handles this case, and builds
     // a new pool whenever an old pool fills up. But this is beyond our current scope
-    if (vkAllocateDescriptorSets(engineDevice.device(), &allocInfo, &descriptor) != VK_SUCCESS) {
+    auto result = engineDevice.device().allocateDescriptorSets(allocInfo);
+    if (result.result != vk::Result::eSuccess) {
         return false;
     }
+    descriptor = result.value.front();
     return true;
 }
 
-void DixDescriptorPool::freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const {
-    vkFreeDescriptorSets(
-        engineDevice.device(),
-        descriptorPool,
-        static_cast<uint32_t>(descriptors.size()),
-        descriptors.data());
+void DixDescriptorPool::freeDescriptors(std::vector<vk::DescriptorSet>& descriptors) const {
+    engineDevice.device().freeDescriptorSets(descriptorPool, descriptors);
 }
 
 void DixDescriptorPool::resetPool() {
-    vkResetDescriptorPool(engineDevice.device(), descriptorPool, 0);
+    engineDevice.device().resetDescriptorPool(descriptorPool);
 }
 
 DixDescriptorWriter::DixDescriptorWriter(DixDescriptorSetLayout& setLayout, DixDescriptorPool& pool)
     : setLayout{ setLayout }, pool{ pool } {
-    bufferInfos.reserve(sizeof(VkDescriptorBufferInfo) * 16);
-    imageInfos.reserve(sizeof(VkDescriptorImageInfo) * 16);
+    bufferInfos.reserve(sizeof(vk::DescriptorBufferInfo) * 16);
+    imageInfos.reserve(sizeof(vk::DescriptorImageInfo) * 16);
 }
 
 DixDescriptorWriter& DixDescriptorWriter::writeBuffer(
-    uint32_t binding, VkDescriptorBufferInfo* bufferInfo) {
+    uint32_t binding, vk::DescriptorBufferInfo* bufferInfo) {
     assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
     auto& bindingDescription = setLayout.bindings[binding];
@@ -147,8 +144,7 @@ DixDescriptorWriter& DixDescriptorWriter::writeBuffer(
     // store a copy owned by the writer and point the write entry to that storage
     bufferInfos.push_back(*bufferInfo);
 
-    VkWriteDescriptorSet write{};
-    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    vk::WriteDescriptorSet write{};
     write.descriptorType = bindingDescription.descriptorType;
     write.dstBinding = binding;
     write.pBufferInfo = &bufferInfos.back();
@@ -159,7 +155,7 @@ DixDescriptorWriter& DixDescriptorWriter::writeBuffer(
 }
 
 DixDescriptorWriter& DixDescriptorWriter::writeImage(
-    uint32_t binding, VkDescriptorImageInfo* imageInfo) {
+    uint32_t binding, vk::DescriptorImageInfo* imageInfo) {
     assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
     auto& bindingDescription = setLayout.bindings[binding];
@@ -172,8 +168,7 @@ DixDescriptorWriter& DixDescriptorWriter::writeImage(
     // store a copy owned by the writer and point the write entry to that storage
     imageInfos.push_back(*imageInfo);
 
-    VkWriteDescriptorSet write{};
-    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    vk::WriteDescriptorSet write{};
     write.descriptorType = bindingDescription.descriptorType;
     write.dstBinding = binding;
     write.pImageInfo = &imageInfos.back();
@@ -185,17 +180,17 @@ DixDescriptorWriter& DixDescriptorWriter::writeImage(
 
 DixDescriptorWriter& DixDescriptorWriter::writeImageSampler(
     uint32_t binding,
-    VkImageView imageView,
-    VkSampler sampler,
-    VkImageLayout imageLayout) {
-    VkDescriptorImageInfo imageInfo{};
+    vk::ImageView imageView,
+    vk::Sampler sampler,
+    vk::ImageLayout imageLayout) {
+    vk::DescriptorImageInfo imageInfo{};
     imageInfo.imageLayout = imageLayout;
     imageInfo.imageView = imageView;
     imageInfo.sampler = sampler;
     return writeImage(binding, &imageInfo);
 }
 
-bool DixDescriptorWriter::build(VkDescriptorSet& set) {
+bool DixDescriptorWriter::build(vk::DescriptorSet& set) {
     bool success = pool.allocateDescriptorSet(setLayout.getDescriptorSetLayout(), set);
     if (!success) {
         return false;
@@ -204,17 +199,11 @@ bool DixDescriptorWriter::build(VkDescriptorSet& set) {
     return true;
 }
 
-void DixDescriptorWriter::overwrite(VkDescriptorSet& set) {
+void DixDescriptorWriter::overwrite(vk::DescriptorSet& set) {
     for (auto& write : writes) {
         write.dstSet = set;
     }
-    vkUpdateDescriptorSets(
-        pool.engineDevice.device(),
-        writes.size(), 
-        writes.data(), 
-        0, 
-        nullptr
-    );
+    pool.engineDevice.device().updateDescriptorSets(writes, {});
 }
 
 }  // namespace dix

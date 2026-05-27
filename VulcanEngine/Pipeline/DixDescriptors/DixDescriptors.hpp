@@ -4,6 +4,9 @@
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
+// libs
+#include <vulkan/vulkan.hpp>
+
 // std
 #include <memory>
 #include <unordered_map>
@@ -19,32 +22,32 @@ public:
 
         Builder& addBinding(
             uint32_t binding,
-            VkDescriptorType descriptorType,
-            VkShaderStageFlags stageFlags,
+            vk::DescriptorType descriptorType,
+            vk::ShaderStageFlags stageFlags,
             uint32_t count = 1);
         std::unique_ptr<DixDescriptorSetLayout> build() const;
 
     private:
         EngineDevice& engineDevice;
-        std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings{};
+        std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings{};
     };
 
     DixDescriptorSetLayout(
-        EngineDevice& engineDevice, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings);
+        EngineDevice& engineDevice, std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings);
     ~DixDescriptorSetLayout();
     DixDescriptorSetLayout(const DixDescriptorSetLayout&) = delete;
     DixDescriptorSetLayout& operator=(const DixDescriptorSetLayout&) = delete;
 
-    VkDescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
+    vk::DescriptorSetLayout getDescriptorSetLayout() const { return descriptorSetLayout; }
 
-    const std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding>& getBindings() const {
+    const std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding>& getBindings() const {
         return bindings;
     }
 
 private:
     EngineDevice& engineDevice;
-    VkDescriptorSetLayout descriptorSetLayout;
-    std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings;
+    vk::DescriptorSetLayout descriptorSetLayout;
+    std::unordered_map<uint32_t, vk::DescriptorSetLayoutBinding> bindings;
 
     friend class DixDescriptorWriter;
 };
@@ -55,38 +58,38 @@ public:
     public:
         Builder(EngineDevice& engineDevice) : engineDevice{ engineDevice } {}
 
-        Builder& addPoolSize(VkDescriptorType descriptorType, uint32_t count);
-        Builder& setPoolFlags(VkDescriptorPoolCreateFlags flags);
+        Builder& addPoolSize(vk::DescriptorType descriptorType, uint32_t count);
+        Builder& setPoolFlags(vk::DescriptorPoolCreateFlags flags);
         Builder& setMaxSets(uint32_t count);
         std::unique_ptr<DixDescriptorPool> build() const;
 
     private:
         EngineDevice& engineDevice;
-        std::vector<VkDescriptorPoolSize> poolSizes{};
+        std::vector<vk::DescriptorPoolSize> poolSizes{};
         uint32_t maxSets = 1000;
-        VkDescriptorPoolCreateFlags poolFlags = 0;
+        vk::DescriptorPoolCreateFlags poolFlags = {};
     };
 
     DixDescriptorPool(
         EngineDevice& engineDevice,
         uint32_t maxSets,
-        VkDescriptorPoolCreateFlags poolFlags,
-        const std::vector<VkDescriptorPoolSize>& poolSizes);
+        vk::DescriptorPoolCreateFlags poolFlags,
+        const std::vector<vk::DescriptorPoolSize>& poolSizes);
     ~DixDescriptorPool();
     DixDescriptorPool(const DixDescriptorPool&) = delete;
     DixDescriptorPool& operator=(const DixDescriptorPool&) = delete;
 
     bool allocateDescriptorSet(
-        const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet& descriptor
+        const vk::DescriptorSetLayout descriptorSetLayout, vk::DescriptorSet& descriptor
     ) const;
 
-    void freeDescriptors(std::vector<VkDescriptorSet>& descriptors) const;
+    void freeDescriptors(std::vector<vk::DescriptorSet>& descriptors) const;
 
     void resetPool();
 
 private:
     EngineDevice& engineDevice;
-    VkDescriptorPool descriptorPool;
+    vk::DescriptorPool descriptorPool;
 
     friend class DixDescriptorWriter;
 };
@@ -95,25 +98,25 @@ class DixDescriptorWriter {
 public:
     DixDescriptorWriter(DixDescriptorSetLayout& setLayout, DixDescriptorPool& pool);
 
-    DixDescriptorWriter& writeBuffer(uint32_t binding, VkDescriptorBufferInfo* bufferInfo);
-    DixDescriptorWriter& writeImage(uint32_t binding, VkDescriptorImageInfo* imageInfo);
+    DixDescriptorWriter& writeBuffer(uint32_t binding, vk::DescriptorBufferInfo* bufferInfo);
+    DixDescriptorWriter& writeImage(uint32_t binding, vk::DescriptorImageInfo* imageInfo);
 
     DixDescriptorWriter& writeImageSampler(
         uint32_t binding,
-        VkImageView imageView,
-        VkSampler sampler,
-        VkImageLayout imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+        vk::ImageView imageView,
+        vk::Sampler sampler,
+        vk::ImageLayout imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal
     );
 
-    bool build(VkDescriptorSet& set);
-    void overwrite(VkDescriptorSet& set);
+    bool build(vk::DescriptorSet& set);
+    void overwrite(vk::DescriptorSet& set);
 
 private:
     DixDescriptorSetLayout& setLayout;
     DixDescriptorPool& pool;
-    std::vector<VkWriteDescriptorSet> writes;
-    std::vector<VkDescriptorImageInfo> imageInfos;
-    std::vector<VkDescriptorBufferInfo> bufferInfos;
+    std::vector<vk::WriteDescriptorSet> writes;
+    std::vector<vk::DescriptorImageInfo> imageInfos;
+    std::vector<vk::DescriptorBufferInfo> bufferInfos;
 };
 
 }  // namespace dix

@@ -5,7 +5,7 @@
 #include <Utils/DixConcepts.hpp>
 
 // libs
-#include <vulkan/vulkan.h>
+#include <vulkan/vulkan.hpp>
 
 // std
 #include <concepts>
@@ -17,7 +17,7 @@ namespace dix {
 
 // Redeclared here for standalone use; identical to the declaration in
 // DixRenderSystem.hpp.  C++ permits identical alias redeclarations.
-using VulkanRenderSystemFlagType = std::tuple<uint32_t, VkDescriptorType, VkShaderStageFlags>;
+using VulkanRenderSystemFlagType = std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>;
 
 // ---------------------------------------------------------------------------
 // Binding descriptor tags
@@ -39,12 +39,12 @@ using VulkanRenderSystemFlagType = std::tuple<uint32_t, VkDescriptorType, VkShad
 // AppContext from the render system's per-frame UBO buffer.
 // UboT determines sizeof/alignof for the DixBuffer that is created, and is
 // the type AppContext populates in drawFrame via if-constexpr field checks.
-template <typename UboT, uint32_t Slot, VkShaderStageFlags Stages>
+template <typename UboT, uint32_t Slot, vk::ShaderStageFlags Stages>
 struct UniformBinding {
     using UboType = UboT;
     static constexpr uint32_t           bindingIndex   = Slot;
-    static constexpr VkShaderStageFlags shaderStages   = Stages;
-    static constexpr VkDescriptorType   descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    static constexpr vk::ShaderStageFlags shaderStages   = Stages;
+    static constexpr vk::DescriptorType   descriptorType = vk::DescriptorType::eUniformBuffer;
 };
 
 // SamplerBinding<Slot, Stages>
@@ -52,11 +52,11 @@ struct UniformBinding {
 // A combined-image-sampler binding.  No associated C++ type — the texture is
 // resolved at runtime and written into set 0 via AppContext's default-texture
 // fallback (per-model textures live in set 1 via the model descriptor pool).
-template <uint32_t Slot, VkShaderStageFlags Stages>
+template <uint32_t Slot, vk::ShaderStageFlags Stages>
 struct SamplerBinding {
     static constexpr uint32_t           bindingIndex   = Slot;
-    static constexpr VkShaderStageFlags shaderStages   = Stages;
-    static constexpr VkDescriptorType   descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    static constexpr vk::ShaderStageFlags shaderStages   = Stages;
+    static constexpr vk::DescriptorType   descriptorType = vk::DescriptorType::eCombinedImageSampler;
 };
 
 // ---------------------------------------------------------------------------

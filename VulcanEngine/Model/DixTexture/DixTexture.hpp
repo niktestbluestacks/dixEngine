@@ -15,24 +15,24 @@ class DixTexture {
 public:
     DixTexture();
     ~DixTexture();
-    DixTexture(VkImage, VkDeviceMemory, VkImageView, VkSampler);
+    DixTexture(vk::Image, vk::DeviceMemory, vk::ImageView, vk::Sampler);
     void Destroy(EngineDevice device);
 
-    VkImage& getImage() { return m_image; }
-    VkImageView& getImageView() { return m_view; }
-    VkDeviceMemory& getDeviceMemory() { return m_memory; }
-    VkSampler& getSampler() { return m_sampler; }
+    vk::Image& getImage() { return m_image; }
+    vk::ImageView& getImageView() { return m_view; }
+    vk::DeviceMemory& getDeviceMemory() { return m_memory; }
+    vk::Sampler& getSampler() { return m_sampler; }
     // const accessors
-    const VkImage& getImage() const { return m_image; }
-    const VkImageView& getImageView() const { return m_view; }
-    const VkDeviceMemory& getDeviceMemory() const { return m_memory; }
-    const VkSampler& getSampler() const { return m_sampler; }
+    const vk::Image& getImage() const { return m_image; }
+    const vk::ImageView& getImageView() const { return m_view; }
+    const vk::DeviceMemory& getDeviceMemory() const { return m_memory; }
+    const vk::Sampler& getSampler() const { return m_sampler; }
 
 private:
-    VkImage m_image;
-    VkDeviceMemory m_memory;
-    VkImageView m_view;
-    VkSampler m_sampler;
+    vk::Image m_image;
+    vk::DeviceMemory m_memory;
+    vk::ImageView m_view;
+    vk::Sampler m_sampler;
 };
 
 DixTexture createDefaultTexture(EngineDevice &dixDevice);

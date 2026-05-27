@@ -13,10 +13,10 @@ namespace dix {
 
 struct ComputePipelineConfigInfo {
     ComputePipelineConfigInfo() = default;
-    ComputePipelineConfigInfo(VkPipelineLayout lay) : pipelineLayout(lay) {}
+    ComputePipelineConfigInfo(vk::PipelineLayout lay) : pipelineLayout(lay) {}
     DIX_DISABLE_COPY(ComputePipelineConfigInfo)
 
-    VkPipelineLayout pipelineLayout = nullptr;
+    vk::PipelineLayout pipelineLayout;
 };
 
 class ComputePipeline {
@@ -30,11 +30,11 @@ public:
 
     DIX_DISABLE_COPY(ComputePipeline)
 
-    void bind(VkCommandBuffer commandBuffer);
+    void bind(vk::CommandBuffer commandBuffer);
 
-    VkPipeline& getPipeline() {
+    vk::Pipeline& getPipeline() {
         return m_computePipeline;
-    } 
+    }
 private:
     static std::vector <char> readFile(const std::string& filepath);
 
@@ -42,13 +42,13 @@ private:
         const std::string& compShaderCode,
         const ComputePipelineConfigInfo& configInfo);
 
-    void createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
+    void createShaderModule(const std::vector<char>& code, vk::ShaderModule* shaderModule);
 
 private:
 
     EngineDevice& m_dixDevice;
-    VkPipeline m_computePipeline;
-    VkShaderModule m_compShaderModule;
+    vk::Pipeline m_computePipeline;
+    vk::ShaderModule m_compShaderModule;
 };
 
 }   // namespace dix

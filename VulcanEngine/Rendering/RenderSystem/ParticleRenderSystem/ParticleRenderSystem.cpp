@@ -12,9 +12,9 @@ namespace dix {
 
 ParticleRenderSystem::ParticleRenderSystem(
     EngineDevice& engineDevice,
-    VkRenderPass renderPass,
-    VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout)
+    vk::RenderPass renderPass,
+    vk::DescriptorSetLayout globalSetLayout,
+    vk::DescriptorSetLayout modelSetLayout)
     : DixRenderSystem(
         engineDevice,
         renderPass,
@@ -25,17 +25,17 @@ ParticleRenderSystem::ParticleRenderSystem(
             .fragShaderPath = "ParticleShader/particle.frag.spv",
 
             // Point-list: each particle is a screen-space point / sprite.
-            .topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST,
+            .topology = vk::PrimitiveTopology::ePointList,
 
             // Vertex layout mirrors the Particle struct.
             .vertexBindings = {
-                { 0, sizeof(Particle), VK_VERTEX_INPUT_RATE_VERTEX }
+                { 0, sizeof(Particle), vk::VertexInputRate::eVertex }
             },
             .vertexAttributes = {
-                { 0, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, positionLifetime) },
-                { 1, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, velocitySize) },     
-                { 2, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, color) },
-                { 3, 0, VK_FORMAT_R32G32B32A32_SFLOAT,    offsetof(Particle, initPosLife)     },
+                { 0, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(Particle, positionLifetime) },
+                { 1, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(Particle, velocitySize) },
+                { 2, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(Particle, color) },
+                { 3, 0, vk::Format::eR32G32B32A32Sfloat,    offsetof(Particle, initPosLife)     },
             },
 
             .transformGameObject = [](void* push, GameObject& obj, FrameInfo& frameInfo) {
@@ -52,22 +52,22 @@ ParticleRenderSystem::ParticleRenderSystem(
                 .shaderPath = "ParticleShader/particle_compute.comp.spv",
                 .bindings   = {
                     // binding 0: particle SSBO (read/write by vertex + compute)
-                    { 0, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                      VK_SHADER_STAGE_COMPUTE_BIT | VK_SHADER_STAGE_VERTEX_BIT },
+                    { 0, vk::DescriptorType::eStorageBuffer,
+                      vk::ShaderStageFlagBits::eCompute | vk::ShaderStageFlagBits::eVertex },
                     // binding 1: simulation params UBO (compute only)
-                    { 1, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                      VK_SHADER_STAGE_COMPUTE_BIT },
+                    { 1, vk::DescriptorType::eUniformBuffer,
+                      vk::ShaderStageFlagBits::eCompute },
                 },
             },
         }) {
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
-    VkDeviceSize particleBufferSize = 16 + sizeof(Particle) * MAX_PARTICLES;
+    vk::DeviceSize particleBufferSize = 16 + sizeof(Particle) * MAX_PARTICLES;
     m_particleBuffer = std::make_unique<DixBuffer>(
         engineDevice,
         particleBufferSize,
         1,
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        vk::BufferUsageFlagBits::eStorageBuffer | vk::BufferUsageFlagBits::eVertexBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
     );
     m_particleBuffer->map();
     uint32_t zeroCount = 0;
@@ -79,8 +79,8 @@ ParticleRenderSystem::ParticleRenderSystem(
         engineDevice,
         sizeof(ParticleSimulationParams),
         1,
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+        vk::BufferUsageFlagBits::eUniformBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
     );
     m_simParams.gravityDeltaTime.w = 0.016f;
     m_simulationParamsBuffer->map();
@@ -99,13 +99,13 @@ void ParticleRenderSystem::buildComputeDescriptors() {
     assert(m_computeDescriptorPool  && "Compute descriptor pool not initialised");
 
     // Particle SSBO: skip the leading uint32_t particle-count header.
-    VkDescriptorBufferInfo particleInfo{};
+    vk::DescriptorBufferInfo particleInfo{};
     particleInfo.buffer = m_particleBuffer->getBuffer();
     particleInfo.offset = 0;
     particleInfo.range =
     16 + sizeof(Particle) * MAX_PARTICLES;
 
-    VkDescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo(
+    vk::DescriptorBufferInfo simParamsInfo = m_simulationParamsBuffer->descriptorInfo(
         sizeof(ParticleSimulationParams), 0
     );
 
@@ -126,57 +126,54 @@ void ParticleRenderSystem::buildComputeDescriptors() {
 // GPU sees the updated SSBO contents during the subsequent
 // graphics pass.  Must be called OUTSIDE a render pass.
 
-void ParticleRenderSystem::dispatchCompute(VkCommandBuffer commandBuffer) {
+void ParticleRenderSystem::dispatchCompute(vk::CommandBuffer commandBuffer) {
     if (m_particleCount == 0 || !hasComputePipeline()) return;
 
     m_computePipeline->bind(commandBuffer);
 
-    vkCmdBindDescriptorSets(
-        commandBuffer,
-        VK_PIPELINE_BIND_POINT_COMPUTE,
+    commandBuffer.bindDescriptorSets(
+        vk::PipelineBindPoint::eCompute,
         m_computePipelineLayout,
         0, 1, &m_computeDescriptorSet,
         0, nullptr);
 
     // local_size_x = 64 in the compute shader
     uint32_t workGroups = (m_particleCount + 63) / 64;
-    vkCmdDispatch(commandBuffer, workGroups, 1, 1);
+    commandBuffer.dispatch(workGroups, 1, 1);
 
     // Barrier: wait for the compute shader's SSBO writes to be visible
     // to the vertex input stage and the vertex shader (which reads the
     // particle SSBO bound at set 1, binding 0).
-    VkMemoryBarrier barrier{};
-    barrier.sType         = VK_STRUCTURE_TYPE_MEMORY_BARRIER;
-    barrier.srcAccessMask = VK_ACCESS_SHADER_WRITE_BIT;
-    barrier.dstAccessMask = VK_ACCESS_VERTEX_ATTRIBUTE_READ_BIT
-                          | VK_ACCESS_SHADER_READ_BIT;
+    vk::MemoryBarrier barrier{};
+    barrier.srcAccessMask = vk::AccessFlagBits::eShaderWrite;
+    barrier.dstAccessMask = vk::AccessFlagBits::eVertexAttributeRead
+                          | vk::AccessFlagBits::eShaderRead;
 
-    vkCmdPipelineBarrier(
-        commandBuffer,
-        VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT,
-        VK_PIPELINE_STAGE_VERTEX_INPUT_BIT | VK_PIPELINE_STAGE_VERTEX_SHADER_BIT,
-        0,
-        1, &barrier,
-        0, nullptr,
-        0, nullptr);
+    commandBuffer.pipelineBarrier(
+        vk::PipelineStageFlagBits::eComputeShader,
+        vk::PipelineStageFlagBits::eVertexInput | vk::PipelineStageFlagBits::eVertexShader,
+        {},
+        barrier,
+        {},
+        {});
 }
 
 void ParticleRenderSystem::renderGameObjects(
-    FrameInfo& frameInfo,
-    std::vector<GameObject>& gameObjects) {
+        FrameInfo& frameInfo,
+        std::vector<GameObject>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
     bindBuffers(frameInfo.commandBuffer);
 
-    VkViewport viewport{
+    vk::Viewport viewport{
         0.0f, 0.0f,
         static_cast<float>(frameInfo.screenExtent.width),
         static_cast<float>(frameInfo.screenExtent.height),
         0.0f, 1.0f
     };
-    vkCmdSetViewport(frameInfo.commandBuffer, 0, 1, &viewport);
+    frameInfo.commandBuffer.setViewport(0, 1, &viewport);
 
-    VkRect2D scissor{ {0, 0}, frameInfo.screenExtent };
-    vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);
+    vk::Rect2D scissor{ {}, frameInfo.screenExtent };
+    frameInfo.commandBuffer.setScissor(0, 1, &scissor);
 
     updateParticles(frameInfo.frameTime);
 
@@ -184,8 +181,7 @@ void ParticleRenderSystem::renderGameObjects(
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
         m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
 
-        vkCmdPushConstants(
-            frameInfo.commandBuffer,
+        frameInfo.commandBuffer.pushConstants(
             m_pipelineLayout,
             m_config.pushConstantStages,
             0,
@@ -203,13 +199,12 @@ void ParticleRenderSystem::renderGameObjects(
         // layout that the graphics pipeline layout expects at set 1.
         // The bouncy-particle vertex shader only accesses set 0, binding 0, so
         // set 1 does not need to be bound at all.
-        std::array<VkDescriptorSet, 1> descriptorSets{
+        std::array<vk::DescriptorSet, 1> descriptorSets{
             frameInfo.globalDescriptorSet
         };
 
-        vkCmdBindDescriptorSets(
-            frameInfo.commandBuffer,
-            VK_PIPELINE_BIND_POINT_GRAPHICS,
+        frameInfo.commandBuffer.bindDescriptorSets(
+            vk::PipelineBindPoint::eGraphics,
             m_pipelineLayout,
             0,
             static_cast<uint32_t>(descriptorSets.size()),
@@ -218,23 +213,23 @@ void ParticleRenderSystem::renderGameObjects(
         );
 
         if (m_particleCount > 0) {
-            vkCmdDraw(frameInfo.commandBuffer, m_particleCount, 1, 0, 0);  
+            frameInfo.commandBuffer.draw(m_particleCount, 1, 0, 0);
         }
     }
 }
 
-void ParticleRenderSystem::bindBuffers(VkCommandBuffer commandBuffer) const {
-    // VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
-    // VkDeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
-    // vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
-    VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
+void ParticleRenderSystem::bindBuffers(vk::CommandBuffer commandBuffer) const {
+    // vk::Buffer buffers[] = { m_particleBuffer->getBuffer() };
+    // vk::DeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
+    // commandBuffer.bindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+    vk::Buffer buffers[] = { m_particleBuffer->getBuffer() };
 
     // std430 alignment:
     // uint particleCount -> 4 bytes
     // next struct array aligned to 16 bytes
-    VkDeviceSize offsets[] = { 16 };
+    vk::DeviceSize offsets[] = { 16 };
 
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+    commandBuffer.bindVertexBuffers(0, 1, buffers, offsets);
 }
 
 void ParticleRenderSystem::updateParticles(float deltaTime) {

@@ -17,9 +17,9 @@ namespace dix {
 
 DixRenderSystem::DixRenderSystem(
     EngineDevice& engineDevice,
-    VkRenderPass renderPass,
-    VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout,
+    vk::RenderPass renderPass,
+    vk::DescriptorSetLayout globalSetLayout,
+    vk::DescriptorSetLayout modelSetLayout,
     DixRenderSystemConfig config)
     : m_dixDevice{ engineDevice }
     , m_config{ std::move(config) }
@@ -45,29 +45,28 @@ DixRenderSystem::DixRenderSystem(
 
 DixRenderSystem::~DixRenderSystem() {
     m_pipeline.reset();
-    if (m_pipelineLayout != VK_NULL_HANDLE) {
-        vkDestroyPipelineLayout(m_dixDevice.device(), m_pipelineLayout, nullptr);
+    if (m_pipelineLayout) {
+        m_dixDevice.device().destroyPipelineLayout(m_pipelineLayout);
     }
     m_computePipeline.reset();
-    if (m_computePipelineLayout != VK_NULL_HANDLE) {
-        vkDestroyPipelineLayout(m_dixDevice.device(), m_computePipelineLayout, nullptr);
+    if (m_computePipelineLayout) {
+        m_dixDevice.device().destroyPipelineLayout(m_computePipelineLayout);
     }
     // Ensure device is idle before destroying resources
-    vkDeviceWaitIdle(m_dixDevice.device());
+    m_dixDevice.device().waitIdle();
 }
 
 void DixRenderSystem::createPipelineLayout(
-    VkDescriptorSetLayout globalSetLayout,
-    VkDescriptorSetLayout modelSetLayout) {
+    vk::DescriptorSetLayout globalSetLayout,
+    vk::DescriptorSetLayout modelSetLayout) {
 
-    std::vector<VkDescriptorSetLayout> setLayouts{ globalSetLayout, modelSetLayout };
+    std::vector<vk::DescriptorSetLayout> setLayouts{ globalSetLayout, modelSetLayout };
 
-    VkPipelineLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    vk::PipelineLayoutCreateInfo layoutInfo{};
     layoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
     layoutInfo.pSetLayouts = setLayouts.data();
 
-    VkPushConstantRange pushConstantRange{};
+    vk::PushConstantRange pushConstantRange{};
     if (m_config.pushConstantSize > 0) {
         pushConstantRange.stageFlags = m_config.pushConstantStages;
         pushConstantRange.offset = 0;
@@ -79,13 +78,15 @@ void DixRenderSystem::createPipelineLayout(
         layoutInfo.pPushConstantRanges = nullptr;
     }
 
-    if (vkCreatePipelineLayout(m_dixDevice.device(), &layoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
+    try {
+        m_pipelineLayout = m_dixDevice.device().createPipelineLayout(layoutInfo);
+    } catch (...) {
         throw std::runtime_error("DixRenderSystem: failed to create pipeline layout");
     }
 }
 
-void DixRenderSystem::createPipeline(VkRenderPass renderPass) {
-    assert(m_pipelineLayout != VK_NULL_HANDLE &&
+void DixRenderSystem::createPipeline(vk::RenderPass renderPass) {
+    assert(m_pipelineLayout &&
            "createPipelineLayout must be called before createPipeline");
 
     m_config.pipelineConfigInfo.inputAssemblyInfo.topology = m_config.topology;
@@ -119,8 +120,7 @@ void DixRenderSystem::renderGameObjects(
         m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
 
         if (m_config.pushConstantSize > 0) {
-            vkCmdPushConstants(
-                frameInfo.commandBuffer,
+            frameInfo.commandBuffer.pushConstants(
                 m_pipelineLayout,
                 m_config.pushConstantStages,
                 0,
@@ -129,17 +129,16 @@ void DixRenderSystem::renderGameObjects(
             );
         }
 
-        std::array<VkDescriptorSet, 2> descriptorSets{
+        std::array<vk::DescriptorSet, 2> descriptorSets{
             frameInfo.globalDescriptorSet,
-            VK_NULL_HANDLE
+            nullptr
         };
         if (obj.model) {
             descriptorSets[1] = obj.model->getDescriptorSet();
         }
 
-        vkCmdBindDescriptorSets(
-            frameInfo.commandBuffer,
-            VK_PIPELINE_BIND_POINT_GRAPHICS,
+        frameInfo.commandBuffer.bindDescriptorSets(
+            vk::PipelineBindPoint::eGraphics,
             m_pipelineLayout,
             0,
             static_cast<uint32_t>(descriptorSets.size()),
@@ -165,8 +164,7 @@ void DixRenderSystem::renderGameObjects(
         m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
 
         if (m_config.pushConstantSize > 0) {
-            vkCmdPushConstants(
-                frameInfo.commandBuffer,
+            frameInfo.commandBuffer.pushConstants(
                 m_pipelineLayout,
                 m_config.pushConstantStages,
                 0,
@@ -175,17 +173,16 @@ void DixRenderSystem::renderGameObjects(
             );
         }
 
-        std::array<VkDescriptorSet, 2> descriptorSets{
+        std::array<vk::DescriptorSet, 2> descriptorSets{
             frameInfo.globalDescriptorSet,
-            VK_NULL_HANDLE
+            nullptr
         };
         if (obj.model) {
             descriptorSets[1] = obj.model->getDescriptorSet();
         }
 
-        vkCmdBindDescriptorSets(
-            frameInfo.commandBuffer,
-            VK_PIPELINE_BIND_POINT_GRAPHICS,
+        frameInfo.commandBuffer.bindDescriptorSets(
+            vk::PipelineBindPoint::eGraphics,
             m_pipelineLayout,
             0,
             static_cast<uint32_t>(descriptorSets.size()),
@@ -214,27 +211,28 @@ void DixRenderSystem::initComputeFromConfig(const ComputePipelineConfig& cc) {
 
 void DixRenderSystem::initComputeLayout(
     std::unique_ptr<DixDescriptorSetLayout> setLayout,
-    const std::vector<VkPushConstantRange>& pushRanges) {
+    const std::vector<vk::PushConstantRange>& pushRanges) {
 
 
     m_computeSetLayout = std::move(setLayout);
 
-    VkDescriptorSetLayout vkLayout = m_computeSetLayout->getDescriptorSetLayout();
+    vk::DescriptorSetLayout vkLayout = m_computeSetLayout->getDescriptorSetLayout();
 
-    VkPipelineLayoutCreateInfo info{};
-    info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    vk::PipelineLayoutCreateInfo info{};
     info.setLayoutCount = 1;
     info.pSetLayouts = &vkLayout;
     info.pushConstantRangeCount = static_cast<uint32_t>(pushRanges.size());
     info.pPushConstantRanges = pushRanges.empty() ? nullptr : pushRanges.data();
 
-    if (vkCreatePipelineLayout(m_dixDevice.device(), &info, nullptr, &m_computePipelineLayout) != VK_SUCCESS) {
+    try {
+        m_computePipelineLayout = m_dixDevice.device().createPipelineLayout(info);
+    } catch (...) {
         throw std::runtime_error("DixRenderSystem: failed to create compute pipeline layout");
     }
 }
 
 void DixRenderSystem::initComputePipeline(const std::string& compShaderPath) {
-    assert(m_computePipelineLayout != VK_NULL_HANDLE &&
+    assert(m_computePipelineLayout &&
            "initComputeLayout must be called before initComputePipeline");
 
     ComputePipelineConfigInfo configInfo{ m_computePipelineLayout };

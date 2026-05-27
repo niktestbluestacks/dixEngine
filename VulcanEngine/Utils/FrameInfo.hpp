@@ -11,10 +11,10 @@ namespace dix {
 struct FrameInfo {
 	int frameIndex;
 	float frameTime;
-	VkCommandBuffer commandBuffer;
+	vk::CommandBuffer commandBuffer;
 	DixCamera& dixcamera;
-	VkDescriptorSet globalDescriptorSet;
-    VkExtent2D screenExtent;
+	vk::DescriptorSet globalDescriptorSet;
+    vk::Extent2D screenExtent;
 };
 }	// namespace dix
 

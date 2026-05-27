@@ -6,32 +6,32 @@
 namespace dix {
 
 namespace detail {
-    
+
 // Returns true for any Vulkan descriptor type backed by a VkBuffer.
-inline constexpr bool isBufferDescriptorType(VkDescriptorType type) {
-    return type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
-        || type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER
-        || type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC
-        || type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC;
+inline constexpr bool isBufferDescriptorType(vk::DescriptorType type) {
+    return type == vk::DescriptorType::eUniformBuffer
+        || type == vk::DescriptorType::eStorageBuffer
+        || type == vk::DescriptorType::eUniformBufferDynamic
+        || type == vk::DescriptorType::eStorageBufferDynamic;
 }
 
 // Returns true for any Vulkan descriptor type backed by a VkImage / VkSampler.
-inline constexpr bool isImageDescriptorType(VkDescriptorType type) {
-    return type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
-        || type == VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE
-        || type == VK_DESCRIPTOR_TYPE_STORAGE_IMAGE
-        || type == VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT
-        || type == VK_DESCRIPTOR_TYPE_SAMPLER;
+inline constexpr bool isImageDescriptorType(vk::DescriptorType type) {
+    return type == vk::DescriptorType::eCombinedImageSampler
+        || type == vk::DescriptorType::eSampledImage
+        || type == vk::DescriptorType::eStorageImage
+        || type == vk::DescriptorType::eInputAttachment
+        || type == vk::DescriptorType::eSampler;
 }
 
 // Maps a buffer-type descriptor to the appropriate VkBufferUsageFlags.
-inline constexpr VkBufferUsageFlags descriptorTypeToBufferUsage(VkDescriptorType type) {
+inline constexpr vk::BufferUsageFlags descriptorTypeToBufferUsage(vk::DescriptorType type) {
     switch (type) {
-        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER:
-        case VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC:
-            return VK_BUFFER_USAGE_STORAGE_BUFFER_BIT;
+        case vk::DescriptorType::eStorageBuffer:
+        case vk::DescriptorType::eStorageBufferDynamic:
+            return vk::BufferUsageFlagBits::eStorageBuffer;
         default:
-            return VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+            return vk::BufferUsageFlagBits::eUniformBuffer;
     }
 }
 
@@ -62,13 +62,13 @@ void AppContext<RenderSystems...>::drawFrame(
     // UI data upload (CPU-side, no render pass required)-
     // The UI system uses its own internal pipeline and does not
     // participate in the render-system descriptor set machinery,
-    // so globalDescriptorSet is VK_NULL_HANDLE here.
+    // so globalDescriptorSet is nullptr here.
     FrameInfo uiFrameInfo{
         frameIndex,
         frameTime,
         commandBuffer,
         camera,
-        VK_NULL_HANDLE,
+        nullptr,
         m_Window.getExtent()
     };
     if (m_uiManager) {
@@ -152,7 +152,7 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
 
     // Build an ordered list of (binding, descriptorType) for every
     // buffer-type flag.  Index i in this list corresponds to Ubos[i].
-    std::vector<std::pair<uint32_t, VkDescriptorType>> bufferBindings;
+    std::vector<std::pair<uint32_t, vk::DescriptorType>> bufferBindings;
     bufferBindings.reserve(uboCount);
     std::apply([&](auto&&... flag) {
         (([&](const auto& f) {
@@ -175,7 +175,7 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
                 // fall back to UNIFORM if the Ubos tuple is longer than
                 // the buffer-type flags (shouldn't happen with a correct
                 // render system, but guards against mistakes).
-                VkBufferUsageFlags usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+                vk::BufferUsageFlags usage = vk::BufferUsageFlagBits::eUniformBuffer;
                 if (uboTypeIndex < bufferBindings.size()) {
                     usage = detail::descriptorTypeToBufferUsage(bufferBindings[uboTypeIndex].second);
                 }
@@ -185,7 +185,7 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
                     sizeof(UboType),
                     1,
                     usage,
-                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
+                    vk::MemoryPropertyFlagBits::eHostVisible | vk::MemoryPropertyFlagBits::eHostCoherent
                 );
                 frameBuffers[uboTypeIndex]->map();
                 ++uboTypeIndex;
@@ -215,8 +215,8 @@ void AppContext<RenderSystems...>::createSingleDescriptorSet(RenderSystemInfo&& 
         })(flag), ...);
     }, flags);
 
-    VkDescriptorImageInfo imageInfo{};
-    imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    vk::DescriptorImageInfo imageInfo{};
+    imageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
     imageInfo.imageView   = m_defaultTexture.getImageView();
     imageInfo.sampler     = m_defaultTexture.getSampler();
 
@@ -227,8 +227,8 @@ void AppContext<RenderSystems...>::createSingleDescriptorSet(RenderSystemInfo&& 
 
         std::apply([&](auto&&... flag) {
             (([&](const auto& f) {
-                uint32_t        binding = std::get<0>(f);
-                VkDescriptorType type   = std::get<1>(f);
+                uint32_t binding = std::get<0>(f);
+                vk::DescriptorType type   = std::get<1>(f);
 
                 if (detail::isBufferDescriptorType(type)) {
                     auto it = bindingToBufferIndex.find(binding);

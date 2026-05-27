@@ -22,7 +22,7 @@
 
 namespace dix {
 
-using VulkanRenderSystemFlagType = std::tuple<uint32_t, VkDescriptorType, VkShaderStageFlags>;
+using VulkanRenderSystemFlagType = std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>;
 
 struct BasePushConstantData {
     glm::mat4 modelMatrix{ 1.f };
@@ -43,11 +43,11 @@ struct ComputePipelineConfig {
     std::string shaderPath;
 
     // Bindings for the compute descriptor set layout.
-    // Each entry: { binding, VkDescriptorType, VkShaderStageFlags }
+    // Each entry: { binding, vk::DescriptorType, vk::ShaderStageFlags }
     std::vector<VulkanRenderSystemFlagType> bindings;
 
     // Optional push-constant ranges for the compute pipeline layout.
-    std::vector<VkPushConstantRange> pushRanges = {};
+    std::vector<vk::PushConstantRange> pushRanges = {};
 
     // How many descriptor sets the pool can allocate.
     uint32_t descriptorPoolMaxSets = 1;
@@ -66,13 +66,13 @@ struct DixRenderSystemConfig {
     std::string fragShaderPath;
 
     // Primitive topology. Defaults to the standard triangle list.
-    VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    vk::PrimitiveTopology topology = vk::PrimitiveTopology::eTriangleList;
 
     // Optional custom vertex input.  When empty the pipeline is
     // created with no vertex bindings (e.g. for full-screen quads
     // or procedural geometry driven by a storage buffer).
-    std::vector<VkVertexInputBindingDescription>    vertexBindings;
-    std::vector<VkVertexInputAttributeDescription>  vertexAttributes;
+    std::vector<vk::VertexInputBindingDescription>    vertexBindings;
+    std::vector<vk::VertexInputAttributeDescription>  vertexAttributes;
 
     // Per-object push-constant writer.
     // Signature: (pointer to push-constant block, game object)
@@ -83,8 +83,8 @@ struct DixRenderSystemConfig {
     uint32_t pushConstantSize = sizeof(BasePushConstantData);
 
     // Pipeline stages that receive the push constants.
-    VkShaderStageFlags pushConstantStages =
-        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    vk::ShaderStageFlags pushConstantStages =
+        vk::ShaderStageFlagBits::eVertex | vk::ShaderStageFlagBits::eFragment;
 
     // When set, the base constructor also sets up the compute pipeline.
     // The subclass must still call buildComputeDescriptors() after
@@ -99,9 +99,9 @@ public:
 
     DixRenderSystem(
         EngineDevice& engineDevice,
-        VkRenderPass renderPass,
-        VkDescriptorSetLayout globalSetLayout,
-        VkDescriptorSetLayout modelSetLayout,
+        vk::RenderPass renderPass,
+        vk::DescriptorSetLayout globalSetLayout,
+        vk::DescriptorSetLayout modelSetLayout,
         DixRenderSystemConfig config
     );
     virtual ~DixRenderSystem();
@@ -129,17 +129,17 @@ public:
 
     // Override in subclasses that use compute.
     // Must be called outside a render pass (before or after graphics).
-    virtual void dispatchCompute(VkCommandBuffer /*commandBuffer*/) {}
+    virtual void dispatchCompute(vk::CommandBuffer /*commandBuffer*/) {}
 
 protected:
     // Override hooks for advanced pipeline customisation.
     // In the vast majority of cases DixRenderSystemConfig is
     // sufficient and these do NOT need to be overridden.
     virtual void createPipelineLayout(
-        VkDescriptorSetLayout globalSetLayout,
-        VkDescriptorSetLayout modelSetLayout
+        vk::DescriptorSetLayout globalSetLayout,
+        vk::DescriptorSetLayout modelSetLayout
     );
-    virtual void createPipeline(VkRenderPass renderPass);
+    virtual void createPipeline(vk::RenderPass renderPass);
 
     virtual void buildComputeDescriptors() {}
 
@@ -147,24 +147,24 @@ protected:
 
     EngineDevice& m_dixDevice;
     std::unique_ptr<Pipeline> m_pipeline;
-    VkPipelineLayout m_pipelineLayout{ VK_NULL_HANDLE };
+    vk::PipelineLayout m_pipelineLayout{};
 
     std::unique_ptr<DixDescriptorPool> m_descriptorPool;
 
     static constexpr uint32_t MAX_PUSH_CONSTANT_BYTES = 256;
 
     std::unique_ptr<ComputePipeline> m_computePipeline;
-    VkPipelineLayout m_computePipelineLayout{ VK_NULL_HANDLE };
+    vk::PipelineLayout m_computePipelineLayout{};
     std::unique_ptr<DixDescriptorSetLayout> m_computeSetLayout;
     std::unique_ptr<DixDescriptorPool> m_computeDescriptorPool;
-    VkDescriptorSet m_computeDescriptorSet{ VK_NULL_HANDLE };
+    vk::DescriptorSet m_computeDescriptorSet{};
 
 private:
     // Internal helpers called by the constructor.
     void initComputeFromConfig(const ComputePipelineConfig& cc);
     void initComputeLayout(
         std::unique_ptr<DixDescriptorSetLayout> setLayout,
-        const std::vector<VkPushConstantRange>& pushRanges = {}
+        const std::vector<vk::PushConstantRange>& pushRanges = {}
     );
     void initComputePipeline(const std::string& compShaderPath);
     void initComputeDescriptorPool(uint32_t maxSets = 1);

@@ -16,9 +16,15 @@ struct SimplePushConstantData {
     glm::mat4 normalMatrix{ 1.f };
 };
 
-class SimpleRenderSystem : public DixRenderSystem {
+using SimpleRenderSystemBindings = std::tuple<
+    UniformBinding<SimpleUbo, 0, VK_SHADER_STAGE_VERTEX_BIT>,
+    SamplerBinding<1,            VK_SHADER_STAGE_FRAGMENT_BIT>
+>;
+
+class SimpleRenderSystem:
+    public DixRenderSystem,
+    public RenderSystemTraits<SimpleRenderSystemBindings> {
 public:
-    using Ubos = std::tuple<SimpleUbo>;
     using PushConstantData = SimplePushConstantData;
 
     SimpleRenderSystem(
@@ -31,14 +37,6 @@ public:
     ~SimpleRenderSystem() = default;
 
     static constexpr const char* Name() { return "SimpleRenderSystem"; }
-
-    static constexpr std::tuple<VulkanRenderSystemFlagType, VulkanRenderSystemFlagType>
-    getVulkanFlags() {
-        return std::make_tuple(
-            VulkanRenderSystemFlagType{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT },
-            VulkanRenderSystemFlagType{ 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT }
-        );
-    }
 
     DIX_DISABLE_COPY(SimpleRenderSystem)
 };

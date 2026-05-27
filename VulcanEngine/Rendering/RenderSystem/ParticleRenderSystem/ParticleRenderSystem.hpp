@@ -32,7 +32,13 @@ struct ParticlePushConstantData {
     alignas(16) glm::mat4 modelMatrix{ 1.f };
 };
 
-class ParticleRenderSystem : public DixRenderSystem {
+using ParticleRenderSystemBindings = std::tuple<
+    UniformBinding<ParticleUbo, 0, VK_SHADER_STAGE_VERTEX_BIT>
+>;
+
+class ParticleRenderSystem:
+    public DixRenderSystem,
+    public RenderSystemTraits<ParticleRenderSystemBindings> {
 public:
     using Ubos = std::tuple<ParticleUbo>;
     using PushConstantData = ParticlePushConstantData;
@@ -46,17 +52,6 @@ public:
     ~ParticleRenderSystem() override = default;
 
     static constexpr const char* Name() { return "ParticleRenderSystem"; }
-
-    static constexpr decltype(auto) getVulkanFlags() {
-        return std::make_tuple(
-            VulkanRenderSystemFlagType{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                        VK_SHADER_STAGE_VERTEX_BIT },
-            VulkanRenderSystemFlagType{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_COMPUTE_BIT },
-            VulkanRenderSystemFlagType{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                        VK_SHADER_STAGE_COMPUTE_BIT }
-        );
-    }
 
     DIX_DISABLE_COPY(ParticleRenderSystem)
 

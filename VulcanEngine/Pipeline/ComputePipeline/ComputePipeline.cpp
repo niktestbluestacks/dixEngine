@@ -22,7 +22,9 @@ ComputePipeline::ComputePipeline(
 
 ComputePipeline::~ComputePipeline() {
     vkDestroyShaderModule(m_dixDevice.device(), m_compShaderModule, nullptr);
-    vkDestroyPipeline(m_dixDevice.device(), m_computePipeline, nullptr);
+    if (m_computePipeline) {
+        vkDestroyPipeline(m_dixDevice.device(), m_computePipeline, nullptr);
+    }
 }
 
 std::vector<char> ComputePipeline::readFile(const std::string& filepath) {

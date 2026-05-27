@@ -14,8 +14,16 @@ struct SkyboxPushContstantData {
     // Empty - skybox doesn't need push constants anymore
 };
 
-class SkyboxRenderSystem : public DixRenderSystem {
+using SkyboxRenderSystemBindings = std::tuple<
+    UniformBinding<SkyboxUbo, 0, VK_SHADER_STAGE_VERTEX_BIT>,
+    SamplerBinding<1,             VK_SHADER_STAGE_FRAGMENT_BIT>
+>;
+
+class SkyboxRenderSystem:
+    public DixRenderSystem,
+    public RenderSystemTraits<SkyboxRenderSystemBindings> {
 public:
+    using PushConstantData = SkyboxPushContstantData;
     using DixRenderSystem::DixRenderSystem;
     SkyboxRenderSystem(
         EngineDevice& device,
@@ -26,19 +34,8 @@ public:
     DIX_DISABLE_COPY(SkyboxRenderSystem)
     ~SkyboxRenderSystem() = default;
 
-    using Ubos = std::tuple<SkyboxUbo>;    
-    using PushConstantData = SkyboxPushContstantData;
-
     static constexpr const char* Name() {
         return "SkyboxRenderSystem";
-    }
-
-    static constexpr std::tuple<VulkanRenderSystemFlagType, VulkanRenderSystemFlagType> 
-    getVulkanFlags() {
-        return std::make_tuple(
-            VulkanRenderSystemFlagType{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT },
-            VulkanRenderSystemFlagType{ 1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT }
-        );
     }
 
 };

@@ -24,8 +24,9 @@ Pipeline::Pipeline(
 Pipeline::~Pipeline() {
 	vkDestroyShaderModule(dixdevice.device(), vertShaderModule, nullptr);
 	vkDestroyShaderModule(dixdevice.device(), fragShaderModule, nullptr);
-
-	vkDestroyPipeline(dixdevice.device(), graphicsPipeline, nullptr);
+	if (graphicsPipeline) {
+		vkDestroyPipeline(dixdevice.device(), graphicsPipeline, nullptr);
+	}
 }
 
 std::vector<char> Pipeline::readFile(const std::string& filepath) {

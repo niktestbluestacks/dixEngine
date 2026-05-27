@@ -193,11 +193,18 @@ void ParticleRenderSystem::renderGameObjects(
             pushBuffer.data()
         );
 
-        // set 0: global UBO (camera / projection)
-        // set 1: particle compute set (SSBO + sim-params)
+        // set 0: system descriptor set — BouncyParticleUbo (projectionView matrix).
+        //        Written by AppContext each frame from m_systemUboBuffers.
+        //
+        // m_computeDescriptorSet is the compute-pipeline set (particle SSBO +
+        // sim-params UBO).  It is bound exclusively during dispatchCompute() on
+        // the COMPUTE bind point and must NOT be bound here: it was allocated
+        // with m_computeSetLayout, which is incompatible with the model set
+        // layout that the graphics pipeline layout expects at set 1.
+        // The bouncy-particle vertex shader only accesses set 0, binding 0, so
+        // set 1 does not need to be bound at all.
         std::array<VkDescriptorSet, 1> descriptorSets{
-            frameInfo.globalDescriptorSet,
-            // m_computeDescriptorSet
+            frameInfo.globalDescriptorSet
         };
 
         vkCmdBindDescriptorSets(

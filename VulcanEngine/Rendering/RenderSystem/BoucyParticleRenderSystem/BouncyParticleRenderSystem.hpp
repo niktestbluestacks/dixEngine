@@ -32,9 +32,14 @@ struct BouncyParticlePushConstantData {
     alignas(16) glm::mat4 modelMatrix{ 1.f };
 };
 
-class BouncyParticleRenderSystem : public DixRenderSystem {
+using BouncyParticleRenderSystemBindings = std::tuple<
+    UniformBinding<BouncyParticleUbo, 0, VK_SHADER_STAGE_VERTEX_BIT>
+>;
+
+class BouncyParticleRenderSystem:
+    public DixRenderSystem,
+    public RenderSystemTraits<BouncyParticleRenderSystemBindings> {
 public:
-    using Ubos = std::tuple<BouncyParticleUbo>;
     using PushConstantData = BouncyParticlePushConstantData;
 
     BouncyParticleRenderSystem(
@@ -46,17 +51,6 @@ public:
     ~BouncyParticleRenderSystem() override = default;
 
     static constexpr const char* Name() { return "BouncyParticleRenderSystem"; }
-
-    static constexpr decltype(auto) getVulkanFlags() {
-        return std::make_tuple(
-            VulkanRenderSystemFlagType{ 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                        VK_SHADER_STAGE_VERTEX_BIT },
-            VulkanRenderSystemFlagType{ 1, VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-                                        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_COMPUTE_BIT },
-            VulkanRenderSystemFlagType{ 2, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                        VK_SHADER_STAGE_COMPUTE_BIT }
-        );
-    }
 
     DIX_DISABLE_COPY(BouncyParticleRenderSystem)
 

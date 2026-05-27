@@ -171,4 +171,6 @@ private:
 };
 
 }   // namespace dix
+
+#include <Rendering/RenderSystem/RenderSystemTraits.hpp>
 #endif // DIX_RENDER_SYSTEM_HPP

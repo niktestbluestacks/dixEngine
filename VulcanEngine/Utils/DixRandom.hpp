@@ -7,15 +7,16 @@
 // std
 #include <cstdlib>
 #include <filesystem>
-#include <vector>
 #include <random>
+#include <vector>
+
 
 namespace dix {
 namespace fs = std::filesystem;
 inline std::string getRandomFile(std::string filepath = toAudioPath("")) {
     if (filepath.back() == '/') filepath.pop_back();
 
-    std::vector <std::filesystem::path> files (0);
+    std::vector<std::filesystem::path> files(0);
     for (auto const& entry : fs::directory_iterator(filepath)) {
         if (fs::is_regular_file(entry.status())) files.push_back(entry.path());
     }
@@ -24,6 +25,6 @@ inline std::string getRandomFile(std::string filepath = toAudioPath("")) {
 
     return files[idx].string();
 }
-}   // namespace dix
+}  // namespace dix
 
-#endif // DIX_RANDOM_HPP
+#endif  // DIX_RANDOM_HPP

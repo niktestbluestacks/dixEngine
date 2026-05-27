@@ -1,22 +1,19 @@
 // dix
-#include <Pipeline/ComputePipeline/ComputePipeline.hpp>
 #include <Logger/Logger.hpp>
-#include <Utils/Converter.hpp>
+#include <Pipeline/ComputePipeline/ComputePipeline.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
+#include <Utils/Converter.hpp>
 
 // std
-#include <stdexcept>
 #include <cassert>
 #include <fstream>
+#include <stdexcept>
 
 namespace dix {
-ComputePipeline::ComputePipeline(
-    EngineDevice& device,
-    const std::string& compFilepath,
-    const ComputePipelineConfigInfo& configInfo
-) :
-    m_dixDevice{device} {
-
+ComputePipeline::ComputePipeline(EngineDevice& device,
+                                 const std::string& compFilepath,
+                                 const ComputePipelineConfigInfo& configInfo)
+    : m_dixDevice{device} {
     createComputePipeline(compFilepath, configInfo);
 }
 
@@ -28,8 +25,7 @@ ComputePipeline::~ComputePipeline() {
 }
 
 std::vector<char> ComputePipeline::readFile(const std::string& filepath) {
-
-    std::ifstream file{ filepath, std::ios::ate | std::ios::binary };
+    std::ifstream file{filepath, std::ios::ate | std::ios::binary};
 
     if (!file.is_open()) {
         throw std::runtime_error("failed to open file: " + filepath);
@@ -48,11 +44,10 @@ std::vector<char> ComputePipeline::readFile(const std::string& filepath) {
 
 void ComputePipeline::createComputePipeline(
     const std::string& compShaderCode,
-    const ComputePipelineConfigInfo& configInfo
-) {
-
+    const ComputePipelineConfigInfo& configInfo) {
     assert(configInfo.pipelineLayout &&
-        "Cannot create compute pipeline:: no pipelineLayout provided in configInfo");
+           "Cannot create compute pipeline:: no pipelineLayout provided in "
+           "configInfo");
 
     auto compCode = readFile(compShaderCode);
 
@@ -67,15 +62,16 @@ void ComputePipeline::createComputePipeline(
     pipelineInfo.stage = shaderStage;
     pipelineInfo.layout = configInfo.pipelineLayout;
 
-    auto result = m_dixDevice.device().createComputePipelines({}, {pipelineInfo});
+    auto result =
+        m_dixDevice.device().createComputePipelines({}, {pipelineInfo});
     if (result.result != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create compute pipeline");
     }
     m_computePipeline = result.value.front();
-
 }
 
-void ComputePipeline::createShaderModule(const std::vector<char>& code, vk::ShaderModule* shaderModule) {
+void ComputePipeline::createShaderModule(const std::vector<char>& code,
+                                         vk::ShaderModule* shaderModule) {
     vk::ShaderModuleCreateInfo createInfo{};
     createInfo.codeSize = code.size();
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
@@ -88,7 +84,8 @@ void ComputePipeline::createShaderModule(const std::vector<char>& code, vk::Shad
 }
 
 void ComputePipeline::bind(vk::CommandBuffer commandBuffer) {
-    commandBuffer.bindPipeline(vk::PipelineBindPoint::eCompute, m_computePipeline);
+    commandBuffer.bindPipeline(vk::PipelineBindPoint::eCompute,
+                               m_computePipeline);
 }
 
-}   // namespace dix
+}  // namespace dix

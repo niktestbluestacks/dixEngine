@@ -1,28 +1,30 @@
 // dix
 #include <FrameRecorder/FrameRecorder.hpp>
+#include <Logger/Logger.hpp>
 #include <Model/GameObject/GameObject.hpp>
 #include <Model/Model.hpp>
-#include <Logger/Logger.hpp>
+
 
 // std
-#include <sstream>
-#include <iomanip>
 #include <cstring>
+#include <iomanip>
+#include <sstream>
+
 
 namespace dix {
 
 // Global singleton instance
 static FrameRecorder g_frameRecorder;
 
-FrameRecorder& getFrameRecorder() {
-    return g_frameRecorder;
-}
+FrameRecorder& getFrameRecorder() { return g_frameRecorder; }
 
 std::string FrameRecorder::getModelPath(const GameObject& obj) const {
     // Since we can't easily get the model path from a shared_ptr<Model>,
-    // we'll use a placeholder. In a real implementation, Model would expose this.
+    // we'll use a placeholder. In a real implementation, Model would expose
+    // this.
     if (obj.model) {
-        return "model_" + std::to_string(reinterpret_cast<uintptr_t>(obj.model.get()));
+        return "model_" +
+               std::to_string(reinterpret_cast<uintptr_t>(obj.model.get()));
     }
     return "no_model";
 }
@@ -70,8 +72,8 @@ void FrameRecorder::stopRecording() {
 }
 
 void FrameRecorder::recordInitialStructure(
-    const std::unordered_map<std::string, std::vector<GameObject>>& gameObjects
-) {
+    const std::unordered_map<std::string, std::vector<GameObject>>&
+        gameObjects) {
     if (!m_isRecording) {
         return;
     }
@@ -79,7 +81,8 @@ void FrameRecorder::recordInitialStructure(
     m_initialStructure.gameObjectsByRenderSystem.clear();
 
     for (const auto& [renderSystemName, objects] : gameObjects) {
-        auto& recordedObjects = m_initialStructure.gameObjectsByRenderSystem[renderSystemName];
+        auto& recordedObjects =
+            m_initialStructure.gameObjectsByRenderSystem[renderSystemName];
         recordedObjects.reserve(objects.size());
 
         for (const auto& obj : objects) {
@@ -101,10 +104,8 @@ void FrameRecorder::recordInitialStructure(
 
 void FrameRecorder::recordFrame(
     const std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
-    const glm::vec3& cameraPosition,
-    const glm::vec3& cameraLookAt,
-    float frameTime
-) {
+    const glm::vec3& cameraPosition, const glm::vec3& cameraLookAt,
+    float frameTime) {
     if (!m_isRecording) {
         return;
     }
@@ -167,10 +168,13 @@ void FrameRecorder::writeInitialStructure() {
     m_outputStream << "FRAME_RECORDER_V1" << std::endl;
 
     // Write number of render systems
-    m_outputStream << "RenderSystems: " << m_initialStructure.gameObjectsByRenderSystem.size() << std::endl;
+    m_outputStream << "RenderSystems: "
+                   << m_initialStructure.gameObjectsByRenderSystem.size()
+                   << std::endl;
 
     // Write each render system's objects
-    for (const auto& [renderSystemName, objects] : m_initialStructure.gameObjectsByRenderSystem) {
+    for (const auto& [renderSystemName, objects] :
+         m_initialStructure.gameObjectsByRenderSystem) {
         m_outputStream << "  RenderSystem: " << renderSystemName << std::endl;
         m_outputStream << "    ObjectCount: " << objects.size() << std::endl;
 
@@ -178,13 +182,15 @@ void FrameRecorder::writeInitialStructure() {
         for (size_t i = 0; i < objects.size(); ++i) {
             const auto& obj = objects[i];
             m_outputStream << "    Object[" << i << "]: ID=" << obj.id
-                          << " Model=" << obj.modelPath << std::endl;
+                           << " Model=" << obj.modelPath << std::endl;
             m_outputStream << "      Translation: " << obj.translation.x << " "
-                          << obj.translation.y << " " << obj.translation.z << std::endl;
+                           << obj.translation.y << " " << obj.translation.z
+                           << std::endl;
             m_outputStream << "      Rotation: " << obj.rotation.x << " "
-                          << obj.rotation.y << " " << obj.rotation.z << std::endl;
+                           << obj.rotation.y << " " << obj.rotation.z
+                           << std::endl;
             m_outputStream << "      Scale: " << obj.scale.x << " "
-                          << obj.scale.y << " " << obj.scale.z << std::endl;
+                           << obj.scale.y << " " << obj.scale.z << std::endl;
         }
     }
 
@@ -206,12 +212,15 @@ void FrameRecorder::writeFrame(const RecordedFrame& frame, size_t frameNumber) {
 
     // Write camera data
     m_outputStream << "  CameraPosition: " << frame.cameraPosition.x << " "
-                  << frame.cameraPosition.y << " " << frame.cameraPosition.z << std::endl;
+                   << frame.cameraPosition.y << " " << frame.cameraPosition.z
+                   << std::endl;
     m_outputStream << "  CameraLookAt: " << frame.cameraLookAt.x << " "
-                  << frame.cameraLookAt.y << " " << frame.cameraLookAt.z << std::endl;
+                   << frame.cameraLookAt.y << " " << frame.cameraLookAt.z
+                   << std::endl;
 
     // Write number of changed objects
-    m_outputStream << "  ChangedObjects: " << frame.changedObjectIds.size() << std::endl;
+    m_outputStream << "  ChangedObjects: " << frame.changedObjectIds.size()
+                   << std::endl;
 
     // Write each changed object's data
     for (auto id : frame.changedObjectIds) {
@@ -219,15 +228,18 @@ void FrameRecorder::writeFrame(const RecordedFrame& frame, size_t frameNumber) {
 
         if (frame.translations.count(id)) {
             const auto& t = frame.translations.at(id);
-            m_outputStream << "      Translation: " << t.x << " " << t.y << " " << t.z << std::endl;
+            m_outputStream << "      Translation: " << t.x << " " << t.y << " "
+                           << t.z << std::endl;
         }
         if (frame.rotations.count(id)) {
             const auto& r = frame.rotations.at(id);
-            m_outputStream << "      Rotation: " << r.x << " " << r.y << " " << r.z << std::endl;
+            m_outputStream << "      Rotation: " << r.x << " " << r.y << " "
+                           << r.z << std::endl;
         }
         if (frame.scales.count(id)) {
             const auto& s = frame.scales.at(id);
-            m_outputStream << "      Scale: " << s.x << " " << s.y << " " << s.z << std::endl;
+            m_outputStream << "      Scale: " << s.x << " " << s.y << " " << s.z
+                           << std::endl;
         }
     }
 }
@@ -235,9 +247,7 @@ void FrameRecorder::writeFrame(const RecordedFrame& frame, size_t frameNumber) {
 void FrameRecorder::startPlayback(
     const std::string& filename,
     std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
-    glm::vec3& cameraPosition,
-    glm::vec3& cameraLookAt
-) {
+    glm::vec3& cameraPosition, glm::vec3& cameraLookAt) {
     m_filename = filename;
     m_inputStream.open(filename);
     if (!m_inputStream.is_open()) {
@@ -265,9 +275,11 @@ void FrameRecorder::startPlayback(
         return;
     }
 
-    // Apply initial structure to gameObjects - preserve order exactly as recorded
-    // BUG FIX A: Store original models before clearing, then reassign them
-    std::unordered_map<std::string, std::vector<std::shared_ptr<Model>>> originalModels;
+    // Apply initial structure to gameObjects - preserve order exactly as
+    // recorded BUG FIX A: Store original models before clearing, then reassign
+    // them
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Model>>>
+        originalModels;
     for (const auto& [renderSystemName, objects] : gameObjects) {
         auto& models = originalModels[renderSystemName];
         models.reserve(objects.size());
@@ -277,7 +289,8 @@ void FrameRecorder::startPlayback(
     }
 
     gameObjects.clear();
-    for (const auto& [renderSystemName, recordedObjects] : m_initialStructure.gameObjectsByRenderSystem) {
+    for (const auto& [renderSystemName, recordedObjects] :
+         m_initialStructure.gameObjectsByRenderSystem) {
         auto& objects = gameObjects[renderSystemName];
         objects.clear();
         objects.reserve(recordedObjects.size());
@@ -291,7 +304,8 @@ void FrameRecorder::startPlayback(
 
             // Try to restore the original model if available
             auto modelsIt = originalModels.find(renderSystemName);
-            if (modelsIt != originalModels.end() && objectIndex < modelsIt->second.size()) {
+            if (modelsIt != originalModels.end() &&
+                objectIndex < modelsIt->second.size()) {
                 obj.model = modelsIt->second[objectIndex];
             }
 
@@ -329,9 +343,7 @@ void FrameRecorder::stopPlayback() {
 
 bool FrameRecorder::updatePlayback(
     std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
-    glm::vec3& cameraPosition,
-    glm::vec3& cameraLookAt
-) {
+    glm::vec3& cameraPosition, glm::vec3& cameraLookAt) {
     if (!m_isPlaying || m_currentFrameIndex >= m_frames.size()) {
         return false;
     }
@@ -348,7 +360,8 @@ bool FrameRecorder::updatePlayback(
         if (it != m_idToLocationMap.end()) {
             const auto& [renderSystemName, objectIndex] = it->second;
             auto rsIt = gameObjects.find(renderSystemName);
-            if (rsIt != gameObjects.end() && objectIndex < rsIt->second.size()) {
+            if (rsIt != gameObjects.end() &&
+                objectIndex < rsIt->second.size()) {
                 rsIt->second[objectIndex].transform.translation = translation;
             }
         }
@@ -359,7 +372,8 @@ bool FrameRecorder::updatePlayback(
         if (it != m_idToLocationMap.end()) {
             const auto& [renderSystemName, objectIndex] = it->second;
             auto rsIt = gameObjects.find(renderSystemName);
-            if (rsIt != gameObjects.end() && objectIndex < rsIt->second.size()) {
+            if (rsIt != gameObjects.end() &&
+                objectIndex < rsIt->second.size()) {
                 rsIt->second[objectIndex].transform.rotation = rotation;
             }
         }
@@ -370,7 +384,8 @@ bool FrameRecorder::updatePlayback(
         if (it != m_idToLocationMap.end()) {
             const auto& [renderSystemName, objectIndex] = it->second;
             auto rsIt = gameObjects.find(renderSystemName);
-            if (rsIt != gameObjects.end() && objectIndex < rsIt->second.size()) {
+            if (rsIt != gameObjects.end() &&
+                objectIndex < rsIt->second.size()) {
                 rsIt->second[objectIndex].transform.scale = scale;
             }
         }
@@ -412,14 +427,18 @@ bool FrameRecorder::readInitialStructure() {
         DixLogErr("Failed to read RenderSystems line");
         return false;
     }
-    // Trim trailing whitespace only (preserve leading spaces for format checking)
+    // Trim trailing whitespace only (preserve leading spaces for format
+    // checking)
     line.erase(line.find_last_not_of(" \t\r\n") + 1);
     const std::string expectedRenderSystemsPrefix = "RenderSystems:";
-    if (line.substr(0, expectedRenderSystemsPrefix.size()) != expectedRenderSystemsPrefix) {
-        DixLogErr("Expected '{}', got: '{}'", expectedRenderSystemsPrefix, line);
+    if (line.substr(0, expectedRenderSystemsPrefix.size()) !=
+        expectedRenderSystemsPrefix) {
+        DixLogErr("Expected '{}', got: '{}'", expectedRenderSystemsPrefix,
+                  line);
         return false;
     }
-    size_t numRenderSystems = std::stoul(line.substr(expectedRenderSystemsPrefix.size() + 1));
+    size_t numRenderSystems =
+        std::stoul(line.substr(expectedRenderSystemsPrefix.size() + 1));
 
     // Read each render system's objects
     for (size_t i = 0; i < numRenderSystems; ++i) {
@@ -428,7 +447,8 @@ bool FrameRecorder::readInitialStructure() {
             DixLogErr("Failed to read RenderSystem line {}", i);
             return false;
         }
-        // Only trim trailing whitespace, preserve leading spaces for format checking
+        // Only trim trailing whitespace, preserve leading spaces for format
+        // checking
         line.erase(line.find_last_not_of(" \t\r\n") + 1);
         const std::string expectedRSPrefix = "  RenderSystem: ";
         if (line.substr(0, expectedRSPrefix.size()) != expectedRSPrefix) {
@@ -442,17 +462,20 @@ bool FrameRecorder::readInitialStructure() {
             DixLogErr("Failed to read ObjectCount line");
             return false;
         }
-        // Only trim trailing whitespace, preserve leading spaces for format checking
+        // Only trim trailing whitespace, preserve leading spaces for format
+        // checking
         line.erase(line.find_last_not_of(" \t\r\n") + 1);
         const std::string expectedOCPrefix = "    ObjectCount:";
         if (line.substr(0, expectedOCPrefix.size()) != expectedOCPrefix) {
             DixLogErr("Expected '{}', got: '{}'", expectedOCPrefix, line);
             return false;
         }
-        size_t numObjects = std::stoul(line.substr(expectedOCPrefix.size() + 1));
+        size_t numObjects =
+            std::stoul(line.substr(expectedOCPrefix.size() + 1));
 
         // Read each object
-        auto& objects = m_initialStructure.gameObjectsByRenderSystem[renderSystemName];
+        auto& objects =
+            m_initialStructure.gameObjectsByRenderSystem[renderSystemName];
         objects.reserve(numObjects);
 
         for (size_t j = 0; j < numObjects; ++j) {
@@ -463,7 +486,8 @@ bool FrameRecorder::readInitialStructure() {
                 DixLogErr("Failed to read Object[{}] line", j);
                 return false;
             }
-            // Only trim trailing whitespace, preserve leading spaces for format checking
+            // Only trim trailing whitespace, preserve leading spaces for format
+            // checking
             line.erase(line.find_last_not_of(" \t\r\n") + 1);
             const std::string expectedObjPrefix = "    Object[";
             if (line.substr(0, expectedObjPrefix.size()) != expectedObjPrefix) {
@@ -477,7 +501,8 @@ bool FrameRecorder::readInitialStructure() {
                 DixLogErr("Failed to parse ID or Model from: '{}'", line);
                 return false;
             }
-            recorded.id = std::stoull(line.substr(idPos + 3, modelPos - idPos - 4));
+            recorded.id =
+                std::stoull(line.substr(idPos + 3, modelPos - idPos - 4));
             recorded.modelPath = line.substr(modelPos + 6);
 
             // Read translation
@@ -485,22 +510,28 @@ bool FrameRecorder::readInitialStructure() {
                 DixLogErr("Failed to read Translation line");
                 return false;
             }
-            // Only trim trailing whitespace, preserve leading spaces for format checking
+            // Only trim trailing whitespace, preserve leading spaces for format
+            // checking
             line.erase(line.find_last_not_of(" \t\r\n") + 1);
             const std::string expectedTransPrefix = "      Translation: ";
-            if (line.substr(0, expectedTransPrefix.size()) != expectedTransPrefix) {
-                DixLogErr("Expected '{}', got: '{}'", expectedTransPrefix, line);
+            if (line.substr(0, expectedTransPrefix.size()) !=
+                expectedTransPrefix) {
+                DixLogErr("Expected '{}', got: '{}'", expectedTransPrefix,
+                          line);
                 return false;
             }
-            std::istringstream transStream(line.substr(expectedTransPrefix.size()));
-            transStream >> recorded.translation.x >> recorded.translation.y >> recorded.translation.z;
+            std::istringstream transStream(
+                line.substr(expectedTransPrefix.size()));
+            transStream >> recorded.translation.x >> recorded.translation.y >>
+                recorded.translation.z;
 
             // Read rotation
             if (!std::getline(m_inputStream, line)) {
                 DixLogErr("Failed to read Rotation line");
                 return false;
             }
-            // Only trim trailing whitespace, preserve leading spaces for format checking
+            // Only trim trailing whitespace, preserve leading spaces for format
+            // checking
             line.erase(line.find_last_not_of(" \t\r\n") + 1);
             const std::string expectedRotPrefix = "      Rotation: ";
             if (line.substr(0, expectedRotPrefix.size()) != expectedRotPrefix) {
@@ -508,22 +539,28 @@ bool FrameRecorder::readInitialStructure() {
                 return false;
             }
             std::istringstream rotStream(line.substr(expectedRotPrefix.size()));
-            rotStream >> recorded.rotation.x >> recorded.rotation.y >> recorded.rotation.z;
+            rotStream >> recorded.rotation.x >> recorded.rotation.y >>
+                recorded.rotation.z;
 
             // Read scale
             if (!std::getline(m_inputStream, line)) {
                 DixLogErr("Failed to read Scale line");
                 return false;
             }
-            // Only trim trailing whitespace, preserve leading spaces for format checking
+            // Only trim trailing whitespace, preserve leading spaces for format
+            // checking
             line.erase(line.find_last_not_of(" \t\r\n") + 1);
             const std::string expectedScalePrefix = "      Scale: ";
-            if (line.substr(0, expectedScalePrefix.size()) != expectedScalePrefix) {
-                DixLogErr("Expected '{}', got: '{}'", expectedScalePrefix, line);
+            if (line.substr(0, expectedScalePrefix.size()) !=
+                expectedScalePrefix) {
+                DixLogErr("Expected '{}', got: '{}'", expectedScalePrefix,
+                          line);
                 return false;
             }
-            std::istringstream scaleStream(line.substr(expectedScalePrefix.size()));
-            scaleStream >> recorded.scale.x >> recorded.scale.y >> recorded.scale.z;
+            std::istringstream scaleStream(
+                line.substr(expectedScalePrefix.size()));
+            scaleStream >> recorded.scale.x >> recorded.scale.y >>
+                recorded.scale.z;
 
             objects.push_back(recorded);
 
@@ -599,7 +636,8 @@ bool FrameRecorder::readInitialStructure() {
             return false;
         }
         std::istringstream camPosStream(line.substr(expectedCPPrefix.size()));
-        camPosStream >> frame.cameraPosition.x >> frame.cameraPosition.y >> frame.cameraPosition.z;
+        camPosStream >> frame.cameraPosition.x >> frame.cameraPosition.y >>
+            frame.cameraPosition.z;
 
         // Read camera look at
         if (!std::getline(m_inputStream, line)) {
@@ -613,7 +651,8 @@ bool FrameRecorder::readInitialStructure() {
             return false;
         }
         std::istringstream camLookStream(line.substr(expectedCLAPrefix.size()));
-        camLookStream >> frame.cameraLookAt.x >> frame.cameraLookAt.y >> frame.cameraLookAt.z;
+        camLookStream >> frame.cameraLookAt.x >> frame.cameraLookAt.y >>
+            frame.cameraLookAt.z;
 
         // Read number of changed objects
         if (!std::getline(m_inputStream, line)) {
@@ -641,7 +680,8 @@ bool FrameRecorder::readInitialStructure() {
                 DixLogErr("Expected '{}', got: '{}'", expectedOIDPrefix, line);
                 return false;
             }
-            GameObject::id_t id = std::stoull(line.substr(expectedOIDPrefix.size()));
+            GameObject::id_t id =
+                std::stoull(line.substr(expectedOIDPrefix.size()));
             frame.changedObjectIds.push_back(id);
 
             // Try to read optional transform lines
@@ -654,8 +694,10 @@ bool FrameRecorder::readInitialStructure() {
                 std::string trimmed = nextLine;
                 trimmed.erase(trimmed.find_last_not_of(" \t\r\n") + 1);
                 const std::string expectedTransPrefix2 = "      Translation: ";
-                if (trimmed.substr(0, expectedTransPrefix2.size()) == expectedTransPrefix2) {
-                    std::istringstream tStream(trimmed.substr(expectedTransPrefix2.size()));
+                if (trimmed.substr(0, expectedTransPrefix2.size()) ==
+                    expectedTransPrefix2) {
+                    std::istringstream tStream(
+                        trimmed.substr(expectedTransPrefix2.size()));
                     glm::vec3 translation;
                     tStream >> translation.x >> translation.y >> translation.z;
                     frame.translations[id] = translation;
@@ -670,8 +712,10 @@ bool FrameRecorder::readInitialStructure() {
                 std::string trimmed = nextLine;
                 trimmed.erase(trimmed.find_last_not_of(" \t\r\n") + 1);
                 const std::string expectedRotPrefix2 = "      Rotation: ";
-                if (trimmed.substr(0, expectedRotPrefix2.size()) == expectedRotPrefix2) {
-                    std::istringstream rStream(trimmed.substr(expectedRotPrefix2.size()));
+                if (trimmed.substr(0, expectedRotPrefix2.size()) ==
+                    expectedRotPrefix2) {
+                    std::istringstream rStream(
+                        trimmed.substr(expectedRotPrefix2.size()));
                     glm::vec3 rotation;
                     rStream >> rotation.x >> rotation.y >> rotation.z;
                     frame.rotations[id] = rotation;
@@ -686,8 +730,10 @@ bool FrameRecorder::readInitialStructure() {
                 std::string trimmed = nextLine;
                 trimmed.erase(trimmed.find_last_not_of(" \t\r\n") + 1);
                 const std::string expectedScalePrefix2 = "      Scale: ";
-                if (trimmed.substr(0, expectedScalePrefix2.size()) == expectedScalePrefix2) {
-                    std::istringstream sStream(trimmed.substr(expectedScalePrefix2.size()));
+                if (trimmed.substr(0, expectedScalePrefix2.size()) ==
+                    expectedScalePrefix2) {
+                    std::istringstream sStream(
+                        trimmed.substr(expectedScalePrefix2.size()));
                     glm::vec3 scale;
                     sStream >> scale.x >> scale.y >> scale.z;
                     frame.scales[id] = scale;
@@ -703,4 +749,4 @@ bool FrameRecorder::readInitialStructure() {
     return true;
 }
 
-} // namespace dix
+}  // namespace dix

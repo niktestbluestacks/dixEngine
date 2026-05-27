@@ -15,15 +15,12 @@
 
 namespace dix {
 
-DixRenderSystem::DixRenderSystem(
-    EngineDevice& engineDevice,
-    vk::RenderPass renderPass,
-    vk::DescriptorSetLayout globalSetLayout,
-    vk::DescriptorSetLayout modelSetLayout,
-    DixRenderSystemConfig config)
-    : m_dixDevice{ engineDevice }
-    , m_config{ std::move(config) }
-{
+DixRenderSystem::DixRenderSystem(EngineDevice& engineDevice,
+                                 vk::RenderPass renderPass,
+                                 vk::DescriptorSetLayout globalSetLayout,
+                                 vk::DescriptorSetLayout modelSetLayout,
+                                 DixRenderSystemConfig config)
+    : m_dixDevice{engineDevice}, m_config{std::move(config)} {
     assert(m_config.pushConstantSize <= MAX_PUSH_CONSTANT_BYTES &&
            "Push constant block exceeds MAX_PUSH_CONSTANT_BYTES (256)");
     assert(m_config.transformGameObject &&
@@ -59,8 +56,8 @@ DixRenderSystem::~DixRenderSystem() {
 void DixRenderSystem::createPipelineLayout(
     vk::DescriptorSetLayout globalSetLayout,
     vk::DescriptorSetLayout modelSetLayout) {
-
-    std::vector<vk::DescriptorSetLayout> setLayouts{ globalSetLayout, modelSetLayout };
+    std::vector<vk::DescriptorSetLayout> setLayouts{globalSetLayout,
+                                                    modelSetLayout};
 
     vk::PipelineLayoutCreateInfo layoutInfo{};
     layoutInfo.setLayoutCount = static_cast<uint32_t>(setLayouts.size());
@@ -79,9 +76,11 @@ void DixRenderSystem::createPipelineLayout(
     }
 
     try {
-        m_pipelineLayout = m_dixDevice.device().createPipelineLayout(layoutInfo);
+        m_pipelineLayout =
+            m_dixDevice.device().createPipelineLayout(layoutInfo);
     } catch (...) {
-        throw std::runtime_error("DixRenderSystem: failed to create pipeline layout");
+        throw std::runtime_error(
+            "DixRenderSystem: failed to create pipeline layout");
     }
 }
 
@@ -94,23 +93,21 @@ void DixRenderSystem::createPipeline(vk::RenderPass renderPass) {
     m_config.pipelineConfigInfo.pipelineLayout = m_pipelineLayout;
 
     if (!m_config.vertexBindings.empty()) {
-        m_config.pipelineConfigInfo.vertexBindingDescriptions = m_config.vertexBindings;
+        m_config.pipelineConfigInfo.vertexBindingDescriptions =
+            m_config.vertexBindings;
     }
     if (!m_config.vertexAttributes.empty()) {
-        m_config.pipelineConfigInfo.vertexAttributeDescriptions = m_config.vertexAttributes;
+        m_config.pipelineConfigInfo.vertexAttributeDescriptions =
+            m_config.vertexAttributes;
     }
 
     m_pipeline = std::make_unique<Pipeline>(
-        m_dixDevice,
-        toShaderPath(m_config.vertShaderPath),
-        toShaderPath(m_config.fragShaderPath),
-        m_config.pipelineConfigInfo
-    );
+        m_dixDevice, toShaderPath(m_config.vertShaderPath),
+        toShaderPath(m_config.fragShaderPath), m_config.pipelineConfigInfo);
 }
 
 void DixRenderSystem::renderGameObjects(
-    FrameInfo& frameInfo,
-    std::vector<GameObject>& gameObjects) const {
+    FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) const {
     m_pipeline->bind(frameInfo.commandBuffer);
 
     for (auto& obj : gameObjects) {
@@ -121,28 +118,19 @@ void DixRenderSystem::renderGameObjects(
 
         if (m_config.pushConstantSize > 0) {
             frameInfo.commandBuffer.pushConstants(
-                m_pipelineLayout,
-                m_config.pushConstantStages,
-                0,
-                m_config.pushConstantSize,
-                pushBuffer.data()
-            );
+                m_pipelineLayout, m_config.pushConstantStages, 0,
+                m_config.pushConstantSize, pushBuffer.data());
         }
 
         std::array<vk::DescriptorSet, 2> descriptorSets{
-            frameInfo.globalDescriptorSet,
-            nullptr
-        };
+            frameInfo.globalDescriptorSet, nullptr};
         if (obj.model) {
             descriptorSets[1] = obj.model->getDescriptorSet();
         }
 
         frameInfo.commandBuffer.bindDescriptorSets(
-            vk::PipelineBindPoint::eGraphics,
-            m_pipelineLayout,
-            0,
-            static_cast<uint32_t>(descriptorSets.size()),
-            descriptorSets.data(),
+            vk::PipelineBindPoint::eGraphics, m_pipelineLayout, 0,
+            static_cast<uint32_t>(descriptorSets.size()), descriptorSets.data(),
             0, nullptr);
 
         if (obj.model) {
@@ -152,9 +140,8 @@ void DixRenderSystem::renderGameObjects(
     }
 }
 
-void DixRenderSystem::renderGameObjects(
-    FrameInfo& frameInfo,
-    std::vector<GameObject>& gameObjects) {
+void DixRenderSystem::renderGameObjects(FrameInfo& frameInfo,
+                                        std::vector<GameObject>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
 
     for (auto& obj : gameObjects) {
@@ -165,30 +152,20 @@ void DixRenderSystem::renderGameObjects(
 
         if (m_config.pushConstantSize > 0) {
             frameInfo.commandBuffer.pushConstants(
-                m_pipelineLayout,
-                m_config.pushConstantStages,
-                0,
-                m_config.pushConstantSize,
-                pushBuffer.data()
-            );
+                m_pipelineLayout, m_config.pushConstantStages, 0,
+                m_config.pushConstantSize, pushBuffer.data());
         }
 
         std::array<vk::DescriptorSet, 2> descriptorSets{
-            frameInfo.globalDescriptorSet,
-            nullptr
-        };
+            frameInfo.globalDescriptorSet, nullptr};
         if (obj.model) {
             descriptorSets[1] = obj.model->getDescriptorSet();
         }
 
         frameInfo.commandBuffer.bindDescriptorSets(
-            vk::PipelineBindPoint::eGraphics,
-            m_pipelineLayout,
-            0,
-            static_cast<uint32_t>(descriptorSets.size()),
-            descriptorSets.data(),
-            0, nullptr
-        );
+            vk::PipelineBindPoint::eGraphics, m_pipelineLayout, 0,
+            static_cast<uint32_t>(descriptorSets.size()), descriptorSets.data(),
+            0, nullptr);
 
         if (obj.model) {
             obj.model->bind(frameInfo.commandBuffer);
@@ -212,11 +189,10 @@ void DixRenderSystem::initComputeFromConfig(const ComputePipelineConfig& cc) {
 void DixRenderSystem::initComputeLayout(
     std::unique_ptr<DixDescriptorSetLayout> setLayout,
     const std::vector<vk::PushConstantRange>& pushRanges) {
-
-
     m_computeSetLayout = std::move(setLayout);
 
-    vk::DescriptorSetLayout vkLayout = m_computeSetLayout->getDescriptorSetLayout();
+    vk::DescriptorSetLayout vkLayout =
+        m_computeSetLayout->getDescriptorSetLayout();
 
     vk::PipelineLayoutCreateInfo info{};
     info.setLayoutCount = 1;
@@ -225,9 +201,11 @@ void DixRenderSystem::initComputeLayout(
     info.pPushConstantRanges = pushRanges.empty() ? nullptr : pushRanges.data();
 
     try {
-        m_computePipelineLayout = m_dixDevice.device().createPipelineLayout(info);
+        m_computePipelineLayout =
+            m_dixDevice.device().createPipelineLayout(info);
     } catch (...) {
-        throw std::runtime_error("DixRenderSystem: failed to create compute pipeline layout");
+        throw std::runtime_error(
+            "DixRenderSystem: failed to create compute pipeline layout");
     }
 }
 
@@ -235,12 +213,9 @@ void DixRenderSystem::initComputePipeline(const std::string& compShaderPath) {
     assert(m_computePipelineLayout &&
            "initComputeLayout must be called before initComputePipeline");
 
-    ComputePipelineConfigInfo configInfo{ m_computePipelineLayout };
+    ComputePipelineConfigInfo configInfo{m_computePipelineLayout};
     m_computePipeline = std::make_unique<ComputePipeline>(
-        m_dixDevice,
-        toShaderPath(compShaderPath),
-        configInfo
-    );
+        m_dixDevice, toShaderPath(compShaderPath), configInfo);
 }
 
 void DixRenderSystem::initComputeDescriptorPool(uint32_t maxSets) {
@@ -254,4 +229,4 @@ void DixRenderSystem::initComputeDescriptorPool(uint32_t maxSets) {
     m_computeDescriptorPool = builder.build();
 }
 
-}   // namespace dix
+}  // namespace dix

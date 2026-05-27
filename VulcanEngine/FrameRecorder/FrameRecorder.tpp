@@ -2,18 +2,21 @@
 // #define FRAME_RECORDER_TPP
 
 // template<>
-// void FrameRecorder::recordFrame<std::unordered_map<std::string, std::vector <GameObject>>>(
+// void FrameRecorder::recordFrame<std::unordered_map<std::string, std::vector
+// <GameObject>>>(
 //         float frameTime,
 //     const glm::vec3& cameraPos,
 //     const glm::vec3& cameraRot,
-//     const std::unordered_map<std::string, std::vector <GameObject>>& gameObjects
+//     const std::unordered_map<std::string, std::vector <GameObject>>&
+//     gameObjects
 // ) {
 //     if (m_mode != Mode::Recording) {
 //         return;
 //     }
 
 //     auto now = std::chrono::high_resolution_clock::now();
-//     float timestamp = std::chrono::duration<float>(now - m_startTime).count();
+//     float timestamp = std::chrono::duration<float>(now -
+//     m_startTime).count();
 
 //     // Capture all game object states
 //     std::vector<GameObjectState> objectStates;

@@ -1,4 +1,5 @@
-// #include <Rendering/RenderSystem/ShadowMappingRenderSystem/ShadowMappingRenderSystem.hpp>
+// #include
+// <Rendering/RenderSystem/ShadowMappingRenderSystem/ShadowMappingRenderSystem.hpp>
 
 // namespace dix {
 
@@ -8,14 +9,15 @@
 //     VkDescriptorSetLayout globalSetLayout,
 //     VkDescriptorSetLayout modelSetLayout
 // ): DixRenderSystem(
-//     device, 
-//     renderPass, 
-//     globalSetLayout, 
+//     device,
+//     renderPass,
+//     globalSetLayout,
 //     modelSetLayout,
 //     DixRenderSystemConfig {
 //         .vertShaderPath = "ShadowMapping/shadow_mapping.vert.spv",
 //         .fragShaderPath = "ShadowMapping/shadow_mapping.frag.spv",
-//         .transformGameObject = [](void* push, GameObject& obj, FrameInfo& frameInfo) {
+//         .transformGameObject = [](void* push, GameObject& obj, FrameInfo&
+//         frameInfo) {
 //             auto* p = static_cast <ShadowMappingPushConstantData*>(push);
 //             p->modelMatrix = obj.transform.mat4();
 //         },

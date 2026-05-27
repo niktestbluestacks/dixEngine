@@ -14,38 +14,39 @@
 
 namespace dix {
 struct TransformComponent {
-	glm::vec3 translation{}; // (position offset)
-	glm::vec3 scale{ 1.f, 1.f, 1.f };
-	glm::vec3 rotation{};
+    glm::vec3 translation{};  // (position offset)
+    glm::vec3 scale{1.f, 1.f, 1.f};
+    glm::vec3 rotation{};
 
-	glm::mat4 mat4();
+    glm::mat4 mat4();
 
-	glm::mat3 normalMatrix();
+    glm::mat3 normalMatrix();
 };
 
 class GameObject {
-public:
-	using id_t = unsigned int;
+   public:
+    using id_t = unsigned int;
 
-	static GameObject createGameObject() {
-		static id_t currentId = 0;
-		return GameObject{ currentId++ };
-	}
+    static GameObject createGameObject() {
+        static id_t currentId = 0;
+        return GameObject{currentId++};
+    }
 
-	DIX_DISABLE_COPY(GameObject)
-	DIX_ENABLE_MOVE(GameObject)
-	~GameObject() = default;
+    DIX_DISABLE_COPY(GameObject)
+    DIX_ENABLE_MOVE(GameObject)
+    ~GameObject() = default;
 
-	id_t getId() const { return id; };
+    id_t getId() const { return id; };
 
-	std::shared_ptr <Model> model{};
-	glm::vec3 color{};
-	TransformComponent transform{};
-private:
-	GameObject(id_t objId) : id{ objId } {};
+    std::shared_ptr<Model> model{};
+    glm::vec3 color{};
+    TransformComponent transform{};
 
-	id_t id;
+   private:
+    GameObject(id_t objId) : id{objId} {};
+
+    id_t id;
 };
-}	// namespace dix
+}  // namespace dix
 
-#endif // GAME_OBJECT_HPP
+#endif  // GAME_OBJECT_HPP

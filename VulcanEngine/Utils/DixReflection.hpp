@@ -2,8 +2,8 @@
 #define DIX_REFLECTION_HPP
 
 // #ifdef __clang__
-// #warning Clang compiler is not supported because clangd does to like reflection \
-// Will be fixed when clangd will start supporting reflection
+// #warning Clang compiler is not supported because clangd does to like
+// reflection \ Will be fixed when clangd will start supporting reflection
 // #endif // clangd
 
 // dix
@@ -13,14 +13,13 @@ namespace dix {
 
 #if !defined(__clang__) && __cplusplus >= 202603L
 
-//dix
+// dix
 #include <Utils/Hash.hpp>
 
 // std
 #include <meta>
 #include <string_view>
 #include <type_traits>
-
 
 template <typename T>
 constexpr std::string_view getTypeName() {
@@ -44,7 +43,8 @@ struct HashClass {
         size_t seed = 0;
         inline for (constexpr auto field : std::meta::members_of(^^T)) {
             if constexpr (std::meta::is_variable(field)) {
-                size_t field_hash = std::hash<decltype(obj.[:field:])>{}(obj.[:field:]);
+                size_t field_hash =
+                    std::hash<decltype(obj.[:field:])>{}(obj.[:field:]);
                 seed ^= field_hash + 0x9e3779b9 + (seed << 6) + (seed >> 2);
             }
         }
@@ -57,7 +57,10 @@ constexpr size_t deepSizeOf(const T& obj) {
     if constexpr (std::is_pointer_v<T>) {
         if (!obj) return 0;
         return sizeof(T) + deepSizeOf(*obj);
-    } else if constexpr (requires { obj.capacity(); T::value_type; }) {
+    } else if constexpr (requires {
+                             obj.capacity();
+                             T::value_type;
+                         }) {
         size_t heapMem = obj.capacity() * sizeof(typename T::value_type);
         for (const auto& item : obj) {
             heapMem += deepSizeOf(item) - sizeof(typename T::value_type);
@@ -85,11 +88,7 @@ constexpr size_t deepSizeOf(const T& obj) {
 #endif  // clangd
 #endif
 
-
-
-
-}   // namespace dix
-
+}  // namespace dix
 
 #ifndef __clang__
 #define GET_TYPE_NAME(Type) dix::getTypeName<Type>()
@@ -99,8 +98,9 @@ constexpr size_t deepSizeOf(const T& obj) {
 #else
 #define GET_TYPE_NAME(Type) std::string_view("")
 #define GET_ENUM_NAME(Enum) std::string_view("")
-#define DEEP_HASH(Obj) dix::hashCombine(std::adressof(Obj),0x2421, 0xffff2312, 0x1)
+#define DEEP_HASH(Obj) \
+    dix::hashCombine(std::adressof(Obj), 0x2421, 0xffff2312, 0x1)
 #define DEEP_SIZE_OF(Obj) sizeof(Obj)
 #endif  // __clang__
 
-#endif // DIX_REFLECTION_HPP
+#endif  // DIX_REFLECTION_HPP

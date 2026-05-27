@@ -6,20 +6,27 @@
 
 namespace dix {
 inline constexpr std::string toShaderPath(const std::string& shaderName) {
-	return std::string(static_cast <std::string> ("../dixEngine/build/shaders/") + shaderName);
+    return std::string(static_cast<std::string>("../dixEngine/build/shaders/") +
+                       shaderName);
 }
 
 inline constexpr std::string toModelPath(const std::string& modelFilepath) {
-	return std::string(static_cast <std::string> ("../dixEngine/Applications/models/") + modelFilepath);
+    return std::string(
+        static_cast<std::string>("../dixEngine/Applications/models/") +
+        modelFilepath);
 }
 
 inline constexpr std::string toAudioPath(const std::string& audioFilepath) {
-	return std::string(static_cast <std::string> ("../dixEngine/Applications/audio/") + audioFilepath);
+    return std::string(
+        static_cast<std::string>("../dixEngine/Applications/audio/") +
+        audioFilepath);
 }
 
-inline constexpr std::string toRecordingPath(const std::string& recordingFilepath) {
-	return std::string(static_cast <std::string>("../dixEngine/recording/") + recordingFilepath);
+inline constexpr std::string toRecordingPath(
+    const std::string& recordingFilepath) {
+    return std::string(static_cast<std::string>("../dixEngine/recording/") +
+                       recordingFilepath);
 }
-}	// dix
+}  // namespace dix
 
-#endif // CONVERTER_HPP
+#endif  // CONVERTER_HPP

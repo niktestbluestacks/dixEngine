@@ -6,7 +6,7 @@
 
 namespace dix {
 class IUIElement {
-public:
+   public:
     virtual ~IUIElement() = default;
     virtual void update(float dt) = 0;
     // update CPU-side state
@@ -14,6 +14,6 @@ public:
     // upload GPU resources for the upcoming frame (called after beginFrame)
     virtual void upload(FrameInfo& fi) { (void)fi; }
 };
-}   // namespace dix
+}  // namespace dix
 
-#endif // IUI_ELEMENT_HPP
+#endif  // IUI_ELEMENT_HPP

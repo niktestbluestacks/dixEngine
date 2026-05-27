@@ -17,7 +17,8 @@ namespace dix {
 
 // Redeclared here for standalone use; identical to the declaration in
 // DixRenderSystem.hpp.  C++ permits identical alias redeclarations.
-using VulkanRenderSystemFlagType = std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>;
+using VulkanRenderSystemFlagType =
+    std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>;
 
 // ---------------------------------------------------------------------------
 // Binding descriptor tags
@@ -42,9 +43,10 @@ using VulkanRenderSystemFlagType = std::tuple<uint32_t, vk::DescriptorType, vk::
 template <typename UboT, uint32_t Slot, vk::ShaderStageFlagBits Stages>
 struct UniformBinding {
     using UboType = UboT;
-    static constexpr uint32_t           bindingIndex   = Slot;
-    static constexpr vk::ShaderStageFlagBits shaderStages   = Stages;
-    static constexpr vk::DescriptorType   descriptorType = vk::DescriptorType::eUniformBuffer;
+    static constexpr uint32_t bindingIndex = Slot;
+    static constexpr vk::ShaderStageFlagBits shaderStages = Stages;
+    static constexpr vk::DescriptorType descriptorType =
+        vk::DescriptorType::eUniformBuffer;
 };
 
 // SamplerBinding<Slot, Stages>
@@ -54,9 +56,10 @@ struct UniformBinding {
 // fallback (per-model textures live in set 1 via the model descriptor pool).
 template <uint32_t Slot, vk::ShaderStageFlagBits Stages>
 struct SamplerBinding {
-    static constexpr uint32_t           bindingIndex   = Slot;
-    static constexpr vk::ShaderStageFlagBits shaderStages   = Stages;
-    static constexpr vk::DescriptorType   descriptorType = vk::DescriptorType::eCombinedImageSampler;
+    static constexpr uint32_t bindingIndex = Slot;
+    static constexpr vk::ShaderStageFlagBits shaderStages = Stages;
+    static constexpr vk::DescriptorType descriptorType =
+        vk::DescriptorType::eCombinedImageSampler;
 };
 
 // ---------------------------------------------------------------------------
@@ -72,23 +75,24 @@ concept ManagedBuffer = requires { typename B::UboType; };
 // Recursively collect UboType from a pack of binding tags, preserving
 // declaration order and skipping non-buffer bindings (e.g. SamplerBinding).
 template <typename... Bs>
-struct ExtractUboTypes { using type = std::tuple<>; };
+struct ExtractUboTypes {
+    using type = std::tuple<>;
+};
 
 template <ManagedBuffer B, typename... Rest>
 struct ExtractUboTypes<B, Rest...> {
     using type = decltype(std::tuple_cat(
         std::declval<std::tuple<typename B::UboType>>(),
-        std::declval<typename ExtractUboTypes<Rest...>::type>()
-    ));
+        std::declval<typename ExtractUboTypes<Rest...>::type>()));
 };
 
 template <typename B, typename... Rest>
-    requires (!ManagedBuffer<B>)
+    requires(!ManagedBuffer<B>)
 struct ExtractUboTypes<B, Rest...> {
     using type = typename ExtractUboTypes<Rest...>::type;
 };
 
-} // namespace detail
+}  // namespace detail
 
 // ---------------------------------------------------------------------------
 // RenderSystemTraits<BindingsTuple>
@@ -121,7 +125,6 @@ struct RenderSystemTraits;
 
 template <typename... Bs>
 struct RenderSystemTraits<std::tuple<Bs...>> {
-
     // Tuple of the C++ UBO types for every buffer-type binding, in
     // declaration order.  AppContext creates one DixBuffer per entry and
     // writes it into set 0 each frame via m_systemUboBuffers.
@@ -131,16 +134,11 @@ struct RenderSystemTraits<std::tuple<Bs...>> {
     // binding in declaration order.  Satisfies the HasVulkanFlags concept
     // used by RenderSystemRegistery.
     static constexpr decltype(auto) getVulkanFlags() {
-        return std::make_tuple(
-            VulkanRenderSystemFlagType{
-                Bs::bindingIndex,
-                Bs::descriptorType,
-                Bs::shaderStages
-            }...
-        );
+        return std::make_tuple(VulkanRenderSystemFlagType{
+            Bs::bindingIndex, Bs::descriptorType, Bs::shaderStages}...);
     }
 };
 
-} // namespace dix
+}  // namespace dix
 
-#endif // RENDER_SYSTEM_TRAITS_HPP
+#endif  // RENDER_SYSTEM_TRAITS_HPP

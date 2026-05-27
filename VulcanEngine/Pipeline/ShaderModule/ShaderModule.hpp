@@ -5,14 +5,15 @@
 #include <vulkan/vulkan.hpp>
 
 // std
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
+
 
 namespace dix {
 
 class ShaderModule {
-public:
+   public:
     ShaderModule() = default;
     ShaderModule(vk::Device device, const std::string& spirvFilepath);
     ~ShaderModule();
@@ -23,13 +24,13 @@ public:
     vk::ShaderModule getModule() const { return module_; }
     bool isValid() const { return module_ != vk::ShaderModule{}; }
 
-private:
+   private:
     std::vector<char> readFile(const std::string& filepath) const;
 
     vk::Device device_ = nullptr;
     vk::ShaderModule module_ = nullptr;
 };
 
-} // namespace dix
+}  // namespace dix
 
-#endif // SHADER_MODULE_HPP
+#endif  // SHADER_MODULE_HPP

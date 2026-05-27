@@ -20,11 +20,9 @@ struct ComputePipelineConfigInfo {
 };
 
 class ComputePipeline {
-public:
-    ComputePipeline(
-        EngineDevice& device,
-        const std::string& compFilepath,
-        const ComputePipelineConfigInfo& configInfo);
+   public:
+    ComputePipeline(EngineDevice& device, const std::string& compFilepath,
+                    const ComputePipelineConfigInfo& configInfo);
 
     ~ComputePipeline();
 
@@ -32,25 +30,23 @@ public:
 
     void bind(vk::CommandBuffer commandBuffer);
 
-    vk::Pipeline& getPipeline() {
-        return m_computePipeline;
-    }
-private:
-    static std::vector <char> readFile(const std::string& filepath);
+    vk::Pipeline& getPipeline() { return m_computePipeline; }
 
-    void createComputePipeline(
-        const std::string& compShaderCode,
-        const ComputePipelineConfigInfo& configInfo);
+   private:
+    static std::vector<char> readFile(const std::string& filepath);
 
-    void createShaderModule(const std::vector<char>& code, vk::ShaderModule* shaderModule);
+    void createComputePipeline(const std::string& compShaderCode,
+                               const ComputePipelineConfigInfo& configInfo);
 
-private:
+    void createShaderModule(const std::vector<char>& code,
+                            vk::ShaderModule* shaderModule);
 
+   private:
     EngineDevice& m_dixDevice;
     vk::Pipeline m_computePipeline;
     vk::ShaderModule m_compShaderModule;
 };
 
-}   // namespace dix
+}  // namespace dix
 
-#endif // COMPUTE_PIPELINE_HPP
+#endif  // COMPUTE_PIPELINE_HPP

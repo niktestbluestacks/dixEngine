@@ -20,7 +20,8 @@ std::vector<char> ShaderModule::readFile(const std::string& filepath) const {
     return buffer;
 }
 
-ShaderModule::ShaderModule(vk::Device device, const std::string& spirvFilepath) : device_(device) {
+ShaderModule::ShaderModule(vk::Device device, const std::string& spirvFilepath)
+    : device_(device) {
     auto code = readFile(spirvFilepath);
     vk::ShaderModuleCreateInfo createInfo{};
     createInfo.setCodeSize(code.size());
@@ -39,4 +40,4 @@ ShaderModule::~ShaderModule() {
     }
 }
 
-} // namespace dix
+}  // namespace dix

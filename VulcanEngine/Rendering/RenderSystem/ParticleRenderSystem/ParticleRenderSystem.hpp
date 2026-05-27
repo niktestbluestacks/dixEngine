@@ -2,8 +2,9 @@
 #define PARTICLE_RENDER_SYSTEM_HPP
 
 // dix
-#include <Rendering/RenderSystem/DixRenderSystem.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
+#include <Rendering/RenderSystem/DixRenderSystem.hpp>
+
 
 // std
 #include <tuple>
@@ -19,36 +20,32 @@ struct Particle {
 };
 
 struct ParticleSimulationParams {
-    alignas(16) glm::vec4 gravityDeltaTime { 0.f, -.1f, 0.f, 0.f };
-    alignas(16) glm::vec4 windDamping { 0.f, 0.f, 0.f, .999f };
-    alignas(16) glm::vec4 particlesPosLife { 0.f, 0.f, 0.f, 100.f };
+    alignas(16) glm::vec4 gravityDeltaTime{0.f, -.1f, 0.f, 0.f};
+    alignas(16) glm::vec4 windDamping{0.f, 0.f, 0.f, .999f};
+    alignas(16) glm::vec4 particlesPosLife{0.f, 0.f, 0.f, 100.f};
 };
 
 struct ParticleUbo {
-    alignas(16) glm::mat4 projectionView{ 1.f };
+    alignas(16) glm::mat4 projectionView{1.f};
 };
 
 struct ParticlePushConstantData {
-    alignas(16) glm::mat4 modelMatrix{ 1.f };
+    alignas(16) glm::mat4 modelMatrix{1.f};
 };
 
 using ParticleRenderSystemBindings = std::tuple<
-    UniformBinding<ParticleUbo, 0, vk::ShaderStageFlagBits::eVertex>
->;
+    UniformBinding<ParticleUbo, 0, vk::ShaderStageFlagBits::eVertex> >;
 
-class ParticleRenderSystem:
-    public DixRenderSystem,
-    public RenderSystemTraits<ParticleRenderSystemBindings> {
-public:
+class ParticleRenderSystem
+    : public DixRenderSystem,
+      public RenderSystemTraits<ParticleRenderSystemBindings> {
+   public:
     using Ubos = std::tuple<ParticleUbo>;
     using PushConstantData = ParticlePushConstantData;
 
-    ParticleRenderSystem(
-        EngineDevice& engineDevice,
-        vk::RenderPass renderPass,
-        vk::DescriptorSetLayout globalSetLayout,
-        vk::DescriptorSetLayout modelSetLayout
-    );
+    ParticleRenderSystem(EngineDevice& engineDevice, vk::RenderPass renderPass,
+                         vk::DescriptorSetLayout globalSetLayout,
+                         vk::DescriptorSetLayout modelSetLayout);
     ~ParticleRenderSystem() override = default;
 
     static constexpr const char* Name() { return "ParticleRenderSystem"; }
@@ -62,14 +59,15 @@ public:
     // Dispatches the compute shader. Call outside a render pass.
     void dispatchCompute(vk::CommandBuffer commandBuffer) override;
 
-    void renderGameObjects(FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) override;
+    void renderGameObjects(FrameInfo& frameInfo,
+                           std::vector<GameObject>& gameObjects) override;
 
-protected:
+   protected:
     // Writes m_particleBuffer and m_simulationParamsBuffer into
     // the compute descriptor set allocated by the base class.
     void buildComputeDescriptors() override;
 
-private:
+   private:
     void bindBuffers(vk::CommandBuffer commandBuffer) const;
 
     // Particle storage buffer: [uint32_t count | Particle[MAX_PARTICLES]]
@@ -78,9 +76,9 @@ private:
     std::unique_ptr<DixBuffer> m_simulationParamsBuffer;
 
     ParticleSimulationParams m_simParams{};
-    uint32_t m_particleCount{ 0 };
+    uint32_t m_particleCount{0};
     static constexpr uint32_t MAX_PARTICLES = 1'000'000;
 };
 
-}   // namespace dix
-#endif // PARTICLE_RENDER_SYSTEM_HPP
+}  // namespace dix
+#endif  // PARTICLE_RENDER_SYSTEM_HPP

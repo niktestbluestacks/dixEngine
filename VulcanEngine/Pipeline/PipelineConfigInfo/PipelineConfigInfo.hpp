@@ -30,9 +30,10 @@ struct PipelineConfigInfo {
 
     // Optional custom vertex input descriptions
     std::vector<vk::VertexInputBindingDescription> vertexBindingDescriptions;
-    std::vector<vk::VertexInputAttributeDescription> vertexAttributeDescriptions;
+    std::vector<vk::VertexInputAttributeDescription>
+        vertexAttributeDescriptions;
 };
 
 }  // namespace dix
 
-#endif // _PIPELINE_CONFIG_INFO_HPP_
+#endif  // _PIPELINE_CONFIG_INFO_HPP_

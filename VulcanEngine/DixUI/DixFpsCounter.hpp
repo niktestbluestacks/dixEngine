@@ -7,19 +7,19 @@
 namespace dix {
 
 class DixFpsCounter : public DixUIElement {
-public:
-    using DixUIElement::DixUIElement; // inherit constructor
+   public:
+    using DixUIElement::DixUIElement;  // inherit constructor
     DixFpsCounter(DixFpsCounter&& other);
     ~DixFpsCounter() override = default;
 
     void update(float dt, const AdditionalUIInfo& additionalInfo) override;
 
-private:
+   private:
     float m_acc = 0.f;
     int m_frames = 0;
     int m_fps = 0;
     std::string m_lastText;
 };
-}   // namespace dix
+}  // namespace dix
 
-#endif // DIX_FPS_COUNTER_HPP
+#endif  // DIX_FPS_COUNTER_HPP

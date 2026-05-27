@@ -10,26 +10,28 @@
 namespace dix {
 
 class DixBuffer {
-public:
-    DixBuffer(
-        EngineDevice& device,
-        vk::DeviceSize instanceSize,
-        uint32_t instanceCount,
-        vk::BufferUsageFlags usageFlags,
-        vk::MemoryPropertyFlags memoryPropertyFlags,
-        vk::DeviceSize minOffsetAlignment = 1);
+   public:
+    DixBuffer(EngineDevice& device, vk::DeviceSize instanceSize,
+              uint32_t instanceCount, vk::BufferUsageFlags usageFlags,
+              vk::MemoryPropertyFlags memoryPropertyFlags,
+              vk::DeviceSize minOffsetAlignment = 1);
     ~DixBuffer();
 
     DixBuffer(const DixBuffer&) = delete;
     DixBuffer& operator=(const DixBuffer&) = delete;
 
-    vk::Result map(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0);
+    vk::Result map(vk::DeviceSize size = VK_WHOLE_SIZE,
+                   vk::DeviceSize offset = 0);
     void unmap();
 
-    void writeToBuffer(void* data, vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0);
-    vk::Result flush(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0);
-    vk::DescriptorBufferInfo descriptorInfo(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0);
-    vk::Result invalidate(vk::DeviceSize size = VK_WHOLE_SIZE, vk::DeviceSize offset = 0);
+    void writeToBuffer(void* data, vk::DeviceSize size = VK_WHOLE_SIZE,
+                       vk::DeviceSize offset = 0);
+    vk::Result flush(vk::DeviceSize size = VK_WHOLE_SIZE,
+                     vk::DeviceSize offset = 0);
+    vk::DescriptorBufferInfo descriptorInfo(vk::DeviceSize size = VK_WHOLE_SIZE,
+                                            vk::DeviceSize offset = 0);
+    vk::Result invalidate(vk::DeviceSize size = VK_WHOLE_SIZE,
+                          vk::DeviceSize offset = 0);
 
     void writeToIndex(void* data, int index);
     vk::Result flushIndex(int index);
@@ -42,11 +44,14 @@ public:
     vk::DeviceSize getInstanceSize() const { return instanceSize; }
     vk::DeviceSize getAlignmentSize() const { return instanceSize; }
     vk::BufferUsageFlags getUsageFlags() const { return usageFlags; }
-    vk::MemoryPropertyFlags getMemoryPropertyFlags() const { return memoryPropertyFlags; }
+    vk::MemoryPropertyFlags getMemoryPropertyFlags() const {
+        return memoryPropertyFlags;
+    }
     vk::DeviceSize getBufferSize() const { return bufferSize; }
 
-private:
-    static vk::DeviceSize getAlignment(vk::DeviceSize instanceSize, vk::DeviceSize minOffsetAlignment);
+   private:
+    static vk::DeviceSize getAlignment(vk::DeviceSize instanceSize,
+                                       vk::DeviceSize minOffsetAlignment);
 
     EngineDevice& m_dixDevice;
     void* m_mapped = nullptr;
@@ -63,5 +68,4 @@ private:
 
 }  // namespace dix
 
-
-#endif // DIX_BUFFER_HPP
+#endif  // DIX_BUFFER_HPP

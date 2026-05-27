@@ -3,9 +3,10 @@
 
 // dix
 #include <Model/DixTexture/DixTexture.hpp>
-#include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
+#include <Pipeline/EngineDevice/EngineDevice.hpp>
+
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -19,93 +20,88 @@
 
 namespace dix {
 class Model {
-public:
-        struct Vertex {
-                glm::vec3 position;
-                glm::vec3 color;
-                glm::vec3 normal{};
-                glm::vec2 uv{};
+   public:
+    struct Vertex {
+        glm::vec3 position;
+        glm::vec3 color;
+        glm::vec3 normal{};
+        glm::vec2 uv{};
 
-                static std::vector <vk::VertexInputBindingDescription> getBindingDescriptions();
-                static std::vector <vk::VertexInputAttributeDescription> getAttributeDescriptions();
+        static std::vector<vk::VertexInputBindingDescription>
+        getBindingDescriptions();
+        static std::vector<vk::VertexInputAttributeDescription>
+        getAttributeDescriptions();
 
-                bool operator==(const Vertex& other) const {
-                        return position == other.position &&
-                                color == other.color &&
-                                normal == other.normal &&
-                                uv == other.uv;
-                }
-        };
+        bool operator==(const Vertex& other) const {
+            return position == other.position && color == other.color &&
+                   normal == other.normal && uv == other.uv;
+        }
+    };
 
-        struct TextureInfo {
-                vk::ImageView view { nullptr };
-                vk::Sampler sampler { nullptr };
-        };
+    struct TextureInfo {
+        vk::ImageView view{nullptr};
+        vk::Sampler sampler{nullptr};
+    };
 
-        struct SubMesh {
-                std::vector<Vertex> vertices;
-                std::vector<uint32_t> indices;
-                std::string texturePath;
-                glm::vec3 baseColor{1.0f};
-                uint32_t textureIndex{0};
-                DixTexture texture;
-        };
+    struct SubMesh {
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
+        std::string texturePath;
+        glm::vec3 baseColor{1.0f};
+        uint32_t textureIndex{0};
+        DixTexture texture;
+    };
 
-        struct Builder {
-                std::vector <Vertex> vertices{};
-                std::vector <uint32_t> indices{};
-                std::vector<SubMesh> submeshes{};
+    struct Builder {
+        std::vector<Vertex> vertices{};
+        std::vector<uint32_t> indices{};
+        std::vector<SubMesh> submeshes{};
 
-                DixTexture texture;
+        DixTexture texture;
 
-                void loadModel(const std::string& filepath, EngineDevice& device);
-        };
+        void loadModel(const std::string& filepath, EngineDevice& device);
+    };
 
-        Model(
-                EngineDevice& dixDevice,
-                const Model::Builder& builder,
-                DixDescriptorPool& descriptorPool,
-                DixDescriptorSetLayout& descriptorSetLayout
-        );
-        ~Model();
+    Model(EngineDevice& dixDevice, const Model::Builder& builder,
+          DixDescriptorPool& descriptorPool,
+          DixDescriptorSetLayout& descriptorSetLayout);
+    ~Model();
 
-        Model(const Model&) = delete;
-        Model& operator=(const Model&) = delete;
+    Model(const Model&) = delete;
+    Model& operator=(const Model&) = delete;
 
-        void bind(vk::CommandBuffer commandBuffer);
-        void draw(vk::CommandBuffer commandBuffer);
+    void bind(vk::CommandBuffer commandBuffer);
+    void draw(vk::CommandBuffer commandBuffer);
 
-        static std::unique_ptr <Model> createModelFromFile(
-                EngineDevice& engineDevice,
-                const std::string& filepath,
-                DixDescriptorPool& descriptorPool,
-                DixDescriptorSetLayout& descriptorSetLayout
-        );
+    static std::unique_ptr<Model> createModelFromFile(
+        EngineDevice& engineDevice, const std::string& filepath,
+        DixDescriptorPool& descriptorPool,
+        DixDescriptorSetLayout& descriptorSetLayout);
 
-        vk::DescriptorSet getDescriptorSet() const { return m_descriptorSet; }
+    vk::DescriptorSet getDescriptorSet() const { return m_descriptorSet; }
 
-private:
-        void createVertexBuffers(const std::vector <Vertex>& vertices);
-        void createIndexBuffers(const std::vector <uint32_t>& indices);
-        void createDescriptorSet(
-                DixDescriptorPool& descriptorPool,
-                DixDescriptorSetLayout& descriptorSetLayout
-        );
-private:
-        EngineDevice& m_dixDevice;      // static?
+   private:
+    void createVertexBuffers(const std::vector<Vertex>& vertices);
+    void createIndexBuffers(const std::vector<uint32_t>& indices);
+    void createDescriptorSet(DixDescriptorPool& descriptorPool,
+                             DixDescriptorSetLayout& descriptorSetLayout);
 
-        std::unique_ptr <DixBuffer> m_vertexBuffer;
-        uint32_t vertexCount;
+   private:
+    EngineDevice& m_dixDevice;  // static?
 
-        bool m_hasIndexBuffer = false;
-        std::unique_ptr <DixBuffer> m_indexBuffer;
-        uint32_t indexCount;
+    std::unique_ptr<DixBuffer> m_vertexBuffer;
+    uint32_t vertexCount;
 
-        TextureInfo m_textureInfo{};
-        DixTexture m_defaultTexture;
-        vk::DescriptorSet m_descriptorSet{nullptr};
-public:
-        const TextureInfo& getTextureInfo() const { return m_textureInfo; }
+    bool m_hasIndexBuffer = false;
+    std::unique_ptr<DixBuffer> m_indexBuffer;
+    uint32_t indexCount;
+
+    TextureInfo m_textureInfo{};
+    DixTexture m_defaultTexture;
+    vk::DescriptorSet m_descriptorSet{nullptr};
+
+   public:
+    const TextureInfo& getTextureInfo() const { return m_textureInfo; }
 };
-}       // namespace dix
-#endif // MODEL_HPP
+}  // namespace dix
+#endif  // MODEL_HPP

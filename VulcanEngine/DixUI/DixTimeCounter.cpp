@@ -18,12 +18,12 @@ void DixTimeCounter::update(float dt, const AdditionalUIInfo& additionalInfo) {
         std::tm* nowTm = &nowTmStorage;
         localtime_s(nowTm, &timeT);
         lastText = std::to_string(nowTm->tm_year + 1900) + "-" +
-                        std::to_string(nowTm->tm_mon + 1) + "-" +
-                        std::to_string(nowTm->tm_mday) + "--" +
-                        std::to_string(nowTm->tm_hour) + ":" + 
-                        std::to_string(nowTm->tm_min) + ":" + 
-                        std::to_string(nowTm->tm_sec);
+                   std::to_string(nowTm->tm_mon + 1) + "-" +
+                   std::to_string(nowTm->tm_mday) + "--" +
+                   std::to_string(nowTm->tm_hour) + ":" +
+                   std::to_string(nowTm->tm_min) + ":" +
+                   std::to_string(nowTm->tm_sec);
         buildVerticesForText(lastText, 8.f, 4.f);
     }
 }
-}   // namespace dix
+}  // namespace dix

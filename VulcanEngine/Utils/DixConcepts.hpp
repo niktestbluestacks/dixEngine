@@ -3,25 +3,22 @@
 
 // std
 #include <concepts>
+#include <cstdint>
 #include <tuple>
 #include <type_traits>
-#include <cstdint>
 
-//libs
+
+// libs
 
 #include <vulkan/vulkan.hpp>
 
 namespace dix {
 
 template <typename T>
-concept HasUbos = requires {
-    typename T::Ubos;
-};
+concept HasUbos = requires { typename T::Ubos; };
 
 template <typename T>
-concept HasName = requires {
-    T::Name();
-};
+concept HasName = requires { T::Name(); };
 
 template <typename T>
 struct is_tuple : std::false_type {};
@@ -40,21 +37,22 @@ template <typename T, typename Y>
 struct same_tuple_type_as : std::false_type {};
 
 template <typename T, typename... Args>
-struct same_tuple_type_as <T, std::tuple <Args...>> :
-    std::conditional_t<
-        (... && std::same_as<T, Args>),
-        std::true_type,
-        std::false_type
-    > {};
+struct same_tuple_type_as<T, std::tuple<Args...>>
+    : std::conditional_t<(... && std::same_as<T, Args>), std::true_type,
+                         std::false_type> {};
 
 template <typename T>
-concept HasVulkanFlags = requires (T t) {
+concept HasVulkanFlags = requires(T t) {
     { T::getVulkanFlags() };
-    requires []<typename... InnerTuples>(std::tuple<InnerTuples...>) {
+    requires[]<typename... InnerTuples>(std::tuple<InnerTuples...>) {
         // Проверяем каждый внутренний элемент через свертку (fold expression)
-        return (... && std::same_as<InnerTuples, std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>>);
-    }(decltype(T::getVulkanFlags()){});
+        return (
+            ... &&
+            std::same_as<InnerTuples, std::tuple<uint32_t, vk::DescriptorType,
+                                                 vk::ShaderStageFlags>>);
+    }
+    (decltype(T::getVulkanFlags()){});
 };
-}   // namespace dix
+}  // namespace dix
 
-#endif // DIX_CONCEPTRS_HPP
+#endif  // DIX_CONCEPTRS_HPP

@@ -1,14 +1,16 @@
 // dix
-#include <Model/DixTexture/DixTexture.hpp>
 #include <Logger/Logger.hpp>
+#include <Model/DixTexture/DixTexture.hpp>
+
 
 // libs
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 // std
-#include <stdexcept>
 #include <filesystem>
+#include <stdexcept>
+
 
 namespace dix {
 DixTexture::DixTexture() {
@@ -20,14 +22,12 @@ DixTexture::DixTexture() {
 
 DixTexture::~DixTexture() = default;
 
-DixTexture::DixTexture(vk::Image image, vk::DeviceMemory memory, vk::ImageView view, vk::Sampler sampler):
-        m_image(image),
-        m_memory(memory),
-        m_view(view),
-        m_sampler(sampler) {}
+DixTexture::DixTexture(vk::Image image, vk::DeviceMemory memory,
+                       vk::ImageView view, vk::Sampler sampler)
+    : m_image(image), m_memory(memory), m_view(view), m_sampler(sampler) {}
 
 DixTexture createDefaultTexture(EngineDevice& dixDevice) {
-    const int texWidth  = 1;
+    const int texWidth = 1;
     const int texHeight = 1;
     const vk::Format texFormat = vk::Format::eR8G8B8A8Unorm;
 
@@ -37,23 +37,28 @@ DixTexture createDefaultTexture(EngineDevice& dixDevice) {
     // 1. create staging buffer
     DixBuffer staging{dixDevice, 4, 1, vk::BufferUsageFlagBits::eTransferSrc,
                       vk::MemoryPropertyFlagBits::eHostVisible |
-                      vk::MemoryPropertyFlagBits::eHostCoherent};
+                          vk::MemoryPropertyFlagBits::eHostCoherent};
     staging.map();
     staging.writeToBuffer(pixel);
 
     // 2. create image
-    DixImage tex{dixDevice, texFormat, texWidth, texHeight,
-                 vk::ImageTiling::eOptimal,
-                 vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst,
-                 vk::MemoryPropertyFlagBits::eDeviceLocal};
+    DixImage tex{
+        dixDevice,
+        texFormat,
+        texWidth,
+        texHeight,
+        vk::ImageTiling::eOptimal,
+        vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst,
+        vk::MemoryPropertyFlagBits::eDeviceLocal};
 
     // 3. transition & copy
     dixDevice.transitionImageLayout(tex.getImage(), vk::ImageLayout::eUndefined,
-                                 vk::ImageLayout::eTransferDstOptimal);
-    dixDevice.copyBufferToImage(staging.getBuffer(), tex.getImage(),
-                             texWidth, texHeight);
-    dixDevice.transitionImageLayout(tex.getImage(), vk::ImageLayout::eTransferDstOptimal,
-                                 vk::ImageLayout::eShaderReadOnlyOptimal);
+                                    vk::ImageLayout::eTransferDstOptimal);
+    dixDevice.copyBufferToImage(staging.getBuffer(), tex.getImage(), texWidth,
+                                texHeight);
+    dixDevice.transitionImageLayout(tex.getImage(),
+                                    vk::ImageLayout::eTransferDstOptimal,
+                                    vk::ImageLayout::eShaderReadOnlyOptimal);
 
     // 4. take ownership of image/view/memory from DixImage
     vk::Image viewImage;
@@ -81,10 +86,11 @@ DixTexture createDefaultTexture(EngineDevice& dixDevice) {
 
     vk::Sampler sampler = dixDevice.device().createSampler(samplerInfo);
 
-    return { viewImage, viewMemory, view, sampler };
+    return {viewImage, viewMemory, view, sampler};
 }
 
-DixTexture createTextureFromFile(const std::string& path, EngineDevice& dixDevice) {
+DixTexture createTextureFromFile(const std::string& path,
+                                 EngineDevice& dixDevice) {
     // Debug: log texture path
     DixLogDebug("Loading texture from: {}", path);
 
@@ -95,36 +101,41 @@ DixTexture createTextureFromFile(const std::string& path, EngineDevice& dixDevic
 
     int texWidth, texHeight, texChannels;
     const vk::Format texFormat = vk::Format::eR8G8B8A8Unorm;
-    stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+    stbi_uc* pixels = stbi_load(path.c_str(), &texWidth, &texHeight,
+                                &texChannels, STBI_rgb_alpha);
     if (!pixels) throw std::runtime_error("Failed to load texture: " + path);
 
     const vk::DeviceSize imageSize = texWidth * texHeight * 4;
 
-    vk::DeviceSize instanceSize = 4; // RGBA8
+    vk::DeviceSize instanceSize = 4;  // RGBA8
 
     // 1. staging buffer
     DixBuffer staging{dixDevice, instanceSize, static_cast<uint32_t>(imageSize),
                       vk::BufferUsageFlagBits::eTransferSrc,
                       vk::MemoryPropertyFlagBits::eHostVisible |
-                      vk::MemoryPropertyFlagBits::eHostCoherent};
+                          vk::MemoryPropertyFlagBits::eHostCoherent};
     staging.map();
     staging.writeToBuffer(pixels, imageSize);
     stbi_image_free(pixels);
 
     // 2. image
-    DixImage tex{dixDevice, vk::Format::eR8G8B8A8Unorm,
-                 static_cast <uint32_t>(texWidth), static_cast <uint32_t>(texHeight),
-                 vk::ImageTiling::eOptimal,
-                 vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst,
-                 vk::MemoryPropertyFlagBits::eDeviceLocal};
+    DixImage tex{
+        dixDevice,
+        vk::Format::eR8G8B8A8Unorm,
+        static_cast<uint32_t>(texWidth),
+        static_cast<uint32_t>(texHeight),
+        vk::ImageTiling::eOptimal,
+        vk::ImageUsageFlagBits::eSampled | vk::ImageUsageFlagBits::eTransferDst,
+        vk::MemoryPropertyFlagBits::eDeviceLocal};
 
     // 3. transition & copy
     dixDevice.transitionImageLayout(tex.getImage(), vk::ImageLayout::eUndefined,
-                                 vk::ImageLayout::eTransferDstOptimal);
-    dixDevice.copyBufferToImage(staging.getBuffer(), tex.getImage(),
-                             texWidth, texHeight);
-    dixDevice.transitionImageLayout(tex.getImage(), vk::ImageLayout::eTransferDstOptimal,
-                                 vk::ImageLayout::eShaderReadOnlyOptimal);
+                                    vk::ImageLayout::eTransferDstOptimal);
+    dixDevice.copyBufferToImage(staging.getBuffer(), tex.getImage(), texWidth,
+                                texHeight);
+    dixDevice.transitionImageLayout(tex.getImage(),
+                                    vk::ImageLayout::eTransferDstOptimal,
+                                    vk::ImageLayout::eShaderReadOnlyOptimal);
 
     // 4. take ownership of image/view/memory from DixImage
     vk::Image viewImage;
@@ -152,6 +163,6 @@ DixTexture createTextureFromFile(const std::string& path, EngineDevice& dixDevic
 
     vk::Sampler sampler = dixDevice.device().createSampler(samplerInfo);
 
-    return { viewImage, viewMemory, view, sampler };
+    return {viewImage, viewMemory, view, sampler};
 }
-}   // namespace dix
+}  // namespace dix

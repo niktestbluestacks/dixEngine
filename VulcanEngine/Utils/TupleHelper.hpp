@@ -5,13 +5,11 @@
 
 namespace dix {
 
-    template <typename Tuple, typename Func>
-    void forEachInTuple(Tuple& tupleT, Func&& func) {
-        std::apply([&](auto&&... args) {
-            (func(args),...);
-        }, tupleT);
-    }
+template <typename Tuple, typename Func>
+void forEachInTuple(Tuple& tupleT, Func&& func) {
+    std::apply([&](auto&&... args) { (func(args), ...); }, tupleT);
+}
 
-}   // namespace dix
+}  // namespace dix
 
-#endif // TUPLE_HELPER_HPP
+#endif  // TUPLE_HELPER_HPP

@@ -1,7 +1,6 @@
 
 // retarted fpr counter, use DixFpsCounter instead
 
-
 // #ifndef FPS_COUNTER_HPP
 // #define FPG_COUNTER_HPP
 
@@ -19,8 +18,8 @@
 
 // class FpsCounter : public IUIElement {
 // public:
-//     FpsCounter(UIRenderer& uiRenderer, VkExtent2D screenExtent, const std::string& fontTxtPath, const std::string& fontTgaPath);
-//     ~FpsCounter();
+//     FpsCounter(UIRenderer& uiRenderer, VkExtent2D screenExtent, const
+//     std::string& fontTxtPath, const std::string& fontTgaPath); ~FpsCounter();
 
 //     void update(float dt) override;
 //     void render(FrameInfo& fi) override;

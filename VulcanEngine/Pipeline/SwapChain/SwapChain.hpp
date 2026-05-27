@@ -8,23 +8,27 @@
 #include <vulkan/vulkan.hpp>
 
 // std
-#include <vector>
 #include <memory>
+#include <vector>
+
 
 namespace dix {
 
 class SwapChain {
-public:
+   public:
     static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
     SwapChain(EngineDevice& deviceRef, vk::Extent2D windowExtent);
-    SwapChain(EngineDevice& deviceRef, vk::Extent2D windowExtent, std::shared_ptr <SwapChain> previous);
+    SwapChain(EngineDevice& deviceRef, vk::Extent2D windowExtent,
+              std::shared_ptr<SwapChain> previous);
     ~SwapChain();
 
     SwapChain(const SwapChain&) = delete;
     SwapChain operator=(const SwapChain&) = delete;
 
-    vk::Framebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
+    vk::Framebuffer getFrameBuffer(int index) {
+        return swapChainFramebuffers[index];
+    }
     vk::RenderPass getRenderPass() { return renderPass; }
     vk::ImageView getImageView(int index) { return swapChainImageViews[index]; }
     size_t imageCount() { return swapChainImages.size(); }
@@ -34,19 +38,21 @@ public:
     uint32_t height() { return swapChainExtent.height; }
 
     float extentAspectRatio() {
-        return static_cast<float>(swapChainExtent.width) / static_cast<float>(swapChainExtent.height);
+        return static_cast<float>(swapChainExtent.width) /
+               static_cast<float>(swapChainExtent.height);
     }
     vk::Format findDepthFormat();
 
     vk::Result acquireNextImage(uint32_t* imageIndex);
-    vk::Result submitCommandBuffers(const vk::CommandBuffer* buffers, uint32_t* imageIndex);
+    vk::Result submitCommandBuffers(const vk::CommandBuffer* buffers,
+                                    uint32_t* imageIndex);
 
     bool compareSwapFormats(const SwapChain& swapChain) const {
         return swapChain.swapChainDepthFormat == swapChainDepthFormat &&
-            swapChain.swapChainImageFormat == swapChainImageFormat;
+               swapChain.swapChainImageFormat == swapChainImageFormat;
     }
 
-private:
+   private:
     void init();
     void createSwapChain();
     void createImageViews();
@@ -60,7 +66,8 @@ private:
         const std::vector<vk::SurfaceFormatKHR>& availableFormats);
     vk::PresentModeKHR chooseSwapPresentMode(
         const std::vector<vk::PresentModeKHR>& availablePresentModes);
-    vk::Extent2D chooseSwapExtent(const vk::SurfaceCapabilitiesKHR& capabilities);
+    vk::Extent2D chooseSwapExtent(
+        const vk::SurfaceCapabilitiesKHR& capabilities);
 
     vk::Format swapChainImageFormat;
     vk::Format swapChainDepthFormat;
@@ -79,7 +86,7 @@ private:
     vk::Extent2D windowExtent;
 
     vk::SwapchainKHR swapChain;
-    std::shared_ptr <SwapChain> oldSwapChain;
+    std::shared_ptr<SwapChain> oldSwapChain;
 
     std::vector<vk::Semaphore> imageAvailableSemaphores;
     std::vector<vk::Semaphore> renderFinishedSemaphores;
@@ -89,4 +96,4 @@ private:
 };
 
 }  // namespace dix
-#endif // SWAP_CHAIN_HPP
+#endif  // SWAP_CHAIN_HPP

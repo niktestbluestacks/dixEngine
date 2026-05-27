@@ -2,19 +2,21 @@
 #define FRAME_RECORDER_HPP
 
 // dix
-#include <Model/GameObject/GameObject.hpp>
 #include <Logger/Logger.hpp>
+#include <Model/GameObject/GameObject.hpp>
+
 
 // libs
 #include <glm/glm.hpp>
 
 // std
-#include <string>
+#include <cstdint>
 #include <fstream>
+#include <map>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <cstdint>
-#include <map>
+
 
 namespace dix {
 
@@ -38,11 +40,12 @@ struct RecordedFrame {
 
 struct InitialStructure {
     // render system name -> vector of recorded game objects
-    std::unordered_map<std::string, std::vector<RecordedGameObject>> gameObjectsByRenderSystem;
+    std::unordered_map<std::string, std::vector<RecordedGameObject>>
+        gameObjectsByRenderSystem;
 };
 
 class FrameRecorder {
-public:
+   public:
     FrameRecorder() = default;
     ~FrameRecorder() = default;
 
@@ -54,35 +57,30 @@ public:
     void stopRecording();
 
     void recordInitialStructure(
-        const std::unordered_map<std::string, std::vector<GameObject>>& gameObjects
-    );
+        const std::unordered_map<std::string, std::vector<GameObject>>&
+            gameObjects);
 
     void recordFrame(
-        const std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
-        const glm::vec3& cameraPosition,
-        const glm::vec3& cameraLookAt,
-        float frameTime
-    );
+        const std::unordered_map<std::string, std::vector<GameObject>>&
+            gameObjects,
+        const glm::vec3& cameraPosition, const glm::vec3& cameraLookAt,
+        float frameTime);
 
     // Playback API
     void startPlayback(
         const std::string& filename,
         std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
-        glm::vec3& cameraPosition,
-        glm::vec3& cameraLookAt
-    );
+        glm::vec3& cameraPosition, glm::vec3& cameraLookAt);
 
     void stopPlayback();
 
     bool updatePlayback(
         std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
-        glm::vec3& cameraPosition,
-        glm::vec3& cameraLookAt
-    );
+        glm::vec3& cameraPosition, glm::vec3& cameraLookAt);
 
     const RecordedFrame* getCurrentFrame() const;
 
-private:
+   private:
     bool m_isRecording = false;
     bool m_isPlaying = false;
     std::string m_filename;
@@ -101,7 +99,8 @@ private:
     // For playback: map (renderSystemName, objectIndex) -> recorded ID
     std::map<std::pair<std::string, size_t>, GameObject::id_t> m_playbackIdMap;
     // Reverse map: recorded ID -> (renderSystemName, objectIndex)
-    std::unordered_map<GameObject::id_t, std::pair<std::string, size_t>> m_idToLocationMap;
+    std::unordered_map<GameObject::id_t, std::pair<std::string, size_t>>
+        m_idToLocationMap;
 
     // Helpers
     std::string getModelPath(const GameObject& obj) const;
@@ -114,6 +113,6 @@ private:
 // Global singleton accessor (as used in FirstApp.cpp)
 FrameRecorder& getFrameRecorder();
 
-} // namespace dix
+}  // namespace dix
 
-#endif // FRAME_RECORDER_HPP
+#endif  // FRAME_RECORDER_HPP

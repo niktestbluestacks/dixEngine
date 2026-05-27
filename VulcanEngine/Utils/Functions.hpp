@@ -1,12 +1,13 @@
 #ifndef FUNCTIONS_HPP
 #define FUNCTIONS_HPP
 
-#include <string>
-#include <format>
 #include <concepts>
+#include <format>
+#include <string>
+
 
 namespace dix {
-template<typename... Args>
+template <typename... Args>
 constexpr std::string formatRuntime(const char* fmt, Args&&... args) {
     if constexpr (sizeof...(args) == 0) {
         return std::string(fmt);
@@ -15,5 +16,5 @@ constexpr std::string formatRuntime(const char* fmt, Args&&... args) {
         return std::vformat(fmt, std::make_format_args(args...));
     }
 }
-}   // namespace dix
-#endif // FUNCTIONS_HPP
+}  // namespace dix
+#endif  // FUNCTIONS_HPP

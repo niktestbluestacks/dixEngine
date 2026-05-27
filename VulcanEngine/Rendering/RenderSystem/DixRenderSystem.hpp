@@ -3,30 +3,33 @@
 
 // dix
 #include <DixCamera/DixCamera.hpp>
-#include <Pipeline/EngineDevice/EngineDevice.hpp>
-#include <Pipeline/DixDescriptors/DixDescriptors.hpp>
-#include <Pipeline/ComputePipeline/ComputePipeline.hpp>
 #include <Model/GameObject/GameObject.hpp>
+#include <Pipeline/ComputePipeline/ComputePipeline.hpp>
+#include <Pipeline/DixDescriptors/DixDescriptors.hpp>
+#include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/Pipeline/Pipeline.hpp>
-#include <Utils/FrameInfo.hpp>
 #include <Utils/Class.hpp>
+#include <Utils/FrameInfo.hpp>
+
 
 // std
+#include <array>
 #include <functional>
 #include <memory>
 #include <optional>
 #include <string>
-#include <vector>
-#include <array>
 #include <tuple>
+#include <vector>
+
 
 namespace dix {
 
-using VulkanRenderSystemFlagType = std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>;
+using VulkanRenderSystemFlagType =
+    std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>;
 
 struct BasePushConstantData {
-    glm::mat4 modelMatrix{ 1.f };
-    glm::mat4 normalMatrix{ 1.f };
+    glm::mat4 modelMatrix{1.f};
+    glm::mat4 normalMatrix{1.f};
 };
 
 // ComputePipelineConfig
@@ -71,8 +74,8 @@ struct DixRenderSystemConfig {
     // Optional custom vertex input.  When empty the pipeline is
     // created with no vertex bindings (e.g. for full-screen quads
     // or procedural geometry driven by a storage buffer).
-    std::vector<vk::VertexInputBindingDescription>    vertexBindings;
-    std::vector<vk::VertexInputAttributeDescription>  vertexAttributes;
+    std::vector<vk::VertexInputBindingDescription> vertexBindings;
+    std::vector<vk::VertexInputAttributeDescription> vertexAttributes;
 
     // Per-object push-constant writer.
     // Signature: (pointer to push-constant block, game object)
@@ -94,51 +97,46 @@ struct DixRenderSystemConfig {
 };
 
 class DixRenderSystem {
-public:
+   public:
     using PushConstantData = BasePushConstantData;
 
-    DixRenderSystem(
-        EngineDevice& engineDevice,
-        vk::RenderPass renderPass,
-        vk::DescriptorSetLayout globalSetLayout,
-        vk::DescriptorSetLayout modelSetLayout,
-        DixRenderSystemConfig config
-    );
+    DixRenderSystem(EngineDevice& engineDevice, vk::RenderPass renderPass,
+                    vk::DescriptorSetLayout globalSetLayout,
+                    vk::DescriptorSetLayout modelSetLayout,
+                    DixRenderSystemConfig config);
     virtual ~DixRenderSystem();
 
     DIX_DISABLE_COPY(DixRenderSystem)
 
-    virtual void renderGameObjects(
-        FrameInfo& frameInfo,
-        std::vector<GameObject>& gameObjects
-    ) const;
+    virtual void renderGameObjects(FrameInfo& frameInfo,
+                                   std::vector<GameObject>& gameObjects) const;
 
-    virtual void renderGameObjects(
-        FrameInfo& frameInfo,
-        std::vector<GameObject>& gameObjects
-    );
+    virtual void renderGameObjects(FrameInfo& frameInfo,
+                                   std::vector<GameObject>& gameObjects);
 
     void setDescriptorPool(std::unique_ptr<DixDescriptorPool> pool) {
         m_descriptorPool = std::move(pool);
     }
     DixDescriptorPool& getDescriptorPool() { return *m_descriptorPool; }
-    const DixDescriptorPool& getDescriptorPool() const { return *m_descriptorPool; }
+    const DixDescriptorPool& getDescriptorPool() const {
+        return *m_descriptorPool;
+    }
 
     // Optional compute pipeline
-    bool hasComputePipeline() const noexcept { return m_computePipeline != nullptr; }
+    bool hasComputePipeline() const noexcept {
+        return m_computePipeline != nullptr;
+    }
 
     // Override in subclasses that use compute.
     // Must be called outside a render pass (before or after graphics).
     virtual void dispatchCompute(vk::CommandBuffer /*commandBuffer*/) {}
 
-protected:
+   protected:
     // Override hooks for advanced pipeline customisation.
     // In the vast majority of cases DixRenderSystemConfig is
     // sufficient and these do NOT need to be overridden.
-    virtual void createPipelineLayout(
-        vk::DescriptorSetLayout globalSetLayout,
-        vk::DescriptorSetLayout modelSetLayout
-    );
+    virtual void createPipelineLayout(vk::DescriptorSetLayout globalSetLayout,
+                                      vk::DescriptorSetLayout modelSetLayout);
     virtual void createPipeline(vk::RenderPass renderPass);
 
     virtual void buildComputeDescriptors() {}
@@ -159,18 +157,17 @@ protected:
     std::unique_ptr<DixDescriptorPool> m_computeDescriptorPool;
     vk::DescriptorSet m_computeDescriptorSet{};
 
-private:
+   private:
     // Internal helpers called by the constructor.
     void initComputeFromConfig(const ComputePipelineConfig& cc);
     void initComputeLayout(
         std::unique_ptr<DixDescriptorSetLayout> setLayout,
-        const std::vector<vk::PushConstantRange>& pushRanges = {}
-    );
+        const std::vector<vk::PushConstantRange>& pushRanges = {});
     void initComputePipeline(const std::string& compShaderPath);
     void initComputeDescriptorPool(uint32_t maxSets = 1);
 };
 
-}   // namespace dix
+}  // namespace dix
 
 #include <Rendering/RenderSystem/RenderSystemTraits.hpp>
-#endif // DIX_RENDER_SYSTEM_HPP
+#endif  // DIX_RENDER_SYSTEM_HPP

@@ -7,12 +7,12 @@ namespace dix {
 
 constexpr bool debugging() {
 #ifdef NDEBUG
-return false;
+    return false;
 #else
-return true;
-#endif // NDEBUG
+    return true;
+#endif  // NDEBUG
 }
 
-}
+}  // namespace dix
 
-#endif // DIX_DEBUG_HPP
+#endif  // DIX_DEBUG_HPP

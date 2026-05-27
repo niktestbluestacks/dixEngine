@@ -8,24 +8,19 @@
 #include <vulkan/vulkan.hpp>
 
 // std
-#include <string>
 #include <stdexcept>
+#include <string>
 #include <tuple>
+
 
 namespace dix {
 class DixImage {
-public:
+   public:
     DixImage();
 
-    DixImage(
-        EngineDevice& dixDevice,
-        vk::Format format,
-        uint32_t width,
-        uint32_t height,
-        vk::ImageTiling tiling,
-        vk::ImageUsageFlags usage,
-        vk::MemoryPropertyFlags properties
-    );
+    DixImage(EngineDevice& dixDevice, vk::Format format, uint32_t width,
+             uint32_t height, vk::ImageTiling tiling, vk::ImageUsageFlags usage,
+             vk::MemoryPropertyFlags properties);
 
     ~DixImage();
 
@@ -35,20 +30,13 @@ public:
 
     std::tuple<vk::Image, vk::DeviceMemory, vk::ImageView> releaseOwnership();
 
-private:
-    void createImage(
-        EngineDevice& device,
-        vk::Format format,
-        uint32_t width,
-        uint32_t height,
-        vk::ImageTiling tiling,
-        vk::ImageUsageFlags usage
-    );
+   private:
+    void createImage(EngineDevice& device, vk::Format format, uint32_t width,
+                     uint32_t height, vk::ImageTiling tiling,
+                     vk::ImageUsageFlags usage);
 
-    void allocateMemory(
-        EngineDevice& device,
-        vk::MemoryPropertyFlags properties
-    );
+    void allocateMemory(EngineDevice& device,
+                        vk::MemoryPropertyFlags properties);
 
     void createImageView(EngineDevice& device, vk::Format format);
 
@@ -60,6 +48,6 @@ private:
     uint32_t m_height;
     EngineDevice* m_dixDevice;
 };
-}
+}  // namespace dix
 
-#endif // DIX_IMAGE_HPP
+#endif  // DIX_IMAGE_HPP

@@ -2,9 +2,10 @@
 #define DIXTEXTURE_HPP
 
 // dix
+#include <Model/DixImage/DixImage.hpp>
 #include <Pipeline/Buffer/DixBuffer.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
-#include <Model/DixImage/DixImage.hpp>
+
 
 // libs
 #include <vulkan/vulkan.hpp>
@@ -12,7 +13,7 @@
 namespace dix {
 
 class DixTexture {
-public:
+   public:
     DixTexture();
     ~DixTexture();
     DixTexture(vk::Image, vk::DeviceMemory, vk::ImageView, vk::Sampler);
@@ -28,16 +29,17 @@ public:
     const vk::DeviceMemory& getDeviceMemory() const { return m_memory; }
     const vk::Sampler& getSampler() const { return m_sampler; }
 
-private:
+   private:
     vk::Image m_image;
     vk::DeviceMemory m_memory;
     vk::ImageView m_view;
     vk::Sampler m_sampler;
 };
 
-DixTexture createDefaultTexture(EngineDevice &dixDevice);
-DixTexture createTextureFromFile(const std::string& path, EngineDevice& dixDevice);
+DixTexture createDefaultTexture(EngineDevice& dixDevice);
+DixTexture createTextureFromFile(const std::string& path,
+                                 EngineDevice& dixDevice);
 
-}   // namespace dix
+}  // namespace dix
 
-#endif // DIXTEXTURE_HPP
+#endif  // DIXTEXTURE_HPP

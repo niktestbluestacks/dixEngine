@@ -14,31 +14,24 @@ struct SkyboxPushContstantData {
     // Empty - skybox doesn't need push constants anymore
 };
 
-using SkyboxRenderSystemBindings = std::tuple<
-    UniformBinding<SkyboxUbo, 0, vk::ShaderStageFlagBits::eVertex>,
-    SamplerBinding<1,            vk::ShaderStageFlagBits::eFragment>
->;
+using SkyboxRenderSystemBindings =
+    std::tuple<UniformBinding<SkyboxUbo, 0, vk::ShaderStageFlagBits::eVertex>,
+               SamplerBinding<1, vk::ShaderStageFlagBits::eFragment> >;
 
-class SkyboxRenderSystem:
-    public DixRenderSystem,
-    public RenderSystemTraits<SkyboxRenderSystemBindings> {
-public:
+class SkyboxRenderSystem
+    : public DixRenderSystem,
+      public RenderSystemTraits<SkyboxRenderSystemBindings> {
+   public:
     using PushConstantData = SkyboxPushContstantData;
     using DixRenderSystem::DixRenderSystem;
-    SkyboxRenderSystem(
-        EngineDevice& device,
-        vk::RenderPass renderPass,
-        vk::DescriptorSetLayout globalSetLayout,
-        vk::DescriptorSetLayout modelSetLayout
-    );
+    SkyboxRenderSystem(EngineDevice& device, vk::RenderPass renderPass,
+                       vk::DescriptorSetLayout globalSetLayout,
+                       vk::DescriptorSetLayout modelSetLayout);
     DIX_DISABLE_COPY(SkyboxRenderSystem)
     ~SkyboxRenderSystem() = default;
 
-    static constexpr const char* Name() {
-        return "SkyboxRenderSystem";
-    }
-
+    static constexpr const char* Name() { return "SkyboxRenderSystem"; }
 };
-}   // namespace dix
+}  // namespace dix
 
-#endif // SKYBOX_RENDER_SYSTEM_HPP
+#endif  // SKYBOX_RENDER_SYSTEM_HPP

@@ -8,32 +8,32 @@
 
 namespace dix {
 
-DixUIElement::DixUIElement(const DixUIInfo& info) :
-        m_uiRenderer(info.uiRenderer), m_screenExtent(info.screenExtent) {
-
+DixUIElement::DixUIElement(const DixUIInfo& info)
+    : m_uiRenderer(info.uiRenderer), m_screenExtent(info.screenExtent) {
     loadFontTxt(info.fontTxtPath);
     loadFontAtlas(info.fontTgaPath);
 
-    m_fontTexture = m_uiRenderer.createTextureFromPixels(m_fontPixels.data(), m_fontWidth, m_fontHeight);
-    // preallocate a reasonably large host-visible vertex buffer to avoid reallocations
-    // during runtime (which can collide with GPU usage and cause submit failures).
-    const uint32_t initialCapacity = 2048; // number of vertices
+    m_fontTexture = m_uiRenderer.createTextureFromPixels(
+        m_fontPixels.data(), m_fontWidth, m_fontHeight);
+    // preallocate a reasonably large host-visible vertex buffer to avoid
+    // reallocations during runtime (which can collide with GPU usage and cause
+    // submit failures).
+    const uint32_t initialCapacity = 2048;  // number of vertices
     m_vertexCapacity = initialCapacity;
     // create one host-visible buffer per frame in flight to avoid CPU/GPU races
-    const size_t kFramesInFlight = 2; // match renderer swapchain frames in flight
+    const size_t kFramesInFlight =
+        2;  // match renderer swapchain frames in flight
     m_vertexBuffers.resize(kFramesInFlight);
     for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
         m_vertexBuffers[i] = std::make_unique<DixBuffer>(
-            m_uiRenderer.getDevice(),
-            sizeof(DixUIVert),
-            m_vertexCapacity,
+            m_uiRenderer.getDevice(), sizeof(DixUIVert), m_vertexCapacity,
             vk::BufferUsageFlagBits::eVertexBuffer,
-            vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostCoherent)
-        );
+            vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) |
+                vk::MemoryPropertyFlags(
+                    vk::MemoryPropertyFlagBits::eHostCoherent));
         m_vertexBuffers[i]->map();
     }
     m_vertexStaging.reserve(initialCapacity * sizeof(DixUIVert));
-
 }
 
 DixUIElement::~DixUIElement() = default;
@@ -42,16 +42,16 @@ void DixUIElement::loadFontTxt(const std::string& path) {
     std::ifstream in(toModelPath(path));
     if (!in.is_open()) throw std::runtime_error("failed to open font txt");
     std::string line;
-    while (std::getline(in,line)) {
+    while (std::getline(in, line)) {
         std::istringstream ss(line);
         int code;
         std::string sym;
-        float u0,u1;
+        float u0, u1;
         int px;
         ss >> code >> sym >> u0 >> u1 >> px;
         if (sym == "space") sym = " ";
         char c = sym[0];
-        m_glyphs[c] = DixGlyphInfo{u0,u1,px};
+        m_glyphs[c] = DixGlyphInfo{u0, u1, px};
     }
 }
 
@@ -74,7 +74,8 @@ void DixUIElement::loadFontAtlas(const std::string& path) {
     if (!in) throw std::runtime_error("failed to read tga image data");
 
     // convert to RGBA
-    m_fontWidth = width; m_fontHeight = height;
+    m_fontWidth = width;
+    m_fontHeight = height;
     m_fontPixels.resize(static_cast<size_t>(width) * height * 4);
     for (size_t i = 0; i < static_cast<size_t>(width) * height; ++i) {
         unsigned char b = raw[i * channels + 0];
@@ -96,7 +97,7 @@ void DixUIElement::upload(FrameInfo& fi) {
     // copy CPU staging into the per-frame mapped buffer for this frame index
     if (m_vertexStaging.empty()) return;
     int idx = fi.frameIndex % static_cast<int>(m_vertexBuffers.size());
-    auto &buf = m_vertexBuffers[idx];
+    auto& buf = m_vertexBuffers[idx];
     if (!buf) return;
     buf->writeToBuffer(m_vertexStaging.data(), m_vertexStaging.size(), 0);
     buf->flush();
@@ -107,14 +108,8 @@ void DixUIElement::render(FrameInfo& fi) {
     // bind descriptor set for font
     vk::PipelineLayout layout = m_uiRenderer.getPipelineLayout();
     fi.commandBuffer.bindDescriptorSets(
-        vk::PipelineBindPoint::eGraphics,
-        layout,
-        0,
-        1,
-        &m_fontTexture.descriptorSet,
-        0,
-        nullptr
-    );
+        vk::PipelineBindPoint::eGraphics, layout, 0, 1,
+        &m_fontTexture.descriptorSet, 0, nullptr);
 
     int idx = fi.frameIndex % static_cast<int>(m_vertexBuffers.size());
     vk::Buffer b = m_vertexBuffers[idx]->getBuffer();
@@ -123,14 +118,15 @@ void DixUIElement::render(FrameInfo& fi) {
 
     // set viewport to screen size so vertex positions in pixels map correctly
     vk::Viewport vp{};
-    vp.x = 0.0f; vp.y = 0.0f;
+    vp.x = 0.0f;
+    vp.y = 0.0f;
     vp.width = static_cast<float>(fi.screenExtent.width);
     vp.height = static_cast<float>(fi.screenExtent.height);
     vp.minDepth = 0.0f;
     vp.maxDepth = 1.0f;
 
     fi.commandBuffer.setViewport(0, 1, &vp);
-    vk::Rect2D scissor{{0,0}, fi.screenExtent};
+    vk::Rect2D scissor{{0, 0}, fi.screenExtent};
     fi.commandBuffer.setScissor(0, 1, &scissor);
     fi.commandBuffer.draw(m_vertexCount, 1, 0, 0);
 }
@@ -149,12 +145,12 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
         float u1 = g.u1;
         float v0 = 0.f, v1 = 1.f;
         // two tris
-        verts.push_back({ x,y,u0,v0 });
-        verts.push_back({ x + gw,y,u1,v0 });
-        verts.push_back({ x + gw,y + gh,u1,v1 });
-        verts.push_back({ x,y,u0,v0 });
-        verts.push_back({ x + gw,y + gh,u1,v1 });
-        verts.push_back({ x,y + gh,u0,v1 });
+        verts.push_back({x, y, u0, v0});
+        verts.push_back({x + gw, y, u1, v0});
+        verts.push_back({x + gw, y + gh, u1, v1});
+        verts.push_back({x, y, u0, v0});
+        verts.push_back({x + gw, y + gh, u1, v1});
+        verts.push_back({x, y + gh, u0, v1});
         x += gw + 1.f;
     }
 
@@ -169,18 +165,19 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
         vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
         for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
             m_vertexBuffers[i] = std::make_unique<DixBuffer>(
-                m_uiRenderer.getDevice(),
-                sizeof(DixUIVert),
-                m_vertexCapacity,
+                m_uiRenderer.getDevice(), sizeof(DixUIVert), m_vertexCapacity,
                 vk::BufferUsageFlagBits::eVertexBuffer,
-                vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostCoherent)
-            );
+                vk::MemoryPropertyFlags(
+                    vk::MemoryPropertyFlagBits::eHostVisible) |
+                    vk::MemoryPropertyFlags(
+                        vk::MemoryPropertyFlagBits::eHostCoherent));
             m_vertexBuffers[i]->map();
         }
     }
 }
 
-void DixUIElement::buildVerticesForText(const std::string& text, float x, float y) {
+void DixUIElement::buildVerticesForText(const std::string& text, float x,
+                                        float y) {
     std::vector<DixUIVert> verts;
     for (char c : text) {
         auto it = m_glyphs.find(c);
@@ -192,12 +189,12 @@ void DixUIElement::buildVerticesForText(const std::string& text, float x, float 
         float u1 = g.u1;
         float v0 = 0.f, v1 = 1.f;
         // two tris
-        verts.push_back({ x,y,u0,v0 });
-        verts.push_back({ x + gw,y,u1,v0 });
-        verts.push_back({ x + gw,y + gh,u1,v1 });
-        verts.push_back({ x,y,u0,v0 });
-        verts.push_back({ x + gw,y + gh,u1,v1 });
-        verts.push_back({ x,y + gh,u0,v1 });
+        verts.push_back({x, y, u0, v0});
+        verts.push_back({x + gw, y, u1, v0});
+        verts.push_back({x + gw, y + gh, u1, v1});
+        verts.push_back({x, y, u0, v0});
+        verts.push_back({x + gw, y + gh, u1, v1});
+        verts.push_back({x, y + gh, u0, v1});
         x += gw + 1.f;
     }
 
@@ -212,15 +209,15 @@ void DixUIElement::buildVerticesForText(const std::string& text, float x, float 
         vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
         for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
             m_vertexBuffers[i] = std::make_unique<DixBuffer>(
-                m_uiRenderer.getDevice(),
-                sizeof(DixUIVert),
-                m_vertexCapacity,
+                m_uiRenderer.getDevice(), sizeof(DixUIVert), m_vertexCapacity,
                 vk::BufferUsageFlagBits::eVertexBuffer,
-                vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostVisible) | vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eHostCoherent)
-            );
+                vk::MemoryPropertyFlags(
+                    vk::MemoryPropertyFlagBits::eHostVisible) |
+                    vk::MemoryPropertyFlags(
+                        vk::MemoryPropertyFlagBits::eHostCoherent));
             m_vertexBuffers[i]->map();
         }
     }
 }
 
-}   // namespace dix
+}  // namespace dix

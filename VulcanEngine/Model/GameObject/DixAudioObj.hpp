@@ -7,14 +7,14 @@
 
 namespace dix {
 class DixAudioObj {
-public:
-	DIX_DISABLE_COPY(DixAudioObj)
-	DIX_ENABLE_MOVE(DixAudioObj)
+   public:
+    DIX_DISABLE_COPY(DixAudioObj)
+    DIX_ENABLE_MOVE(DixAudioObj)
     ~DixAudioObj() = default;
 
     GameObject gameObject;
     DixAudio dixAudio;
 };
-}   // namespace dix
+}  // namespace dix
 
-#endif // DIX_AUDIO_OBJ
+#endif  // DIX_AUDIO_OBJ

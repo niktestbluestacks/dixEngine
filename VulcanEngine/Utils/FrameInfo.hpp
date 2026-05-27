@@ -9,13 +9,13 @@
 
 namespace dix {
 struct FrameInfo {
-	int frameIndex;
-	float frameTime;
-	vk::CommandBuffer commandBuffer;
-	DixCamera& dixcamera;
-	vk::DescriptorSet globalDescriptorSet;
+    int frameIndex;
+    float frameTime;
+    vk::CommandBuffer commandBuffer;
+    DixCamera& dixcamera;
+    vk::DescriptorSet globalDescriptorSet;
     vk::Extent2D screenExtent;
 };
-}	// namespace dix
+}  // namespace dix
 
-#endif // FRAME_INFO_HPP
+#endif  // FRAME_INFO_HPP

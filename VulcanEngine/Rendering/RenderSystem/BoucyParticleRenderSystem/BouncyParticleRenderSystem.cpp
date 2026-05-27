@@ -164,16 +164,16 @@ void BouncyParticleRenderSystem::renderGameObjects(
     m_pipeline->bind(frameInfo.commandBuffer);
     bindBuffers(frameInfo.commandBuffer);
 
-    VkViewport viewport{
+    vk::Viewport viewport{
         0.0f, 0.0f,
         static_cast<float>(frameInfo.screenExtent.width),
         static_cast<float>(frameInfo.screenExtent.height),
         0.0f, 1.0f
     };
-    vkCmdSetViewport(frameInfo.commandBuffer, 0, 1, &viewport);
+    frameInfo.commandBuffer.setViewport(0, 1, &viewport);
 
-    VkRect2D scissor{ {0, 0}, frameInfo.screenExtent };
-    vkCmdSetScissor(frameInfo.commandBuffer, 0, 1, &scissor);
+    vk::Rect2D scissor{ {0, 0}, frameInfo.screenExtent };
+    frameInfo.commandBuffer.setScissor(0, 1, &scissor);
 
     updateParticles(frameInfo.frameTime);
 
@@ -181,8 +181,7 @@ void BouncyParticleRenderSystem::renderGameObjects(
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
         m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
 
-        vkCmdPushConstants(
-            frameInfo.commandBuffer,
+        frameInfo.commandBuffer.pushConstants(
             m_pipelineLayout,
             m_config.pushConstantStages,
             0,
@@ -200,13 +199,12 @@ void BouncyParticleRenderSystem::renderGameObjects(
         // layout that the graphics pipeline layout expects at set 1.
         // The bouncy-particle vertex shader only accesses set 0, binding 0, so
         // set 1 does not need to be bound at all.
-        std::array<VkDescriptorSet, 1> descriptorSets{
+        std::array<vk::DescriptorSet, 1> descriptorSets{
             frameInfo.globalDescriptorSet,
         };
 
-        vkCmdBindDescriptorSets(
-            frameInfo.commandBuffer,
-            VK_PIPELINE_BIND_POINT_GRAPHICS,
+        frameInfo.commandBuffer.bindDescriptorSets(
+            vk::PipelineBindPoint::eGraphics,
             m_pipelineLayout,
             0,
             static_cast<uint32_t>(descriptorSets.size()),
@@ -215,23 +213,23 @@ void BouncyParticleRenderSystem::renderGameObjects(
         );
 
         if (m_particleCount > 0) {
-            vkCmdDraw(frameInfo.commandBuffer, m_particleCount, 1, 0, 0);
+            frameInfo.commandBuffer.draw(m_particleCount, 1, 0, 0);
         }
     }
 }
 
-void BouncyParticleRenderSystem::bindBuffers(VkCommandBuffer commandBuffer) const {
-    // VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
-    // VkDeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
-    // vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
-    VkBuffer buffers[] = { m_particleBuffer->getBuffer() };
+void BouncyParticleRenderSystem::bindBuffers(vk::CommandBuffer commandBuffer) const {
+    // vk::Buffer buffers[] = { m_particleBuffer->getBuffer() };
+    // vk::DeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
+    // commandBuffer.bindVertexBuffers(0, 1, buffers, offsets);
+    vk::Buffer buffers[] = { m_particleBuffer->getBuffer() };
 
     // std430 alignment:
     // uint particleCount -> 4 bytes
     // next struct array aligned to 16 bytes
-    VkDeviceSize offsets[] = { 16 };
+    vk::DeviceSize offsets[] = { 16 };
 
-    vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+    commandBuffer.bindVertexBuffers(0, 1, buffers, offsets);
 }
 
 void BouncyParticleRenderSystem::updateParticles(float deltaTime) {

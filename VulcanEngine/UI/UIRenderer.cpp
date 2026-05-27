@@ -10,7 +10,7 @@
 
 namespace dix {
 
-UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device(device) {
+UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass) : m_device(device) {
     // Descriptor layout: binding 0 = font/sprite texture sampler
     m_descriptorSetLayout = DixDescriptorSetLayout::Builder(m_device)
         .addBinding(0, vk::DescriptorType::eCombinedImageSampler, vk::ShaderStageFlagBits::eFragment)
@@ -22,19 +22,19 @@ UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device
         .build();
 
     // Pipeline layout: one descriptor set + vec2 push constant for screen size
-    VkDescriptorSetLayout descLayout = m_descriptorSetLayout->getDescriptorSetLayout();
-    VkPushConstantRange pushRange{};
-    pushRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    vk::DescriptorSetLayout descLayout = m_descriptorSetLayout->getDescriptorSetLayout();
+    vk::PushConstantRange pushRange{};
+    pushRange.stageFlags = vk::ShaderStageFlagBits::eVertex;
     pushRange.offset     = 0;
     pushRange.size       = sizeof(float) * 2; // vec2 screenSize
 
-    VkPipelineLayoutCreateInfo layoutInfo{};
+    vk::PipelineLayoutCreateInfo layoutInfo{};
     layoutInfo.sType                  = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layoutInfo.setLayoutCount         = 1;
     layoutInfo.pSetLayouts            = &descLayout;
     layoutInfo.pushConstantRangeCount = 1;
     layoutInfo.pPushConstantRanges    = &pushRange;
-    if (vkCreatePipelineLayout(m_device.device(), &layoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
+    if (m_device.device().createPipelineLayout(&layoutInfo, nullptr, &m_pipelineLayout) != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create UI pipeline layout");
     }
 
@@ -44,19 +44,19 @@ UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device
     config.depthStencilInfo.depthTestEnable  = VK_FALSE;
     config.depthStencilInfo.depthWriteEnable = VK_FALSE;
 
-    VkVertexInputBindingDescription binding{};
+    vk::VertexInputBindingDescription binding{};
     binding.binding   = 0;
-    binding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    binding.inputRate = vk::VertexInputRate::eVertex;
     binding.stride    = sizeof(float) * 4;
     config.vertexBindingDescriptions = { binding };
 
-    VkVertexInputAttributeDescription attrPos{};
+    vk::VertexInputAttributeDescription attrPos{};
     attrPos.binding  = 0; attrPos.location = 0;
-    attrPos.format   = VK_FORMAT_R32G32_SFLOAT; attrPos.offset = 0;
+    attrPos.format   = vk::Format::eR32G32Sfloat; attrPos.offset = 0;
 
-    VkVertexInputAttributeDescription attrUV{};
+    vk::VertexInputAttributeDescription attrUV{};
     attrUV.binding   = 0; attrUV.location = 1;
-    attrUV.format    = VK_FORMAT_R32G32_SFLOAT; attrUV.offset = sizeof(float) * 2;
+    attrUV.format    = vk::Format::eR32G32Sfloat; attrUV.offset = sizeof(float) * 2;
     config.vertexAttributeDescriptions = { attrPos, attrUV };
 
     // Alpha blending for UI elements
@@ -80,7 +80,7 @@ UIRenderer::UIRenderer(EngineDevice& device, VkRenderPass renderPass) : m_device
 
 UIRenderer::~UIRenderer() {
     if (m_pipelineLayout != VK_NULL_HANDLE) {
-        vkDestroyPipelineLayout(m_device.device(), m_pipelineLayout, nullptr);
+        m_device.device().destroyPipelineLayout(m_pipelineLayout);
     }
 }
 
@@ -88,7 +88,7 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
     UITexture t;
     t.extent.width  = width;
     t.extent.height = height;
-    VkDeviceSize imageSize = static_cast<VkDeviceSize>(width) * height * 4;
+    vk::DeviceSize imageSize = static_cast<vk::DeviceSize>(width) * height * 4;
 
     DixBuffer staging{
         m_device,
@@ -104,18 +104,18 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
 
     vk::ImageCreateInfo imageInfo{};
     imageInfo.sType         = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageInfo.imageType     = VK_IMAGE_TYPE_2D;
+    imageInfo.imageType     = vk::ImageType::e2D;
     imageInfo.extent.width  = static_cast<uint32_t>(width);
     imageInfo.extent.height = static_cast<uint32_t>(height);
     imageInfo.extent.depth  = 1;
     imageInfo.mipLevels     = 1;
     imageInfo.arrayLayers   = 1;
-    imageInfo.format        = VK_FORMAT_R8G8B8A8_UNORM;
-    imageInfo.tiling        = VK_IMAGE_TILING_OPTIMAL;
-    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    imageInfo.usage         = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    imageInfo.samples       = VK_SAMPLE_COUNT_1_BIT;
-    imageInfo.sharingMode   = VK_SHARING_MODE_EXCLUSIVE;
+    imageInfo.format        = vk::Format::eR8G8B8A8Unorm;
+    imageInfo.tiling        = vk::ImageTiling::eOptimal;
+    imageInfo.initialLayout = vk::ImageLayout::eUndefined;
+    imageInfo.usage         = vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eSampled;
+    imageInfo.samples       = vk::SampleCountFlagBits::e1;
+    imageInfo.sharingMode   = vk::SharingMode::eExclusive;
 
     m_device.createImageWithInfo(imageInfo, vk::MemoryPropertyFlags(vk::MemoryPropertyFlagBits::eDeviceLocal), t.image, t.memory);
     m_device.copyBufferToImage(staging.getBuffer(), t.image, width, height, 1);
@@ -123,38 +123,38 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
     vk::ImageViewCreateInfo viewInfo{};
     viewInfo.sType                           = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.image                           = t.image;
-    viewInfo.viewType                        = VK_IMAGE_VIEW_TYPE_2D;
-    viewInfo.format                          = VK_FORMAT_R8G8B8A8_UNORM;
-    viewInfo.subresourceRange.aspectMask     = VK_IMAGE_ASPECT_COLOR_BIT;
+    viewInfo.viewType                        = vk::ImageViewType::e2D;
+    viewInfo.format                          = vk::Format::eR8G8B8A8Unorm;
+    viewInfo.subresourceRange.aspectMask     = vk::ImageAspectFlagBits::eColor;
     viewInfo.subresourceRange.baseMipLevel   = 0;
     viewInfo.subresourceRange.levelCount     = 1;
     viewInfo.subresourceRange.baseArrayLayer = 0;
     viewInfo.subresourceRange.layerCount     = 1;
 
-    if (vkCreateImageView(m_device.device(), &viewInfo, nullptr, &t.view) != VK_SUCCESS) {
+    if (m_device.device().createImageView(&viewInfo, nullptr, &t.view) != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create UI texture image view");
     }
 
     vk::SamplerCreateInfo samplerInfo{};
     samplerInfo.sType            = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-    samplerInfo.magFilter        = VK_FILTER_LINEAR;
-    samplerInfo.minFilter        = VK_FILTER_LINEAR;
-    samplerInfo.addressModeU     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    samplerInfo.addressModeV     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-    samplerInfo.addressModeW     = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    samplerInfo.magFilter        = vk::Filter::eLinear;
+    samplerInfo.minFilter        = vk::Filter::eLinear;
+    samplerInfo.addressModeU     = vk::SamplerAddressMode::eClampToEdge;
+    samplerInfo.addressModeV     = vk::SamplerAddressMode::eClampToEdge;
+    samplerInfo.addressModeW     = vk::SamplerAddressMode::eClampToEdge;
     samplerInfo.anisotropyEnable = VK_FALSE;
     samplerInfo.maxAnisotropy    = 1.0f;
-    samplerInfo.borderColor      = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    samplerInfo.borderColor      = vk::BorderColor::eIntOpaqueBlack;
     samplerInfo.compareEnable    = VK_FALSE;
-    samplerInfo.compareOp        = VK_COMPARE_OP_ALWAYS;
-    samplerInfo.mipmapMode       = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    samplerInfo.compareOp        = vk::CompareOp::eAlways;
+    samplerInfo.mipmapMode       = vk::SamplerMipmapMode::eLinear;
 
-    if (vkCreateSampler(m_device.device(), &samplerInfo, nullptr, &t.sampler) != VK_SUCCESS) {
+    if (m_device.device().createSampler(&samplerInfo, nullptr, &t.sampler) != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create UI texture sampler");
     }
 
     vk::DescriptorImageInfo imageInfoDesc{};
-    imageInfoDesc.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    imageInfoDesc.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
     imageInfoDesc.imageView   = t.view;
     imageInfoDesc.sampler     = t.sampler;
 
@@ -165,20 +165,19 @@ UITexture UIRenderer::createTextureFromPixels(const unsigned char* pixels, int w
     return t;
 }
 
-void UIRenderer::bindPipeline(VkCommandBuffer cb) {
+void UIRenderer::bindPipeline(vk::CommandBuffer cb) {
     if (m_pipeline) m_pipeline->bind(cb);
 }
 
-void UIRenderer::uploadPushConstants(VkCommandBuffer cb, VkExtent2D screenExtent) {
+void UIRenderer::uploadPushConstants(vk::CommandBuffer cb, vk::Extent2D screenExtent) {
     // The UI vertex shader expects a vec2 push constant: (screenWidth, screenHeight).
     std::array<float, 2> screenSize{
         static_cast<float>(screenExtent.width),
         static_cast<float>(screenExtent.height)
     };
-    vkCmdPushConstants(
-        cb,
+    cb.pushConstants(
         m_pipelineLayout,
-        VK_SHADER_STAGE_VERTEX_BIT,
+        vk::ShaderStageFlagBits::eVertex,
         0,
         sizeof(screenSize),
         screenSize.data());

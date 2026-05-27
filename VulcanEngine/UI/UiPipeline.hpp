@@ -9,16 +9,16 @@ namespace dix {
 
 class UiPipeline {
 public:
-    UiPipeline(EngineDevice& device, VkRenderPass renderPass);
+    UiPipeline(EngineDevice& device, vk::RenderPass renderPass);
     ~UiPipeline();
 
-    void bind(VkCommandBuffer commandBuffer) { if (m_pipeline) m_pipeline->bind(commandBuffer); }
-    VkPipelineLayout getLayout() const { return m_pipelineLayout; }
+    void bind(vk::CommandBuffer commandBuffer) { if (m_pipeline) m_pipeline->bind(commandBuffer); }
+    vk::PipelineLayout getLayout() const { return m_pipelineLayout; }
 
 private:
     EngineDevice& m_device;
     std::unique_ptr<dix::Pipeline> m_pipeline;
-    VkPipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
+    vk::PipelineLayout m_pipelineLayout = VK_NULL_HANDLE;
 };
 
 }   // namespace dix

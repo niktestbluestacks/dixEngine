@@ -14,9 +14,9 @@ struct DixUIVert {
     float u, v; // uv coordinates in font atlas
 };
 
-struct DixGlyphInfo { 
-    float u0, u1; 
-    int px; 
+struct DixGlyphInfo {
+    float u0, u1;
+    int px;
 };
 
 struct AdditionalUIInfo{
@@ -25,7 +25,7 @@ struct AdditionalUIInfo{
 
 struct DixUIInfo {
     UIRenderer& uiRenderer;
-    VkExtent2D screenExtent;
+    vk::Extent2D screenExtent;
     std::string name = "";
     // DixUIVert vert;
     std::string fontTxtPath = "UI/font.txt";
@@ -37,7 +37,7 @@ public:
     DixUIElement(const DixUIInfo& info);
     DixUIElement(DixUIElement&&) = default;
     virtual ~DixUIElement();
-    
+
 protected:
     virtual void loadFontTxt(const std::string& path);
     virtual void loadFontAtlas(const std::string& path);
@@ -48,14 +48,14 @@ public:
     virtual void render(FrameInfo& fi);
     // upload GPU resources for the upcoming frame (called after beginFrame)
     virtual void upload(FrameInfo& fi);
-    
+
 protected:
     void buildVerticesForText(const std::string& text);
     void buildVerticesForText(const std::string& text, float x, float y);
 
 protected:
     UIRenderer& m_uiRenderer;
-    VkExtent2D m_screenExtent;
+    vk::Extent2D m_screenExtent;
     UITexture m_fontTexture;
     std::unordered_map<char, DixGlyphInfo> m_glyphs;
 

@@ -7,7 +7,7 @@
 
 namespace dix {
 
-UiPipeline::UiPipeline(EngineDevice& device, VkRenderPass renderPass) : m_device(device) {
+UiPipeline::UiPipeline(EngineDevice& device, vk::RenderPass renderPass) : m_device(device) {
     PipelineConfigInfo config{};
     Pipeline::defaultPipelineConfigInfo(config);
 
@@ -19,13 +19,13 @@ UiPipeline::UiPipeline(EngineDevice& device, VkRenderPass renderPass) : m_device
     // Default vertex attributes will be used by Pipeline if custom ones are not provided.
 
     // create an empty pipeline layout (no descriptor sets) for this simple pipeline
-    VkPipelineLayoutCreateInfo layoutInfo{};
+    vk::PipelineLayoutCreateInfo layoutInfo{};
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     layoutInfo.setLayoutCount = 0;
     layoutInfo.pSetLayouts = nullptr;
     layoutInfo.pushConstantRangeCount = 0;
     layoutInfo.pPushConstantRanges = nullptr;
-    if (vkCreatePipelineLayout(m_device.device(), &layoutInfo, nullptr, &m_pipelineLayout) != VK_SUCCESS) {
+    if (m_device.device().createPipelineLayout(&layoutInfo, nullptr, &m_pipelineLayout) != vk::Result::eSuccess) {
         throw std::runtime_error("failed to create ui pipeline layout");
     }
 

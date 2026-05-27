@@ -17,9 +17,9 @@ struct UboTypeInfo {
 
 struct RenderSystemConstructInfo {
 	EngineDevice& engineDevice;
-	VkRenderPass renderPass;
-	VkDescriptorSetLayout globalSetLayout;
-	VkDescriptorSetLayout modelSetLayout;
+	vk::RenderPass renderPass;
+	vk::DescriptorSetLayout globalSetLayout;
+	vk::DescriptorSetLayout modelSetLayout;
 };
 
 template <typename RenderSystem>

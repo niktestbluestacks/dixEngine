@@ -138,6 +138,19 @@ class DixRenderSystem {
 
     virtual void buildComputeDescriptors() {}
 
+    // Helper methods for creating pipelines with custom configurations
+    // These provide better abstraction for pipeline creation
+    std::unique_ptr<Pipeline> createGraphicsPipeline(
+        EngineDevice& device,
+        const std::string& vertShaderPath,
+        const std::string& fragShaderPath,
+        PipelineConfigInfo& configInfo);
+
+    std::unique_ptr<ComputePipeline> createComputePipeline(
+        EngineDevice& device,
+        const std::string& compShaderPath,
+        ComputePipelineConfigInfo& configInfo);
+
     DixRenderSystemConfig m_config;
 
     EngineDevice& m_dixDevice;

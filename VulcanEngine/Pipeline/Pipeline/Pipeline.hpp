@@ -108,6 +108,86 @@ struct PipelineConfigInfo {
     PipelineConfigInfo(PipelineConfigInfo&&) = default;
     PipelineConfigInfo& operator=(PipelineConfigInfo&&) = default;
 
+    // Fluent configuration methods for common settings
+    PipelineConfigInfo& enableBlending(
+        vk::BlendFactor srcColor = vk::BlendFactor::eSrcAlpha,
+        vk::BlendFactor dstColor = vk::BlendFactor::eOneMinusSrcAlpha,
+        vk::BlendFactor srcAlpha = vk::BlendFactor::eOne,
+        vk::BlendFactor dstAlpha = vk::BlendFactor::eZero) {
+        colorBlendAttachment.blendEnable = VK_TRUE;
+        colorBlendAttachment.srcColorBlendFactor = srcColor;
+        colorBlendAttachment.dstColorBlendFactor = dstColor;
+        colorBlendAttachment.colorBlendOp = vk::BlendOp::eAdd;
+        colorBlendAttachment.srcAlphaBlendFactor = srcAlpha;
+        colorBlendAttachment.dstAlphaBlendFactor = dstAlpha;
+        colorBlendAttachment.alphaBlendOp = vk::BlendOp::eAdd;
+        return *this;
+    }
+
+    PipelineConfigInfo& disableBlending() {
+        colorBlendAttachment.blendEnable = VK_FALSE;
+        return *this;
+    }
+
+    PipelineConfigInfo& enableDepthTesting(
+        bool writeEnable = true,
+        vk::CompareOp compareOp = vk::CompareOp::eLessOrEqual) {
+        depthStencilInfo.depthTestEnable = VK_TRUE;
+        depthStencilInfo.depthWriteEnable = writeEnable ? VK_TRUE : VK_FALSE;
+        depthStencilInfo.depthCompareOp = compareOp;
+        return *this;
+    }
+
+    PipelineConfigInfo& disableDepthTesting() {
+        depthStencilInfo.depthTestEnable = VK_FALSE;
+        depthStencilInfo.depthWriteEnable = VK_FALSE;
+        return *this;
+    }
+
+    PipelineConfigInfo& setCullMode(vk::CullModeFlags cullMode) {
+        rasterizetionInfo.cullMode = cullMode;
+        return *this;
+    }
+
+    PipelineConfigInfo& setFrontFace(vk::FrontFace frontFace) {
+        rasterizetionInfo.frontFace = frontFace;
+        return *this;
+    }
+
+    PipelineConfigInfo& setPolygonMode(vk::PolygonMode polygonMode) {
+        rasterizetionInfo.polygonMode = polygonMode;
+        return *this;
+    }
+
+    PipelineConfigInfo& setTopology(vk::PrimitiveTopology topology) {
+        inputAssemblyInfo.topology = topology;
+        return *this;
+    }
+
+    PipelineConfigInfo& setRasterizationSamples(
+        vk::SampleCountFlagBits samples) {
+        multisampleStateInfo.rasterizationSamples = samples;
+        return *this;
+    }
+
+    PipelineConfigInfo& enableStencilTesting() {
+        depthStencilInfo.stencilTestEnable = VK_TRUE;
+        return *this;
+    }
+
+    PipelineConfigInfo& disableStencilTesting() {
+        depthStencilInfo.stencilTestEnable = VK_FALSE;
+        return *this;
+    }
+
+    PipelineConfigInfo& setDynamicStates(std::vector<vk::DynamicState> states) {
+        dynamicStateEnables = std::move(states);
+        dynamicStateInfo.pDynamicStates = dynamicStateEnables.data();
+        dynamicStateInfo.dynamicStateCount =
+            static_cast<uint32_t>(dynamicStateEnables.size());
+        return *this;
+    }
+
     vk::PipelineViewportStateCreateInfo viewportInfo;
     vk::PipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
     vk::PipelineRasterizationStateCreateInfo rasterizetionInfo;

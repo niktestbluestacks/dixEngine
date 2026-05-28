@@ -229,4 +229,21 @@ void DixRenderSystem::initComputeDescriptorPool(uint32_t maxSets) {
     m_computeDescriptorPool = builder.build();
 }
 
+std::unique_ptr<Pipeline> DixRenderSystem::createGraphicsPipeline(
+    EngineDevice& device,
+    const std::string& vertShaderPath,
+    const std::string& fragShaderPath,
+    PipelineConfigInfo& configInfo) {
+    return std::make_unique<Pipeline>(
+        device, toShaderPath(vertShaderPath), toShaderPath(fragShaderPath), configInfo);
+}
+
+std::unique_ptr<ComputePipeline> DixRenderSystem::createComputePipeline(
+    EngineDevice& device,
+    const std::string& compShaderPath,
+    ComputePipelineConfigInfo& configInfo) {
+    return std::make_unique<ComputePipeline>(
+        device, toShaderPath(compShaderPath), configInfo);
+}
+
 }  // namespace dix

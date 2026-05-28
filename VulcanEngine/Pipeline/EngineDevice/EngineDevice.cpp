@@ -2,7 +2,6 @@
 #include <Logger/Logger.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
-
 // libs
 #include <vulkan/vulkan.hpp>
 #include <vulkan/vulkan_to_string.hpp>

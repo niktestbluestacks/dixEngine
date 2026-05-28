@@ -5,8 +5,8 @@
 #include <Utils/Class.hpp>
 
 // std
-#include <string>
 #include <memory>
+#include <string>
 
 // libs
 #define GLM_FORCE_SWIZZLE
@@ -14,15 +14,14 @@
 
 namespace dix {
 class DixAudio {
-public:
+   public:
     DixAudio();
     DixAudio(const std::string& filepath);
     ~DixAudio();
 
-    DixAudio(const DixAudio&) = delete; 
-    DixAudio& operator=(const DixAudio&) = delete;
+    DIX_DISABLE_COPY(DixAudio)
 
-    DixAudio(DixAudio&&) noexcept; 
+    DixAudio(DixAudio&&) noexcept;
     DixAudio& operator=(DixAudio&&) noexcept;
 
     bool loadFromFile(const std::string& filepath);
@@ -40,9 +39,9 @@ public:
 
     void seekTo(float seconds);
 
-    /** 
+    /**
     @brief Position in audio in seconds
-    @return Position in audio (second) 
+    @return Position in audio (second)
     **/
     float getPosition() const;
     float getDuration() const;
@@ -52,20 +51,17 @@ public:
     bool isPaused() const;
     bool isLoaded() const;
 
-    void setMinDistance(float dist); // Distance where attenuation starts
+    void setMinDistance(float dist);  // Distance where attenuation starts
     void setMaxDistance(float dist);
 
-    void updateListener(
-        const glm::vec3& objPosition,
-        const glm::vec3& position, 
-        const glm::vec3& forward, 
-        const glm::vec3& up = { 0.f, 1.f, 0.f }
-    );
-private:
+    void updateListener(const glm::vec3& objPosition, const glm::vec3& position,
+                        const glm::vec3& forward,
+                        const glm::vec3& up = {0.f, 1.f, 0.f});
+
+   private:
     class Impl;
-    std::unique_ptr <Impl> m_Impl;
-
+    std::unique_ptr<Impl> m_Impl;
 };
-}   // namespace dix
+}  // namespace dix
 
-#endif // DIX_AUDIO_HPP
+#endif  // DIX_AUDIO_HPP

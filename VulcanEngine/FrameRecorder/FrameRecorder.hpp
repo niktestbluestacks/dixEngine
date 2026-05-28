@@ -5,7 +5,6 @@
 #include <Logger/Logger.hpp>
 #include <Model/GameObject/GameObject.hpp>
 
-
 // libs
 #include <glm/glm.hpp>
 
@@ -16,7 +15,6 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-
 
 namespace dix {
 

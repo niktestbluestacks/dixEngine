@@ -7,7 +7,6 @@
 #include <cstdint>
 #include <stdexcept>
 
-
 namespace dix {
 
 Renderer::Renderer(Window& window, EngineDevice& engineDevice)

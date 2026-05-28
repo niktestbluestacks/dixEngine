@@ -6,7 +6,6 @@
 #include <Utils/Class.hpp>
 #include <Window/WindowClass/WindowClass.hpp>
 
-
 // std
 #include <vector>
 #include <vulkan/vulkan.hpp>

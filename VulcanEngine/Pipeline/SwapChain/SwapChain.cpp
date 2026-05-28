@@ -2,10 +2,6 @@
 #include <Logger/Logger.hpp>
 #include <Pipeline/SwapChain/SwapChain.hpp>
 
-
-// libs
-#include <vulkan/vk_enum_string_helper.h>
-
 // std
 #include <array>
 #include <cstdlib>

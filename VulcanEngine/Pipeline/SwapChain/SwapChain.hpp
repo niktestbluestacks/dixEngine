@@ -11,7 +11,6 @@
 #include <memory>
 #include <vector>
 
-
 namespace dix {
 
 class SwapChain {

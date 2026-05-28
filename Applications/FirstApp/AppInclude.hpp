@@ -6,12 +6,10 @@
 #include <FrameRecorder/FrameRecorder.hpp>
 #include <Logger/Logger.hpp>
 
-
 // PIPELINE
 #include <Pipeline/Buffer/DixBuffer.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
-
 
 // RENDERING
 #include <Rendering/RenderSystem/BoucyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
@@ -29,12 +27,10 @@
 #include <UI/UIManager.hpp>
 #include <UI/UIRenderer.hpp>
 
-
 // DIXUI
 #include <DixUI/DixFpsCounter.hpp>
 #include <DixUI/DixPlayerInfo.hpp>
 #include <DixUI/DixTimeCounter.hpp>
-
 
 // MODELING AND GAME OBJECTS
 #include <DixCamera/DixCamera.hpp>
@@ -42,11 +38,9 @@
 #include <Model/GameObject/GameObject.hpp>
 #include <Sound/DixAudio.hpp>
 
-
 // WINDOW AND INPUT
 #include <Input/Keyboard/KeyboardAndMouseController.hpp>
 #include <Window/WindowClass/WindowClass.hpp>
-
 
 // UTILS
 #include <Utils/Converter.hpp>

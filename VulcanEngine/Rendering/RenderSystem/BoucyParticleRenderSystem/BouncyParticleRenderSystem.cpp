@@ -3,7 +3,6 @@
 #include <Rendering/RenderSystem/BoucyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
 
-
 // std
 #include <cassert>
 #include <random>

@@ -6,7 +6,6 @@
 #include <Pipeline/Buffer/DixBuffer.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
-
 // libs
 #include <vulkan/vulkan.hpp>
 

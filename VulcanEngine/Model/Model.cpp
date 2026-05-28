@@ -5,7 +5,6 @@
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Utils/Hash.hpp>
 
-
 // libs
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
@@ -17,7 +16,6 @@
 #include <cstring>
 #include <fstream>
 #include <unordered_map>
-
 
 namespace std {
 template <>

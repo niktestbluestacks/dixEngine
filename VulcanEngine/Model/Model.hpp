@@ -7,7 +7,6 @@
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
-
 // libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE

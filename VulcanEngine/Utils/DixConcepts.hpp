@@ -7,7 +7,6 @@
 #include <tuple>
 #include <type_traits>
 
-
 // libs
 
 #include <vulkan/vulkan.hpp>

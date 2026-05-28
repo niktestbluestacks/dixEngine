@@ -1,10 +1,10 @@
 #ifndef FUNCTIONS_HPP
 #define FUNCTIONS_HPP
 
+// std
 #include <concepts>
 #include <format>
 #include <string>
-
 
 namespace dix {
 template <typename... Args>

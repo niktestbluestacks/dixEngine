@@ -8,7 +8,6 @@
 #include <Pipeline/Pipeline/Pipeline.hpp>
 #include <Rendering/Renderer/Renderer.hpp>
 
-
 // std
 #include <memory>
 

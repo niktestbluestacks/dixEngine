@@ -3,12 +3,10 @@
 #include <Model/Model.hpp>
 #include <Pipeline/Pipeline/Pipeline.hpp>
 
-
 // std
 #include <cassert>
 #include <fstream>
 #include <stdexcept>
-
 
 namespace dix {
 

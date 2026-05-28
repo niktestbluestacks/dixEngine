@@ -3,7 +3,6 @@
 #include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
 
-
 // std
 #include <cassert>
 #include <random>

@@ -8,7 +8,6 @@
 #include <string>
 #include <vector>
 
-
 namespace dix {
 
 UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass)

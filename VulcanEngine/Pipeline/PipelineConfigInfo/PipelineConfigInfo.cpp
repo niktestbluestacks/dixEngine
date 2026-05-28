@@ -2,7 +2,6 @@
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 #include <Pipeline/PipelineConfigInfo/PipelineConfigInfo.hpp>
 
-
 namespace dix {
 
 vk::PipelineVertexInputStateCreateInfo createVertexInputState(

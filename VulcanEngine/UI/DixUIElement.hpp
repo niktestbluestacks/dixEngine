@@ -5,7 +5,6 @@
 #include <UI/UIRenderer.hpp>
 #include <Utils/FrameInfo.hpp>
 
-
 // std
 #include <string>
 

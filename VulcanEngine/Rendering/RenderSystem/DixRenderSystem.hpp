@@ -11,7 +11,6 @@
 #include <Utils/Class.hpp>
 #include <Utils/FrameInfo.hpp>
 
-
 // std
 #include <array>
 #include <functional>
@@ -20,7 +19,6 @@
 #include <string>
 #include <tuple>
 #include <vector>
-
 
 namespace dix {
 

@@ -5,7 +5,6 @@
 #include <Pipeline/Buffer/DixBuffer.hpp>
 #include <Rendering/RenderSystem/DixRenderSystem.hpp>
 
-
 // std
 #include <tuple>
 

@@ -2,7 +2,6 @@
 #include <Logger/Logger.hpp>
 #include <Model/DixTexture/DixTexture.hpp>
 
-
 // libs
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -10,7 +9,6 @@
 // std
 #include <filesystem>
 #include <stdexcept>
-
 
 namespace dix {
 DixTexture::DixTexture() {

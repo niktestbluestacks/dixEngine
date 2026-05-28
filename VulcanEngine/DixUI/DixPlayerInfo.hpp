@@ -5,7 +5,6 @@
 #include <Input/Keyboard/KeyboardAndMouseController.hpp>
 #include <UI/DixUIElement.hpp>
 
-
 // libs
 #define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>

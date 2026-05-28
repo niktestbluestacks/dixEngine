@@ -4,12 +4,10 @@
 #include <Model/GameObject/GameObject.hpp>
 #include <Model/Model.hpp>
 
-
 // std
 #include <cstring>
 #include <iomanip>
 #include <sstream>
-
 
 namespace dix {
 

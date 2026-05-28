@@ -2,7 +2,6 @@
 #include <FirstApp/AppContext.hpp>
 #include <FirstApp/FirstApp.hpp>
 
-
 namespace dix {
 
 FirstApp::FirstApp(void) {

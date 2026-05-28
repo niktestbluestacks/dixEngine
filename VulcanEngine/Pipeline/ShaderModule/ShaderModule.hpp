@@ -5,7 +5,6 @@
 #include <vulkan/vulkan.hpp>
 
 // std
-#include <memory>
 #include <string>
 #include <vector>
 

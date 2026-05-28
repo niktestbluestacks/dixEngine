@@ -6,7 +6,6 @@
 
 // std
 #include <cstring>
-#include <iomanip>
 #include <sstream>
 
 namespace dix {

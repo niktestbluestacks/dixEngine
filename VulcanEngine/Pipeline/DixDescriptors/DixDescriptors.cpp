@@ -6,7 +6,6 @@
 
 // std
 #include <cassert>
-#include <stdexcept>
 
 namespace dix {
 

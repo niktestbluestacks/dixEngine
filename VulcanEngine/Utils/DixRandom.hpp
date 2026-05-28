@@ -7,15 +7,17 @@
 // std
 #include <cstdlib>
 #include <filesystem>
-#include <random>
 #include <vector>
+#ifndef __clang__
+#include <random>
+#endif // __clang__
 
 namespace dix {
 namespace fs = std::filesystem;
 inline std::string getRandomFile(std::string filepath = toAudioPath("")) {
     if (filepath.back() == '/') filepath.pop_back();
 
-    std::vector<std::filesystem::path> files(0);
+    std::vector<fs::path> files(0);
     for (auto const& entry : fs::directory_iterator(filepath)) {
         if (fs::is_regular_file(entry.status())) files.push_back(entry.path());
     }

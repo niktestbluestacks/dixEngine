@@ -1,7 +1,9 @@
 #ifndef DIX_DEBUG_HPP
 #define DIX_DEBUG_HPP
 
+#ifndef __clang__
 #include <debugging>
+#endif // __clang__
 
 namespace dix {
 

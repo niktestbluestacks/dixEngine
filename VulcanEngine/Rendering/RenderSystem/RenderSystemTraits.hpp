@@ -8,10 +8,13 @@
 #include <vulkan/vulkan.hpp>
 
 // std
-#include <concepts>
 #include <cstdint>
 #include <tuple>
+
+#ifndef __clang__
 #include <type_traits>
+#include <concepts>
+#endif // __clang_
 
 namespace dix {
 

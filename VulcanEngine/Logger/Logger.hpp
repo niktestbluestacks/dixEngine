@@ -5,9 +5,12 @@
 #include <Utils/Functions.hpp>
 
 // std
+#ifndef __clang__
 #include <format>
-#include <string>
 #include <string_view>
+#endif // __clang__
+#include <string>
+
 
 namespace dix {
 

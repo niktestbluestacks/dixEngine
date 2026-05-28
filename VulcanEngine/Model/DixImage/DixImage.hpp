@@ -8,8 +8,6 @@
 #include <vulkan/vulkan.hpp>
 
 // std
-#include <stdexcept>
-#include <string>
 #include <tuple>
 
 

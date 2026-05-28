@@ -12,7 +12,6 @@
 #include <Utils/FrameInfo.hpp>
 
 // std
-#include <array>
 #include <functional>
 #include <memory>
 #include <optional>

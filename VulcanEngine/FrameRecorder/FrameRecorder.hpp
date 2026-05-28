@@ -9,7 +9,6 @@
 #include <glm/glm.hpp>
 
 // std
-#include <cstdint>
 #include <fstream>
 #include <map>
 #include <string>

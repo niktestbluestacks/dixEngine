@@ -23,7 +23,8 @@ struct RenderSystemConstructInfo {
 };
 
 template <typename RenderSystem>
-    requires HasUbos<RenderSystem> && is_tuple_v<typename RenderSystem::Ubos> &&
+    requires std::derived_from<RenderSystem, DixRenderSystem> &&
+             HasUbos<RenderSystem> && is_tuple_v<typename RenderSystem::Ubos> &&
              HasName<RenderSystem> && HasVulkanFlags<RenderSystem>
 struct RenderSystemDescription {
     std::unique_ptr<RenderSystem> renderSystem =

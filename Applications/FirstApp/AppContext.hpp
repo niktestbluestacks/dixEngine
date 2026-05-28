@@ -60,7 +60,6 @@ class AppContext {
         std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
         const glm::vec3& playerPosition);
 
-    //
     void addUIElement(std::unique_ptr<DixUIElement> element) {
         if (m_uiManager) {
             m_uiManager->addElement(std::move(element));
@@ -76,6 +75,7 @@ class AppContext {
     }
 
     template <typename RenderSystem>
+    requires (std::same_as<RenderSystem, RenderSystems> || ...)
     decltype(auto) getRenderSystem() {
         return m_renderSystemRegistery.template getRenderSystem<RenderSystem>();
     }

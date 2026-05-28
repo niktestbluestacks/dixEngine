@@ -44,7 +44,6 @@ template <typename T>
 concept HasVulkanFlags = requires(T t) {
     { T::getVulkanFlags() };
     requires[]<typename... InnerTuples>(std::tuple<InnerTuples...>) {
-        // Проверяем каждый внутренний элемент через свертку (fold expression)
         return (
             ... &&
             std::same_as<InnerTuples, std::tuple<uint32_t, vk::DescriptorType,
@@ -54,4 +53,4 @@ concept HasVulkanFlags = requires(T t) {
 };
 }  // namespace dix
 
-#endif  // DIX_CONCEPTRS_HPP
+#endif  // DIX_CONCEPTS_HPP

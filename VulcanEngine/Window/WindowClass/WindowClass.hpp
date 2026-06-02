@@ -5,7 +5,6 @@
 #include <vulkan/vulkan.hpp>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-#define STD_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 // std

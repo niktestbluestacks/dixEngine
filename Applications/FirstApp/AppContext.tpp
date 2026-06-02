@@ -1,7 +1,12 @@
 #ifndef APP_CONTEXT_TPP
 #define APP_CONTEXT_TPP
 
-#ifndef __clang__
+// This one is for clangd
+// it cannot fathom .tpp files existing
+
+#ifdef __clang__
+#include <FirstApp/AppContext.hpp>
+#endif  // __clang__
 
 #include <Utils/TupleHelper.hpp>
 
@@ -122,6 +127,8 @@ void AppContext<RenderSystems...>::drawFrame(
                 // m_systemUboBuffers[renderSystemName][frameIndex][uboTypeIndex]
                 //     ->flush();
                 // unnececery with host coherent bit
+                // need to add if constexpr check
+                // but right now it will work for some time
                 ++uboTypeIndex;
             });
 
@@ -173,12 +180,8 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
             // fall back to UNIFORM if the Ubos tuple is longer than
             // the buffer-type flags (shouldn't happen with a correct
             // render system, but guards against mistakes).
-            vk::BufferUsageFlags usage =
-                vk::BufferUsageFlagBits::eUniformBuffer;
-            if (uboTypeIndex < bufferBindings.size()) {
-                usage = detail::descriptorTypeToBufferUsage(
-                    bufferBindings[uboTypeIndex].second);
-            }
+            vk::BufferUsageFlags usage = detail::descriptorTypeToBufferUsage(
+                bufferBindings[uboTypeIndex].second);
 
             frameBuffers[uboTypeIndex] = std::make_unique<DixBuffer>(
                 m_dixDevice, sizeof(UboType), 1, usage,
@@ -382,5 +385,4 @@ void AppContext<RenderSystems...>::createUBOs() {
 }
 
 }  // namespace dix
-#endif  // __clang__
 #endif  // APP_CONTEXT_TPP

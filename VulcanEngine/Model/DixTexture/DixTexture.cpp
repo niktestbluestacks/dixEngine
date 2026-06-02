@@ -3,7 +3,6 @@
 #include <Model/DixTexture/DixTexture.hpp>
 
 // libs
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 // std

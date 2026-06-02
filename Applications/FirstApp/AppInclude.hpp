@@ -36,6 +36,7 @@
 #include <DixCamera/DixCamera.hpp>
 #include <Model/DixTexture/DixTexture.hpp>
 #include <Model/GameObject/GameObject.hpp>
+#include <Model/GameObject/SimpleGameObject.hpp>
 #include <Sound/DixAudio.hpp>
 
 // WINDOW AND INPUT

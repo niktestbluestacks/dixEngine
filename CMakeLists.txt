@@ -72,12 +72,15 @@ file(GLOB_RECURSE ENGINE_SOURCES
     "${CMAKE_SOURCE_DIR}/VulcanEngine/*.tpp"
     "${CMAKE_SOURCE_DIR}/Applications/*.cpp"
     "${CMAKE_SOURCE_DIR}/Applications/*.tpp"
+    "${CMAKE_SOURCE_DIR}/Dependecies/*.cpp"
+    "${CMAKE_SOURCE_DIR}/Dependecies/*.tpp"
 )
 
 file(GLOB_RECURSE TPP_FILES 
     "${CMAKE_SOURCE_DIR}/VulcanEngine/*.tpp"
     "${CMAKE_SOURCE_DIR}/Applications/*.tpp"
 )
+
 set_source_files_properties(${TPP_FILES} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 if(WIN32)
@@ -98,7 +101,6 @@ target_include_directories(VulcanApp PRIVATE
     ${CMAKE_SOURCE_DIR}/VulcanEngine
     ${CMAKE_SOURCE_DIR}/Dependecies
 )
-
 
 target_link_libraries(VulcanApp PRIVATE
     Vulkan::Vulkan

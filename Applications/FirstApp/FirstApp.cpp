@@ -225,6 +225,7 @@ void FirstApp::handleRecorderInput(float frameTime) {
     if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
         if (!m_playing && !m_recording) {
             m_playing = true;
+            m_initialGameObects = m_gameObjects;
             getFrameRecorder().startPlayback("recording.txt", m_gameObjects,
                                              playerPosition, playerLookAt);
             DixLogInfo("Playback started - press P again to stop");
@@ -232,6 +233,7 @@ void FirstApp::handleRecorderInput(float frameTime) {
         } else if (m_playing) {
             m_playing = false;
             getFrameRecorder().stopPlayback();
+            m_gameObjects = m_initialGameObects;
             DixLogInfo("Playback stopped");
             keyCooldown = 0.3f;
         }

@@ -48,10 +48,8 @@ void FrameRecorder::stopRecording() {
         return;
     }
 
-    // Write initial structure first (if not already written)
     writeInitialStructure();
 
-    // Write all accumulated frames
     size_t frameNumber = 0;
     for (const auto& frame : m_frames) {
         writeFrame(frame, frameNumber++);
@@ -60,7 +58,6 @@ void FrameRecorder::stopRecording() {
     m_outputStream.close();
     m_isRecording = false;
 
-    // Clear recording state but don't crash - allow program to continue
     m_frames.clear();
     m_prevTranslations.clear();
     m_prevRotations.clear();

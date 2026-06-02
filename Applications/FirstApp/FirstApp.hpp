@@ -33,6 +33,7 @@ class FirstApp {
     glm::vec3 playerPosition{-1.f, -2.f, 2.f};
     glm::vec3 playerLookAt{0.f, 0.f, 2.5f};
     std::unordered_map<std::string, std::vector<GameObject>> m_gameObjects;
+    std::unordered_map<std::string, std::vector<GameObject>> m_initialGameObects;
     std::unordered_map<std::string, DixAudio> m_sounds;
     std::unique_ptr<CurrentAppContext> m_context{
         std::make_unique<CurrentAppContext>(

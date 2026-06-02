@@ -107,7 +107,6 @@ class FrameRecorder {
     bool readNextFrame(RecordedFrame& frame);
 };
 
-// Global singleton accessor (as used in FirstApp.cpp)
 FrameRecorder& getFrameRecorder();
 
 }  // namespace dix

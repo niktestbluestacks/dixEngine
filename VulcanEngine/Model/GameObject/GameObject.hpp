@@ -28,12 +28,25 @@ class GameObject {
     using id_t = unsigned int;
 
     static GameObject createGameObject() {
-        static id_t currentId = 0;
-        return GameObject{currentId++};
+        return GameObject{GameObject::getNewId()};
     }
 
-    DIX_DISABLE_COPY(GameObject)
-    DIX_ENABLE_MOVE(GameObject)
+    DIX_ENABLE_COPY(GameObject)
+    GameObject(GameObject&& other) {
+        model = other.model;
+        color = other.color;
+        transform = other.transform;
+        id = getNewId();    
+    }
+
+    GameObject operator=(GameObject&& other) {
+        model = other.model;
+        color = other.color;
+        transform = other.transform;
+        id = getNewId();  
+        return *this;
+    }
+    
     ~GameObject() = default;
 
     id_t getId() const { return id; };
@@ -43,6 +56,11 @@ class GameObject {
     TransformComponent transform{};
 
    private:
+    static id_t getNewId() {
+        static id_t currentId = 0;
+        return currentId++;
+    }
+
     GameObject(id_t objId) : id{objId} {};
 
     id_t id;

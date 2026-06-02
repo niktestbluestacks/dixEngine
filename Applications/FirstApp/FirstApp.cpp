@@ -24,7 +24,7 @@ void FirstApp::run(void) {
     DixCamera dixcamera{};
     dixcamera.setViewTarget(playerPosition, playerLookAt);
 
-    auto viewerObject = GameObject::create<SimpleGameObject>();
+    auto viewerObject = GameObject::createGameObject();
     KeyboardAndMouseController cameraController{};
 
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -71,8 +71,8 @@ void FirstApp::run(void) {
         } else {
             cameraController.moveInPlaneXZ(m_context->getGLFWwindow(),
                                            frameTime, viewerObject);
-            playerPosition = viewerObject.getTransformComponent().translation;
-            playerLookAt = viewerObject.getTransformComponent().rotation;
+            playerPosition = viewerObject.transform.translation;
+            playerLookAt = viewerObject.transform.rotation;
             dixcamera.setViewYXZ(playerPosition, playerLookAt);
         }
 
@@ -129,27 +129,25 @@ void FirstApp::loadGameObjects() {
             m_context->device(), std::filesystem::absolute(entry).string(),
             m_context->getDescriptorPool(), m_context->getModelSetLayout());
 
-        auto gameObj = GameObject::create<SimpleGameObject>(
-            dixModel,
-            TransformComponent{.translation{dist(gen), dist(gen), dist(gen)},
-                               .scale = {1.f, 1.f, 1.f}});
+        auto gameObj = GameObject::createGameObject();
+        gameObj.model = dixModel;
+        gameObj.transform.translation = {dist(gen), dist(gen), dist(gen)};
+        gameObj.transform.scale = {1.f, 1.f, 1.f};
         m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
     }
 
     // particle emitter
-    auto particleEmitter = GameObject::create<SimpleGameObject>(
-        TransformComponent{.translation{0.f, 0.f, 0.f}}
-    );
+    auto particleEmitter = GameObject::createGameObject();
+    particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
     m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
     m_context->getRenderSystem<ParticleRenderSystem>().createParticleEmitter(
         glm::vec3{0.f, 50.f, 0.f}, 500);
 
     // bouncy particle emitter
-    auto bouncyParticleEmitter = GameObject::create<SimpleGameObject>(
-        TransformComponent{.translation{0.f, 0.f, 0.f}}
-    );
+    auto bouncyParticleEmitter = GameObject::createGameObject();
+    particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
     m_gameObjects["BouncyParticleRenderSystem"].push_back(
-        std::move(bouncyParticleEmitter));
+        std::move(particleEmitter));
     m_context->getRenderSystem<BouncyParticleRenderSystem>()
         .createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 500);
 
@@ -161,10 +159,8 @@ void FirstApp::loadGameObjects() {
         m_context->device(), std::filesystem::absolute(entry).string(),
         m_context->getDescriptorPool(), m_context->getModelSetLayout());
 
-    auto Skybox = GameObject::create<SimpleGameObject>(
-        dixModel,
-        TransformComponent{.translation{0.f, 0.f, 0.f}}
-    );
+    auto Skybox = GameObject::createGameObject();
+    Skybox.model = dixModel;
     dixModel.reset();
     m_gameObjects["SkyboxRenderSystem"].push_back(std::move(Skybox));
 }

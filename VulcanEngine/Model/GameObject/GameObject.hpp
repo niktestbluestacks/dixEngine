@@ -23,34 +23,29 @@ struct TransformComponent {
     glm::mat3 normalMatrix();
 };
 
-// Base class
 class GameObject {
    public:
     using id_t = unsigned int;
 
-    template <typename T, typename... Args>
-    static T create(Args&&... args) {
+    static GameObject createGameObject() {
         static id_t currentId = 0;
-
-        return T{Key{}, currentId++, std::forward<Args>(args)...};
+        return GameObject{currentId++};
     }
 
-    virtual ~GameObject() = default;
+    DIX_DISABLE_COPY(GameObject)
+    DIX_ENABLE_MOVE(GameObject)
+    ~GameObject() = default;
 
     id_t getId() const { return id; };
 
-   protected:
-    struct Key {
-        friend class GameObject;
-        explicit Key() = default;
-    };
+    std::shared_ptr<Model> model{};
+    glm::vec3 color{};
+    TransformComponent transform{};
 
-    GameObject(Key key, id_t objId) : id{objId} {};
+   private:
+    GameObject(id_t objId) : id{objId} {};
 
     id_t id;
-
-    template <typename T, typename... Args>
-    friend T GameObject::create(Args&&... args);
 };
 }  // namespace dix
 

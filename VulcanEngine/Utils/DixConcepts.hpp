@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <tuple>
 #include <type_traits>
+#include <functional>
 
 // libs
 
@@ -51,6 +52,18 @@ concept HasVulkanFlags = requires(T t) {
     }
     (decltype(T::getVulkanFlags()){});
 };
+
+template <typename T>
+struct is_supported_command_type : std::false_type {};
+
+template <typename... FuncArgs>
+struct is_supported_command_type<std::pair<std::string, std::function<void(FuncArgs...)>>> : std::true_type{};
+
+template <typename T>
+inline constexpr bool is_supported_command_type_v = is_supported_command_type<T>::value;
+
+template <typename... Commands>
+concept IsSupportedCommandType = (is_supported_command_type_v<Commands> && ...);
 }  // namespace dix
 
 #endif  // DIX_CONCEPTS_HPP

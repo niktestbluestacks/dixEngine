@@ -50,10 +50,10 @@ void FirstApp::run(void) {
         currentTime = newTime;
 
         frameTime = glm::min(frameTime, MAX_FRAME_TIME);
-
         // Handle recorder input (R to record, P to playback)
-        handleRecorderInput(frameTime);
-
+        if (!CurrentConsole::getDixConsole().isVisible()) {
+            handleRecorderInput(frameTime);
+        }
         // If playing back, use recorded camera data and object states
         if (m_playing) {
             auto& recorder = getFrameRecorder();
@@ -69,8 +69,10 @@ void FirstApp::run(void) {
                 dixcamera.setViewYXZ(playerPosition, playerLookAt);
             }
         } else {
-            cameraController.moveInPlaneXZ(m_context->getGLFWwindow(),
-                                           frameTime, viewerObject);
+            if (!CurrentConsole::getDixConsole().isVisible()) {
+                cameraController.moveInPlaneXZ(m_context->getGLFWwindow(),
+                                               frameTime, viewerObject);
+            }
             playerPosition = viewerObject.transform.translation;
             playerLookAt = viewerObject.transform.rotation;
             dixcamera.setViewYXZ(playerPosition, playerLookAt);
@@ -194,6 +196,45 @@ void FirstApp::loadUIElements(void) {
         },
         playerPosition);
     m_context->addUIElement(std::move(playerInfo));
+
+    auto consoleUI = std::make_unique<DixConsoleUI>(DixUIInfo{
+        *m_context->getUIRenderer(),
+        m_context->getExtent(),
+    });
+
+    auto* consoleUIPtr = consoleUI.get();
+    m_context->addUIElement(std::move(consoleUI));
+
+    auto& console = CurrentConsole::getDixConsole();
+    console.setConsoleUI(consoleUIPtr);
+    console.setPosition(0.f, 600.f, 600.0f, 600.f);
+
+    consoleUIPtr->setHistoryRef(&console.getHistory());
+    consoleUIPtr->setInputBufferCallback(
+        [&console]() { return console.getInputBuffer(); });
+
+    m_context->getDixWindow().bindKey(
+        GLFW_KEY_GRAVE_ACCENT, [&console]() { console.toggleConsole(); });
+
+    m_context->getDixWindow().bindKey(GLFW_KEY_BACKSPACE, [&console]() {
+        if (console.isVisible()) {
+            console.backspace();
+        }
+    });
+
+    m_context->getDixWindow().bindKey(GLFW_KEY_ENTER, [&console]() {
+        if (console.isVisible()) {
+            console.enterCommand();
+        }
+    });
+
+    m_context->getDixWindow().setCharCallback([&console](char c) {
+        if (console.isVisible() && c != '`') {
+            console.addCharacter(c);
+        }
+    });
+
+    console.logInfo("Console initialized");
 }
 
 void FirstApp::handleRecorderInput(float frameTime) {

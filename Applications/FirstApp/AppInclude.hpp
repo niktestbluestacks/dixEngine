@@ -4,6 +4,7 @@
 // dix
 // LOGGING
 #include <FrameRecorder/FrameRecorder.hpp>
+#include <Logger/Console.hpp>
 #include <Logger/Logger.hpp>
 
 // PIPELINE

@@ -53,7 +53,8 @@ void AppContext<RenderSystems...>::drawFrame(
     auto extent = m_Window.getExtent();
     if (extent.width == 0 || extent.height == 0) return;
 
-    AdditionalUIInfo additionalInfo{.playerPosition = playerPosition};
+    AdditionalUIInfo additionalInfo{.playerPosition = playerPosition,
+                                    .screenExtent = extent};
     if (m_uiManager) {
         m_uiManager->update(frameTime, additionalInfo);
     }

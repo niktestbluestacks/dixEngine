@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 namespace dix {
+
 Window::Window(int width, int height, std::string title)
     : m_width(width), m_height(height), m_title(title) {
     initWindow();
@@ -49,6 +50,8 @@ void Window::initWindow(void) {
 
     glfwSetWindowUserPointer(m_window, this);
     glfwSetFramebufferSizeCallback(m_window, framebufferResizeCallback);
+    glfwSetKeyCallback(m_window, keyCallback);
+    glfwSetCharCallback(m_window, charCallback);
 }
 
 void Window::framebufferResizeCallback(GLFWwindow* window, int width,
@@ -60,6 +63,26 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width,
     dixWindow->m_height = height;
 }
 
+void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
+                        int mods) {
+    if (action != GLFW_PRESS) {
+        return;
+    }
+
+    auto dixWindow = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    auto it = dixWindow->m_keyBindings.find(key);
+    if (it != dixWindow->m_keyBindings.end()) {
+        it->second();
+    }
+}
+
+void Window::charCallback(GLFWwindow* window, unsigned int codepoint) {
+    auto dixWindow = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    if (dixWindow->m_charCallback && codepoint < 128) {
+        dixWindow->m_charCallback(static_cast<char>(codepoint));
+    }
+}
+
 void Window::setWindowIcon(const std::string& filepath) {
     GLFWimage images[1];
     images[0].pixels =
@@ -68,6 +91,18 @@ void Window::setWindowIcon(const std::string& filepath) {
         glfwSetWindowIcon(m_window, 1, images);
         stbi_image_free(images[0].pixels);
     }
+}
+
+void Window::bindKey(int key, std::function<void()> callback) {
+    m_keyBindings[key] = callback;
+}
+
+void Window::unbindKey(int key) {
+    m_keyBindings.erase(key);
+}
+
+void Window::setCharCallback(std::function<void(char)> callback) {
+    m_charCallback = callback;
 }
 
 }  // namespace dix

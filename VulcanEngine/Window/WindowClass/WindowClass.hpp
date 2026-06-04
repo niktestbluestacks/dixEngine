@@ -9,6 +9,9 @@
 
 // std
 #include <string>
+#include <map>
+#include <functional>
+#include <vector>
 
 namespace dix {
 
@@ -17,6 +20,9 @@ class Window {
     void initWindow(void);
     static void framebufferResizeCallback(GLFWwindow* window, int width,
                                           int height);
+    static void keyCallback(GLFWwindow* window, int key, int scancode, int action,
+                           int mods);
+    static void charCallback(GLFWwindow* window, unsigned int codepoint);
 
    public:
     Window(int width, int height, std::string title);
@@ -36,6 +42,10 @@ class Window {
 
     void setWindowIcon(const std::string& filepath);
 
+    void bindKey(int key, std::function<void()> callback);
+    void unbindKey(int key);
+    void setCharCallback(std::function<void(char)> callback);
+
    private:
     int m_width;
     int m_height;
@@ -43,7 +53,9 @@ class Window {
 
     std::string m_title;
     GLFWwindow* m_window;
+    std::map<int, std::function<void()>> m_keyBindings;
+    std::function<void(char)> m_charCallback;
 };  // class Window
-}  // namespace dix
+}   // namespace dix
 
 #endif  // WINDOW_CLASS_HPP

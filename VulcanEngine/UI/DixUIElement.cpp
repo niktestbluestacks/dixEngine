@@ -135,7 +135,13 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
     std::vector<DixUIVert> verts;
     float x = 8.f;
     float y = 8.f;
+    float startX = x;
     for (char c : text) {
+        if (c == '\n') {
+            x = startX;
+            y -= m_fontHeight;
+            continue;
+        }
         auto it = m_glyphs.find(c);
         if (it == m_glyphs.end()) continue;
         DixGlyphInfo g = it->second;
@@ -179,7 +185,13 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
 void DixUIElement::buildVerticesForText(const std::string& text, float x,
                                         float y) {
     std::vector<DixUIVert> verts;
+    float startX = x;
     for (char c : text) {
+        if (c == '\n') {
+            x = startX;
+            y -= m_fontHeight;
+            continue;
+        }
         auto it = m_glyphs.find(c);
         if (it == m_glyphs.end()) continue;
         DixGlyphInfo g = it->second;

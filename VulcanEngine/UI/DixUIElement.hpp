@@ -21,6 +21,7 @@ struct DixGlyphInfo {
 
 struct AdditionalUIInfo {
     glm::vec3 playerPosition;
+    vk::Extent2D screenExtent;
 };
 
 struct DixUIInfo {
@@ -52,6 +53,7 @@ class DixUIElement {
    protected:
     void buildVerticesForText(const std::string& text);
     void buildVerticesForText(const std::string& text, float x, float y);
+    void clearVertices() { m_vertexCount = 0; m_vertexStaging.clear(); }
 
    protected:
     UIRenderer& m_uiRenderer;
@@ -68,7 +70,7 @@ class DixUIElement {
     std::vector<unsigned char> m_fontPixels;
 
     int m_fontWidth = 0;
-    int m_fontHeight = 0;
+    int m_fontHeight = 6;
 };
 }  // namespace dix
 

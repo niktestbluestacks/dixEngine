@@ -9,7 +9,7 @@ using CurrentAppContext =
     AppContext<SimpleRenderSystem, SkyboxRenderSystem, ParticleRenderSystem,
                BouncyParticleRenderSystem>;
 
-using CurrentConsole = DixConsole<>;
+using CurrentConsole = DixConsole;
 class FirstApp {
    private:
     void loadGameObjects(void);

@@ -7,6 +7,7 @@
 #include <Utils/DixConcepts.hpp>
 
 // std
+#include <any>
 #include <deque>
 #include <functional>
 #include <tuple>
@@ -17,8 +18,6 @@ template <typename... Args>
 using DixCommandInputType =
     std::pair<std::string, std::function<void(Args...)>>;
 
-template <typename... Commands>
-    requires IsSupportedCommandType<Commands...>
 class DixConsole {
    public:
     DIX_DISABLE_COPY_AND_MOVE(DixConsole)
@@ -58,13 +57,21 @@ class DixConsole {
 
     const std::string& getInputBuffer() const { return m_inputBuffer; }
 
+    template<typename... Args>
+    void register_function(const std::string& name, std::function<void(Args...)> func) {
+        if (m_internalCommands.contains(name) || m_commands.contains(name)) {
+            throw std::runtime_error("The command with name " + name + " already exists!");
+        }
+        m_commands[name] = func;
+    }
+
     static constexpr size_t MAX_HISTORY_SIZE = DixConsoleUI::LINES_TO_DISPLAY;
 
    private:
     DixConsole() { fillInternalCommands(); }
 
     std::deque<std::string> m_history;
-    std::tuple<Commands...> m_commands;
+    std::unordered_map<std::string, std::any> m_commands;
     std::unordered_map<std::string, std::function<void()>> m_internalCommands;
     glm::vec4 m_cornerPositions = {0.f, 100.f, 100.f, 100.f};
     DixConsoleUI* m_consoleUI_ptr = nullptr;
@@ -72,9 +79,7 @@ class DixConsole {
     bool m_isVisible = false;
     std::string m_inputBuffer;
 
-    template <size_t... Indices>
-    void executeCommandImpl(const std::vector<std::string>& args,
-                            std::index_sequence<Indices...>);
+    void executeCommandImpl(const std::vector<std::string>& args);
 
     void fillInternalCommands() {
         m_internalCommands["clear"] = [this]() {

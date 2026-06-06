@@ -46,7 +46,10 @@ class DixConsole {
 
     const std::deque<std::string>& getHistory() const { return m_history; }
 
-    void toggleConsole() { m_isVisible = !m_isVisible; }
+    void toggleConsole() {
+        m_isVisible = !m_isVisible;
+        
+    }
     bool isVisible() const { return m_isVisible; }
 
     void addCharacter(char c);
@@ -74,7 +77,10 @@ class DixConsole {
                             std::index_sequence<Indices...>);
 
     void fillInternalCommands() {
-        m_internalCommands["clear"] = [this]() { m_history.clear(); };
+        m_internalCommands["clear"] = [this]() {
+            m_history.clear();
+            m_history.push_back(">");
+        };
         m_internalCommands["help"] = [this]() {
             this->log("help <-> helps you\nclear <-> clear the history");
         };

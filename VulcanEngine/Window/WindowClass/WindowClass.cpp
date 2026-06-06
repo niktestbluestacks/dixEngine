@@ -72,7 +72,17 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
     auto dixWindow = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
     auto it = dixWindow->m_keyBindings.find(key);
     if (it != dixWindow->m_keyBindings.end()) {
-        it->second();
+        if (dixWindow->m_currentKey == -69420) {
+            it->second.first();
+            if (it->second.second) {
+                dixWindow->m_currentKey = key;
+            }
+        } else if (dixWindow->m_currentKey == key) {
+            it->second.first();
+            dixWindow->m_currentKey = -69420;
+        } else if (!GLFWIsLetterOrNumber(key)) {
+            it->second.first();
+        }
     }
 }
 
@@ -93,8 +103,8 @@ void Window::setWindowIcon(const std::string& filepath) {
     }
 }
 
-void Window::bindKey(int key, std::function<void()> callback) {
-    m_keyBindings[key] = callback;
+void Window::bindKey(int key, std::function<void()> callback, bool overrideOtherBidngs) {
+    m_keyBindings[key] = std::make_pair(callback, overrideOtherBidngs);
 }
 
 void Window::unbindKey(int key) {

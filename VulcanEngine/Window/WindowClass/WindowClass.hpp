@@ -8,12 +8,17 @@
 #include <stb_image.h>
 
 // std
+#include <cwctype>
 #include <string>
 #include <map>
 #include <functional>
 #include <vector>
 
 namespace dix {
+
+inline bool GLFWIsLetterOrNumber(int key) {
+    return (key >= GLFW_KEY_A && key <= GLFW_KEY_Z) || (key >= GLFW_KEY_0 && key <= GLFW_KEY_9);
+}
 
 class Window {
    private:
@@ -42,7 +47,7 @@ class Window {
 
     void setWindowIcon(const std::string& filepath);
 
-    void bindKey(int key, std::function<void()> callback);
+    void bindKey(int key, std::function<void()> callback, bool overrideOtherBidngs = false);
     void unbindKey(int key);
     void setCharCallback(std::function<void(char)> callback);
 
@@ -50,10 +55,11 @@ class Window {
     int m_width;
     int m_height;
     bool m_framebufferResized = false;
+    int m_currentKey = -69420;
 
     std::string m_title;
     GLFWwindow* m_window;
-    std::map<int, std::function<void()>> m_keyBindings;
+    std::map<int, std::pair<std::function<void()>, bool>> m_keyBindings;
     std::function<void(char)> m_charCallback;
 };  // class Window
 }   // namespace dix

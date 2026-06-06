@@ -31,6 +31,7 @@ struct DixUIInfo {
     // DixUIVert vert;
     std::string fontTxtPath = "UI/font.txt";
     std::string fontTgaPath = "UI/font02.tga";
+    int fontHeight = 3;
 };
 
 class DixUIElement {
@@ -70,7 +71,7 @@ class DixUIElement {
     std::vector<unsigned char> m_fontPixels;
 
     int m_fontWidth = 0;
-    int m_fontHeight = 6;
+    int m_fontHeight = 3;
 };
 }  // namespace dix
 

@@ -14,7 +14,6 @@ class FirstApp {
    private:
     void loadGameObjects(void);
     void loadUIElements(void);
-    void handleRecorderInput(float frameTime);
 
    public:
     static constexpr int WIDTH = 800;

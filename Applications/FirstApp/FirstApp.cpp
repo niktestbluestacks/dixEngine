@@ -51,9 +51,9 @@ void FirstApp::run(void) {
 
         frameTime = glm::min(frameTime, MAX_FRAME_TIME);
         // Handle recorder input (R to record, P to playback)
-        if (!CurrentConsole::getDixConsole().isVisible()) {
-            handleRecorderInput(frameTime);
-        }
+        // if (!CurrentConsole::getDixConsole().isVisible()) {
+        //     handleRecorderInput(frameTime);
+        // }
         // If playing back, use recorded camera data and object states
         if (m_playing) {
             auto& recorder = getFrameRecorder();
@@ -214,7 +214,7 @@ void FirstApp::loadUIElements(void) {
         [&console]() { return console.getInputBuffer(); });
 
     m_context->getDixWindow().bindKey(
-        GLFW_KEY_GRAVE_ACCENT, [&console]() { console.toggleConsole(); });
+        GLFW_KEY_GRAVE_ACCENT, [&console]() { console.toggleConsole(); }, true);
 
     m_context->getDixWindow().bindKey(GLFW_KEY_BACKSPACE, [&console]() {
         if (console.isVisible()) {
@@ -235,50 +235,64 @@ void FirstApp::loadUIElements(void) {
     });
 
     console.logInfo("Console initialized");
-}
 
-void FirstApp::handleRecorderInput(float frameTime) {
-    static float keyCooldown = 0.f;
-    keyCooldown -= frameTime;
+    m_context->getDixWindow().bindKey(GLFW_KEY_R, [this]() {
+        static float keyCooldown = 0.f;
+        static auto lastFrame = std::chrono::steady_clock::now();
+        auto currentFrame = std::chrono::steady_clock::now();
+        float frameTime =
+            (currentFrame - lastFrame) / std::chrono_literals::operator""s(1);
+        lastFrame = currentFrame;
 
-    if (keyCooldown > 0.f) {
-        return;
-    }
+        keyCooldown -= frameTime;
 
-    GLFWwindow* window = m_context->getGLFWwindow();
+        if (keyCooldown > 0.f) {
+            return;
+        }
 
-    // Press R to start/stop recording
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-        if (!m_recording && !m_playing) {
-            m_recording = true;
+        if (!this->m_recording && !this->m_playing) {
+            this->m_recording = true;
             getFrameRecorder().startRecording("recording.txt");
             DixLogInfo("Recording started - press R again to stop");
             keyCooldown = 0.3f;  // 300ms cooldown
-        } else if (m_recording) {
-            m_recording = false;
+        } else if (this->m_recording) {
+            this->m_recording = false;
             getFrameRecorder().stopRecording();
             DixLogInfo("Recording stopped");
             keyCooldown = 0.3f;
         }
-    }
+    });
 
-    // Press P to start/stop playback
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-        if (!m_playing && !m_recording) {
-            m_playing = true;
-            m_initialGameObects = m_gameObjects;
-            getFrameRecorder().startPlayback("recording.txt", m_gameObjects,
-                                             playerPosition, playerLookAt);
+    m_context->getDixWindow().bindKey(GLFW_KEY_P, [this]() {
+        static float keyCooldown = 0.f;
+        static auto lastFrame = std::chrono::steady_clock::now();
+        auto currentFrame = std::chrono::steady_clock::now();
+        float frameTime =
+            (currentFrame - lastFrame) / std::chrono_literals::operator""s(1);
+        lastFrame = currentFrame;
+
+        keyCooldown -= frameTime;
+
+        if (keyCooldown > 0.f) {
+            return;
+        }
+
+        if (!this->m_playing && !this->m_recording) {
+            this->m_playing = true;
+            this->m_initialGameObects = this->m_gameObjects;
+            getFrameRecorder().startPlayback(
+                "recording.txt", this->m_gameObjects, this->playerPosition,
+                this->playerLookAt);
             DixLogInfo("Playback started - press P again to stop");
             keyCooldown = 0.3f;
-        } else if (m_playing) {
-            m_playing = false;
+        } else if (this->m_playing) {
+            this->m_playing = false;
             getFrameRecorder().stopPlayback();
-            m_gameObjects = m_initialGameObects;
+            this->m_gameObjects = this->m_initialGameObects;
             DixLogInfo("Playback stopped");
             keyCooldown = 0.3f;
         }
-    }
+    });
 }
 
 }  // namespace dix

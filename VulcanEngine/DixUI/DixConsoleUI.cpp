@@ -48,7 +48,7 @@ void DixConsoleUI::update(float dt, const AdditionalUIInfo& additionalInfo) {
 
         displayText += "> " + m_inputBufferCallback();
 
-        if (displayText != m_displayText) {
+        if (displayText != m_displayText || m_visibilityCallback()) {
             // IMPORTANT
             // ADD SOME BOOLEAN THAT WILL LOCK CONSOLLE IN CORNER
             buildVerticesForText(displayText, 0,

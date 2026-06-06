@@ -9,7 +9,9 @@
 namespace dix {
 
 DixUIElement::DixUIElement(const DixUIInfo& info)
-    : m_uiRenderer(info.uiRenderer), m_screenExtent(info.screenExtent) {
+    : m_uiRenderer(info.uiRenderer),
+      m_screenExtent(info.screenExtent),
+      m_fontHeight(info.fontHeight) {
     loadFontTxt(info.fontTxtPath);
     loadFontAtlas(info.fontTgaPath);
 

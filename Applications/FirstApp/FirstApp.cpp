@@ -352,7 +352,7 @@ void FirstApp::loadConsoleCommands(void) {
                 auto result = string_to_num(elem);
                 std::visit(
                     [&](auto&& arg) {
-                        using T = std::decay_t<decltype(arg)    >;
+                        using T = std::decay_t<decltype(arg)>;
                         if constexpr (std::is_same_v<T, int>) {
                             if (!cleared[3]) {
                                 cleared[3] = true;
@@ -382,7 +382,7 @@ void FirstApp::loadConsoleCommands(void) {
                     m_context->getRenderSystem<BouncyParticleRenderSystem>()
                         .createParticleEmitter(position, amount)));
             } else {
-                m_gameObjects["BouncyParticleRenderSystem"].push_back(
+                m_gameObjects["ParticleRenderSystem"].push_back(
                     std::move(m_context->getRenderSystem<ParticleRenderSystem>()
                                   .createParticleEmitter(position, amount)));
             }

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <random>
 #include <stdexcept>
+#include <thread>
 
 namespace dix {
 
@@ -242,13 +243,11 @@ void BouncyParticleRenderSystem::updateParticles(float deltaTime) {
 
 GameObject BouncyParticleRenderSystem::createParticleEmitter(glm::vec3 position,
                                                        uint32_t count) {
-    if (m_particleCount + count > MAX_PARTICLES) {
-        count = MAX_PARTICLES - m_particleCount;
-    }
-
     auto obj = GameObject::createGameObject();
     obj.transform.translation = position;
-
+    if (m_particleCount + count > MAX_PARTICLES) {
+        count = std::max(MAX_PARTICLES - m_particleCount, 0u);
+    }
     if (count == 0) return obj;
 
     m_simParams.particlesPosLife =
@@ -268,17 +267,48 @@ GameObject BouncyParticleRenderSystem::createParticleEmitter(glm::vec3 position,
     auto* particles = reinterpret_cast<BouncyParticle*>(
         static_cast<uint8_t*>(m_particleBuffer->getMappedMemory()) + 16);
 
-    for (uint32_t i = 0; i < count; ++i) {
-        BouncyParticle& p = particles[m_particleCount + i];
-        p.positionLifetime = glm::vec4(
-            position + glm::vec3(posDist(gen), posDist(gen), posDist(gen)),
-            m_simParams.particlesPosLife.w);
-        p.initVelocity =
-            glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen));
-        p.velocitySize = glm::vec4(p.initVelocity, 3.f);
-        p.color = glm::vec4(colDist(gen), colDist(gen), colDist(gen), 1.0f);
-        p.initPosLife = p.positionLifetime;
+    const uint32_t NUM_THREADS = std::min(4u, std::thread::hardware_concurrency());
+    std::vector<std::jthread> threads;
+    threads.reserve(NUM_THREADS);
+
+    std::random_device rd;
+    uint32_t baseSeed = rd();
+
+    uint32_t chunk_size = count / NUM_THREADS;
+    uint32_t remainder = count % NUM_THREADS;
+
+    uint32_t current_start = 0;
+
+    for (uint32_t t = 0; t < NUM_THREADS; ++t) {
+        uint32_t current_count = chunk_size + (t < remainder ? 1 : 0);
+        if (current_count == 0) continue; 
+
+        threads.emplace_back([t, current_start, current_count, &position, particles, baseSeed, this]() {
+            std::mt19937 gen{baseSeed + t}; 
+            std::uniform_real_distribution<float> posDist(-0.5f, 0.5f);
+            std::uniform_real_distribution<float> velDist(-2.0f, 2.0f);
+            std::uniform_real_distribution<float> colDist(0.5f, 1.0f);
+
+            for (uint32_t i = 0; i < current_count; ++i) {
+                uint32_t global_idx = current_start + i;
+                BouncyParticle& p = particles[global_idx];
+
+                p.positionLifetime = glm::vec4(
+                    position + glm::vec3(posDist(gen), posDist(gen), posDist(gen)),
+                    m_simParams.particlesPosLife.w);
+                p.initVelocity =
+                    glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen));
+                p.velocitySize = glm::vec4(p.initVelocity, 3.f);
+                p.color = glm::vec4(colDist(gen), colDist(gen), colDist(gen), 1.0f);
+                p.initPosLife = p.positionLifetime;
+            }
+        });
+
+        current_start += current_count;
     }
+    threads.clear(); 
+
+    
     m_particleBuffer->unmap();
     m_particleCount += count;
 

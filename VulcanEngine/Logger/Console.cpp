@@ -102,7 +102,6 @@ void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
                 m_commands[commandName]();
                 found = true;
             }
-
         }
 
         default: {
@@ -148,7 +147,13 @@ void DixConsole::fillInternalCommands() {
         m_history.push_back(">");
     };
     m_internalCommands["help"] = [this]() {
-        this->log("help <-> helps you\nclear <-> clear the history");
+        this->log(
+            "help <-> helps you\n"
+            "clear <-> clear the history\n"
+            "particle_emitter {--bouncy} float x float y float z uint amount <->\n"
+            "creates as particle emitter with or without bouncy property at x "
+            "y z\n"
+            "with amount particles");
     };
 }
 

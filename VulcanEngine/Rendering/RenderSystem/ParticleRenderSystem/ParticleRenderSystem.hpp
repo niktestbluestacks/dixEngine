@@ -76,7 +76,7 @@ class ParticleRenderSystem
 
     ParticleSimulationParams m_simParams{};
     uint32_t m_particleCount{0};
-    static constexpr uint32_t MAX_PARTICLES = 1'000'000;
+    static constexpr uint32_t MAX_PARTICLES = 10'000'000;
 };
 
 }  // namespace dix

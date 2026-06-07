@@ -34,7 +34,7 @@ class DixConsoleUI : public DixUIElement {
         m_visibilityCallback = callback;
     }
 
-    static constexpr size_t LINES_TO_DISPLAY = 16;
+    static constexpr size_t LINES_TO_DISPLAY = 25;
 
    private:
     glm::vec4 m_consolePosition = {0.f, 0.f, 1.0f, 1.0f};

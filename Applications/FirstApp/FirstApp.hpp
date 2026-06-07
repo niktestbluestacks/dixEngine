@@ -14,6 +14,7 @@ class FirstApp {
    private:
     void loadGameObjects(void);
     void loadUIElements(void);
+    void loadConsoleCommands(void);
 
    public:
     static constexpr int WIDTH = 800;

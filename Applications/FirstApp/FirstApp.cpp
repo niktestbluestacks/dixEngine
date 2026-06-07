@@ -10,6 +10,7 @@ FirstApp::FirstApp(void) {
     // FirstApp focuses on game objects and game logic only.
     loadGameObjects();
     loadUIElements();
+    loadConsoleCommands();
     DixLogInfo("FirstApp initialized successfully!");
 }
 
@@ -50,10 +51,6 @@ void FirstApp::run(void) {
         currentTime = newTime;
 
         frameTime = glm::min(frameTime, MAX_FRAME_TIME);
-        // Handle recorder input (R to record, P to playback)
-        // if (!CurrentConsole::getDixConsole().isVisible()) {
-        //     handleRecorderInput(frameTime);
-        // }
         // If playing back, use recorded camera data and object states
         if (m_playing) {
             auto& recorder = getFrameRecorder();
@@ -137,21 +134,6 @@ void FirstApp::loadGameObjects() {
         gameObj.transform.scale = {1.f, 1.f, 1.f};
         m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
     }
-
-    // particle emitter
-    auto particleEmitter = GameObject::createGameObject();
-    particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
-    m_gameObjects["ParticleRenderSystem"].push_back(std::move(particleEmitter));
-    m_context->getRenderSystem<ParticleRenderSystem>().createParticleEmitter(
-        glm::vec3{0.f, 50.f, 0.f}, 500);
-
-    // bouncy particle emitter
-    auto bouncyParticleEmitter = GameObject::createGameObject();
-    particleEmitter.transform.translation = glm::vec3{0.f, 0.f, 0.f};
-    m_gameObjects["BouncyParticleRenderSystem"].push_back(
-        std::move(particleEmitter));
-    m_context->getRenderSystem<BouncyParticleRenderSystem>()
-        .createParticleEmitter(glm::vec3{0.f, 0.f, 0.f}, 500);
 
     // skybox
     const auto entry = toModelPath("skybox.obj");
@@ -293,6 +275,118 @@ void FirstApp::loadUIElements(void) {
             keyCooldown = 0.3f;
         }
     });
+}
+
+void FirstApp::loadConsoleCommands(void) {
+    auto& console = CurrentConsole::getDixConsole();
+    console.register_function(
+        "play", std::function{[&]() {
+            static float keyCooldown = 0.f;
+            static auto lastFrame = std::chrono::steady_clock::now();
+            auto currentFrame = std::chrono::steady_clock::now();
+            float frameTime = (currentFrame - lastFrame) /
+                              std::chrono_literals::operator""s(1);
+            lastFrame = currentFrame;
+
+            keyCooldown -= frameTime;
+
+            if (keyCooldown > 0.f) {
+                return;
+            }
+
+            if (!this->m_playing && !this->m_recording) {
+                this->m_playing = true;
+                this->m_initialGameObects = this->m_gameObjects;
+                getFrameRecorder().startPlayback(
+                    "recording.txt", this->m_gameObjects, this->playerPosition,
+                    this->playerLookAt);
+                console.log("Playback started - use play again to stop");
+                keyCooldown = 0.3f;
+            } else if (this->m_playing) {
+                this->m_playing = false;
+                getFrameRecorder().stopPlayback();
+                this->m_gameObjects = this->m_initialGameObects;
+                console.log("Playback stopped");
+                keyCooldown = 0.3f;
+            }
+        }});
+
+    console.register_function(
+        "record", std::function{[&]() {
+            static float keyCooldown = 0.f;
+            static auto lastFrame = std::chrono::steady_clock::now();
+            auto currentFrame = std::chrono::steady_clock::now();
+            float frameTime = (currentFrame - lastFrame) /
+                              std::chrono_literals::operator""s(1);
+            lastFrame = currentFrame;
+
+            keyCooldown -= frameTime;
+
+            if (keyCooldown > 0.f) {
+                return;
+            }
+
+            if (!this->m_recording && !this->m_playing) {
+                this->m_recording = true;
+                getFrameRecorder().startRecording("recording.txt");
+                console.log("Recording started - use record to stop recording");
+                keyCooldown = 0.3f;  // 300ms cooldown
+            } else if (this->m_recording) {
+                this->m_recording = false;
+                getFrameRecorder().stopRecording();
+                console.log("Recording stopped");
+                keyCooldown = 0.3f;
+            }
+        }});
+
+    console.register_function(
+        "particle_emitter",
+        std::function{[&](const std::vector<std::string>& arguments) {
+            std::string flag{"--bouncy"};
+
+            bool is_bouncy = false;
+            glm::vec3 position{0.f};
+            std::array<bool, 4> cleared{};
+            int amount = 0;
+            for (auto& elem : arguments) {
+                auto result = string_to_num(elem);
+                std::visit(
+                    [&](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)    >;
+                        if constexpr (std::is_same_v<T, int>) {
+                            if (!cleared[3]) {
+                                cleared[3] = true;
+                                amount = arg;
+                            }
+                        } else if constexpr (std::is_same_v<T, float>) {
+                            if (!cleared[0]) {
+                                cleared[0] = true;
+                                position.x = arg;
+                            } else if (!cleared[1]) {
+                                cleared[1] = true;
+                                position.y = arg;
+                            } else if (!cleared[2]) {
+                                cleared[2] = true;
+                                position.z = arg;
+                            }
+                        } else if constexpr (std::is_same_v<T, std::string>) {
+                            if (arg == "--bouncy") {
+                                is_bouncy = true;
+                            }
+                        }
+                    },
+                    result);
+            }
+            if (is_bouncy) {
+                m_gameObjects["BouncyParticleRenderSystem"].push_back(std::move(
+                    m_context->getRenderSystem<BouncyParticleRenderSystem>()
+                        .createParticleEmitter(position, amount)));
+            } else {
+                m_gameObjects["BouncyParticleRenderSystem"].push_back(
+                    std::move(m_context->getRenderSystem<ParticleRenderSystem>()
+                                  .createParticleEmitter(position, amount)));
+            }
+        }});
 }
 
 }  // namespace dix

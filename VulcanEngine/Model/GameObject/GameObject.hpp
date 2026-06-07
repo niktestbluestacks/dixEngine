@@ -49,7 +49,7 @@ class GameObject {
     
     ~GameObject() = default;
 
-    id_t getId() const { return id; };
+    const id_t getId() const { return id; };
 
     std::shared_ptr<Model> model{};
     glm::vec3 color{};
@@ -66,5 +66,14 @@ class GameObject {
     id_t id;
 };
 }  // namespace dix
+
+namespace std {
+    template<>
+    struct hash<dix::GameObject> {
+        size_t operator()(const dix::GameObject& obj) {
+            return hash<unsigned int>()(obj.getId());
+        }
+    };
+}   // namespace std
 
 #endif  // GAME_OBJECT_HPP

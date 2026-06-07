@@ -53,7 +53,7 @@ class BouncyParticleRenderSystem
 
     // BouncyParticle management
     void updateParticles(float deltaTime);
-    void createParticleEmitter(glm::vec3 position, uint32_t count);
+    GameObject createParticleEmitter(glm::vec3 position, uint32_t count);
 
     // Dispatches the compute shader. Call outside a render pass.
     void dispatchCompute(vk::CommandBuffer commandBuffer) override;

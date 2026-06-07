@@ -1,9 +1,10 @@
 // dix
-#include <Logger/Console.hpp>
 #include <DixUI/DixConsoleUI.hpp>
+#include <Logger/Console.hpp>
 
 // std
 #include <algorithm>
+#include <span>
 #include <sstream>
 
 namespace dix {
@@ -85,21 +86,42 @@ void DixConsole::enterCommand() {
 }
 
 void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
-    if (args.empty()) {
-        logError("No command provided");
-        return;
-    }
+    switch (args.size()) {
+        case 0: {
+            logError("No command provided");
+            break;
+        }
+        case 1: {
+            const std::string& commandName = args[0];
+            bool found = false;
 
-    const std::string& commandName = args[0];
-    bool found = false;
+            if (m_internalCommands.contains(commandName)) {
+                m_internalCommands[commandName]();
+                found = true;
+            } else if (m_commands.contains(commandName)) {
+                m_commands[commandName]();
+                found = true;
+            }
 
-    if (m_internalCommands.contains(commandName)) {
-        m_internalCommands[commandName]();
-        found = true;
-    }
+        }
 
-    if (!found) {
-        logError("Unknown command: " + commandName);
+        default: {
+            const std::string& commandName = args[0];
+            bool found = false;
+            auto res = std::vector(args.begin() + 1, args.end());
+            if (m_internalCommandsWithArgs.contains(commandName)) {
+                m_internalCommandsWithArgs[commandName](res);
+                found = true;
+            } else if (m_commandsWithArgs.contains(commandName)) {
+                m_commandsWithArgs[commandName](res);
+                found = true;
+            }
+
+            if (!found) {
+                logError("Unknown command: " + commandName);
+            }
+            break;
+        }
     }
 }
 
@@ -118,6 +140,16 @@ void DixConsole::executeCommand(const std::string& command) {
 
     log("> " + command);
     executeCommandImpl(args);
+}
+
+void DixConsole::fillInternalCommands() {
+    m_internalCommands["clear"] = [this]() {
+        m_history.clear();
+        m_history.push_back(">");
+    };
+    m_internalCommands["help"] = [this]() {
+        this->log("help <-> helps you\nclear <-> clear the history");
+    };
 }
 
 }  // namespace dix

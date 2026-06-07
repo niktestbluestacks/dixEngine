@@ -231,12 +231,14 @@ void ParticleRenderSystem::updateParticles(float deltaTime) {
     m_simulationParamsBuffer->unmap();
 }
 
-void ParticleRenderSystem::createParticleEmitter(glm::vec3 position,
-                                                 uint32_t count) {
+GameObject ParticleRenderSystem::createParticleEmitter(glm::vec3 position,
+                                                       uint32_t count) {
+    auto obj = GameObject::createGameObject();
+    obj.transform.translation = position;
     if (m_particleCount + count > MAX_PARTICLES) {
         count = MAX_PARTICLES - m_particleCount;
     }
-    if (count == 0) return;
+    if (count == 0) return obj;
 
     m_simParams.particlesPosLife =
         glm::vec4(position, m_simParams.particlesPosLife.w);
@@ -268,6 +270,8 @@ void ParticleRenderSystem::createParticleEmitter(glm::vec3 position,
     }
     m_particleBuffer->unmap();
     m_particleCount += count;
+
+    return obj;
 }
 
 }  // namespace dix

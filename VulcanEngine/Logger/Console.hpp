@@ -57,13 +57,34 @@ class DixConsole {
 
     const std::string& getInputBuffer() const { return m_inputBuffer; }
 
-    template<typename... Args>
-    void register_function(const std::string& name, std::function<void(Args...)> func) {
+    void register_function(const std::string& name, std::function<void()> func) {
         if (m_internalCommands.contains(name) || m_commands.contains(name)) {
             throw std::runtime_error("The command with name " + name + " already exists!");
         }
         m_commands[name] = func;
     }
+
+    void register_function(DixCommandInputType<>& command) {
+        if (m_internalCommands.contains(command.first) || m_commands.contains(command.first)) {
+            throw std::runtime_error("The command with name " + command.first + " already exists!");
+        }
+        m_commands[command.first] = command.second;
+    }
+
+    void register_function(const std::string& name, std::function<void(const std::vector<std::string>&)> func) {
+        if (m_internalCommandsWithArgs.contains(name) || m_commandsWithArgs.contains(name)) {
+            throw std::runtime_error("The command with name " + name + " already exists!");
+        }
+        m_commandsWithArgs[name] = func;
+    }
+
+    void register_function(DixCommandInputType<const std::vector<std::string>&> command) {
+        if (m_internalCommandsWithArgs.contains(command.first) || m_commandsWithArgs.contains(command.first)) {
+            throw std::runtime_error("The command with name " + command.first + " already exists!");
+        }
+        m_commandsWithArgs[command.first] = command.second;
+    }
+
 
     static constexpr size_t MAX_HISTORY_SIZE = DixConsoleUI::LINES_TO_DISPLAY;
 
@@ -71,8 +92,10 @@ class DixConsole {
     DixConsole() { fillInternalCommands(); }
 
     std::deque<std::string> m_history;
-    std::unordered_map<std::string, std::any> m_commands;
+    std::unordered_map<std::string, std::function<void()>> m_commands;
+    std::unordered_map<std::string, std::function<void(const std::vector<std::string>&)>> m_commandsWithArgs;
     std::unordered_map<std::string, std::function<void()>> m_internalCommands;
+    std::unordered_map<std::string, std::function<void(const std::vector<std::string>&)>> m_internalCommandsWithArgs;
     glm::vec4 m_cornerPositions = {0.f, 100.f, 100.f, 100.f};
     DixConsoleUI* m_consoleUI_ptr = nullptr;
 
@@ -81,15 +104,7 @@ class DixConsole {
 
     void executeCommandImpl(const std::vector<std::string>& args);
 
-    void fillInternalCommands() {
-        m_internalCommands["clear"] = [this]() {
-            m_history.clear();
-            m_history.push_back(">");
-        };
-        m_internalCommands["help"] = [this]() {
-            this->log("help <-> helps you\nclear <-> clear the history");
-        };
-    }
+    void fillInternalCommands();
 };
 
 }  // namespace dix

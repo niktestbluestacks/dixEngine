@@ -32,6 +32,7 @@ void DixConsole::setConsoleUI(DixConsoleUI* ui) {
         ui->setInputBufferCallback([this]() { return m_inputBuffer; });
         ui->setVisibilityCallback([this]() { return m_isVisible; });
         ui->setConsolePosition(m_cornerPositions);
+        ui->setConsoleColor(&m_consoleColor);
     }
 }
 
@@ -195,60 +196,106 @@ void DixConsole::fillInternalCommands() {
             "creates as particle emitter with or without bouncy property at x "
             "y z\n"
             "with amount particles\n"
-            "echo acceps --debug e.t.c. <-> will print on new lines only after spaces\n"
-            "exit <-> calls exit(EXIT_SUCCESS)");
+            "echo acceps --debug e.t.c. <-> will print on new lines only after "
+            "spaces\n"
+            "exit <-> calls exit(EXIT_SUCCESS)\n"
+            "termcolor accepts four floats or flags suck as --blue e.t.c. and "
+            "float after it <->\n"
+            "changes color of terminal (if -- flag then changes that color in "
+            "terminal)");
     };
 
     m_internalCommands["clear"] = [this]() {
         m_history.clear();
         m_history.push_back(">");
     };
-    
-    m_internalCommands["exit"] = [this]() {
-        std::exit(EXIT_SUCCESS);
-    };
 
-    m_internalCommandsWithArgs["echo"] =
+    m_internalCommands["exit"] = [this]() { std::exit(EXIT_SUCCESS); };
+
+    m_internalCommandsWithArgs["termcolor"] =
         [this](const std::vector<std::string>& arguments) {
-            enum class FLAGS {
-                Log,
-                Debug,
-                Info,
-                Warn,
-                Err
-            };
-
-            FLAGS flags = FLAGS::Log;
-
-            std::string flag = arguments[0];
-            if (flag == "--debug") {
-                flags = FLAGS::Debug;
-            } else if (flag == "--info") {
-                flags = FLAGS::Info;
-            } else if (flag == "--warn") {
-                flags = FLAGS::Warn;
-            } else if (flag == "--err") {
-                flags = FLAGS::Err;
+            glm::vec4 newColor = m_consoleColor;
+            std::array<bool, 4> visited{};
+            int nextToFill = -1;
+            for (auto& elem : arguments) {
+                auto res = string_to_num(elem);
+                std::visit(
+                    [&](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<T, float>) {
+                            if (nextToFill == -1) {
+                                if (!visited[0]) {
+                                    visited[0] = true;
+                                    newColor[0] = std::clamp(arg, 0.f, 1.f);
+                                } else if (!visited[1]) {
+                                    visited[1] = true;
+                                    newColor[1] = std::clamp(arg, 0.f, 1.f);
+                                } else if (!visited[2]) {
+                                    visited[2] = true;
+                                    newColor[2] = std::clamp(arg, 0.f, 1.f);
+                                } else if (!visited[3]) {
+                                    visited[3] = true;
+                                    newColor[3] = std::clamp(arg, 0.f, 1.f);
+                                } else
+                                    return;
+                            } else {
+                                visited[nextToFill] = true;
+                                newColor[nextToFill] =
+                                    std::clamp(arg, 0.f, 1.f);
+                                nextToFill = -1;
+                            }
+                        } else if constexpr (std::is_same_v<T, std::string>) {
+                            if (arg == "--red") {
+                                nextToFill = 0;
+                            } else if (arg == "--green") {
+                                nextToFill = 1;
+                            } else if (arg == "--blue") {
+                                nextToFill = 2;
+                            } else if (arg == "--alpha") {
+                                nextToFill = 3;
+                            }
+                        }
+                    },
+                    res);
             }
+            m_consoleColor = newColor;
+        };
 
-            switch (flags) {
-                case FLAGS::Log:
+    m_internalCommandsWithArgs["echo"] = [this](const std::vector<std::string>&
+                                                    arguments) {
+        enum class FLAGS { Log, Debug, Info, Warn, Err };
+
+        FLAGS flags = FLAGS::Log;
+
+        std::string flag = arguments[0];
+        if (flag == "--debug") {
+            flags = FLAGS::Debug;
+        } else if (flag == "--info") {
+            flags = FLAGS::Info;
+        } else if (flag == "--warn") {
+            flags = FLAGS::Warn;
+        } else if (flag == "--err") {
+            flags = FLAGS::Err;
+        }
+
+        switch (flags) {
+            case FLAGS::Log:
                 log(arguments);
                 break;
-                case FLAGS::Debug:
+            case FLAGS::Debug:
                 logDebug(std::vector(arguments.begin() + 1, arguments.end()));
                 break;
-                case FLAGS::Info:
+            case FLAGS::Info:
                 logInfo(std::vector(arguments.begin() + 1, arguments.end()));
                 break;
-                case FLAGS::Warn:
+            case FLAGS::Warn:
                 logWarn(std::vector(arguments.begin() + 1, arguments.end()));
                 break;
-                case FLAGS::Err:
+            case FLAGS::Err:
                 logError(std::vector(arguments.begin() + 1, arguments.end()));
                 break;
-            }
-        };
+        }
+    };
 }
 
 }  // namespace dix

@@ -133,7 +133,7 @@ void DixUIElement::render(FrameInfo& fi) {
     fi.commandBuffer.draw(m_vertexCount, 1, 0, 0);
 }
 
-void DixUIElement::buildVerticesForText(const std::string& text) {
+void DixUIElement::buildVerticesForText(const std::string& text, const glm::vec4& color) {
     std::vector<DixUIVert> verts;
     float x = 8.f;
     float y = 8.f;
@@ -153,12 +153,12 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
         float u1 = g.u1;
         float v0 = 0.f, v1 = 1.f;
         // two tris
-        verts.push_back({x, y, u0, v0});
-        verts.push_back({x + gw, y, u1, v0});
-        verts.push_back({x + gw, y + gh, u1, v1});
-        verts.push_back({x, y, u0, v0});
-        verts.push_back({x + gw, y + gh, u1, v1});
-        verts.push_back({x, y + gh, u0, v1});
+        verts.push_back({x, y, u0, v0, color});
+        verts.push_back({x + gw, y, u1, v0, color});
+        verts.push_back({x + gw, y + gh, u1, v1, color});
+        verts.push_back({x, y, u0, v0, color});
+        verts.push_back({x + gw, y + gh, u1, v1, color});
+        verts.push_back({x, y + gh, u0, v1, color});
         x += gw + 1.f;
     }
 
@@ -170,7 +170,7 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
     if (m_vertexCapacity < m_vertexCount) {
         // grow existing per-frame buffers
         m_vertexCapacity = m_vertexCount;
-        vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
+        m_uiRenderer.getDevice().device().waitIdle();
         for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
             m_vertexBuffers[i] = std::make_unique<DixBuffer>(
                 m_uiRenderer.getDevice(), sizeof(DixUIVert), m_vertexCapacity,
@@ -185,7 +185,7 @@ void DixUIElement::buildVerticesForText(const std::string& text) {
 }
 
 void DixUIElement::buildVerticesForText(const std::string& text, float x,
-                                        float y) {
+                                        float y, const glm::vec4& color) {
     std::vector<DixUIVert> verts;
     float startX = x;
     for (char c : text) {
@@ -203,12 +203,12 @@ void DixUIElement::buildVerticesForText(const std::string& text, float x,
         float u1 = g.u1;
         float v0 = 0.f, v1 = 1.f;
         // two tris
-        verts.push_back({x, y, u0, v0});
-        verts.push_back({x + gw, y, u1, v0});
-        verts.push_back({x + gw, y + gh, u1, v1});
-        verts.push_back({x, y, u0, v0});
-        verts.push_back({x + gw, y + gh, u1, v1});
-        verts.push_back({x, y + gh, u0, v1});
+        verts.push_back({x, y, u0, v0, color});
+        verts.push_back({x + gw, y, u1, v0, color});
+        verts.push_back({x + gw, y + gh, u1, v1, color});
+        verts.push_back({x, y, u0, v0, color});
+        verts.push_back({x + gw, y + gh, u1, v1, color});
+        verts.push_back({x, y + gh, u0, v1, color});
         x += gw + 1.f;
     }
 
@@ -220,7 +220,7 @@ void DixUIElement::buildVerticesForText(const std::string& text, float x,
     if (m_vertexCapacity < m_vertexCount) {
         // grow existing per-frame buffers
         m_vertexCapacity = m_vertexCount;
-        vkDeviceWaitIdle(m_uiRenderer.getDevice().device());
+        m_uiRenderer.getDevice().device().waitIdle();
         for (size_t i = 0; i < m_vertexBuffers.size(); ++i) {
             m_vertexBuffers[i] = std::make_unique<DixBuffer>(
                 m_uiRenderer.getDevice(), sizeof(DixUIVert), m_vertexCapacity,

@@ -12,6 +12,7 @@ namespace dix {
 struct DixUIVert {
     float x, y;  // position in pixels relative to top-left of screen
     float u, v;  // uv coordinates in font atlas
+    glm::vec4 color;
 };
 
 struct DixGlyphInfo {
@@ -34,6 +35,15 @@ struct DixUIInfo {
     int fontHeight = 3;
 };
 
+inline uint32_t packRGBA(float r, float g, float b, float a) {
+    uint32_t ur = static_cast<uint32_t>(std::clamp(r, 0.f, 1.f) * 255.f);
+    uint32_t ug = static_cast<uint32_t>(std::clamp(g, 0.f, 1.f) * 255.f);
+    uint32_t ub = static_cast<uint32_t>(std::clamp(b, 0.f, 1.f) * 255.f);
+    uint32_t ua = static_cast<uint32_t>(std::clamp(a, 0.f, 1.f) * 255.f);
+
+    return (ua << 24) | (ub << 16) | (ug << 8) | ur;
+}
+
 class DixUIElement {
    public:
     DixUIElement(const DixUIInfo& info);
@@ -52,8 +62,8 @@ class DixUIElement {
     virtual void upload(FrameInfo& fi);
 
    protected:
-    void buildVerticesForText(const std::string& text);
-    void buildVerticesForText(const std::string& text, float x, float y);
+    void buildVerticesForText(const std::string& text, const glm::vec4& color = glm::vec4(1.f));
+    void buildVerticesForText(const std::string& text, float x, float y, const glm::vec4& color = glm::vec4(1.f));
     void clearVertices() { m_vertexCount = 0; m_vertexStaging.clear(); }
 
    protected:

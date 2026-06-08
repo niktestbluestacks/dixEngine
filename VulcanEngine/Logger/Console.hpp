@@ -115,6 +115,7 @@ class DixConsole {
                        std::function<void(const std::vector<std::string>&)>>
         m_internalCommandsWithArgs;
     glm::vec4 m_cornerPositions = {0.f, 100.f, 100.f, 100.f};
+    glm::vec4 m_consoleColor{1.f};
     DixConsoleUI* m_consoleUI_ptr = nullptr;
 
     bool m_isVisible = false;

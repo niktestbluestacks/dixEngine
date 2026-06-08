@@ -8,6 +8,9 @@
 #include <string>
 #include <vector>
 
+// libs
+#include <glm/vec4.hpp>
+
 namespace dix {
 
 UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass)
@@ -44,7 +47,7 @@ UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass)
         throw std::runtime_error("failed to create UI pipeline layout");
     }
 
-    // Pipeline: UI vertex layout — vec2 position, vec2 uv
+    // Pipeline: UI vertex layout — vec2 position, vec2 uv, vec4 color
     PipelineConfigInfo config{};
     Pipeline::defaultPipelineConfigInfo(config);
     config.depthStencilInfo.depthTestEnable = VK_FALSE;
@@ -53,7 +56,7 @@ UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass)
     vk::VertexInputBindingDescription binding{};
     binding.binding = 0;
     binding.inputRate = vk::VertexInputRate::eVertex;
-    binding.stride = sizeof(float) * 4;
+    binding.stride = sizeof(float) * 4 + sizeof(glm::vec4);
     config.vertexBindingDescriptions = {binding};
 
     vk::VertexInputAttributeDescription attrPos{};
@@ -67,7 +70,13 @@ UIRenderer::UIRenderer(EngineDevice& device, vk::RenderPass renderPass)
     attrUV.location = 1;
     attrUV.format = vk::Format::eR32G32Sfloat;
     attrUV.offset = sizeof(float) * 2;
-    config.vertexAttributeDescriptions = {attrPos, attrUV};
+
+    vk::VertexInputAttributeDescription attrColor{};
+    attrColor.binding = 0;
+    attrColor.location = 2;
+    attrColor.format = vk::Format::eR32G32B32A32Sfloat;
+    attrColor.offset = sizeof(float) * 4;
+    config.vertexAttributeDescriptions = {attrPos, attrUV, attrColor};
 
     // Alpha blending for UI elements
     config.colorBlendAttachment.blendEnable = VK_TRUE;

@@ -34,6 +34,10 @@ class DixConsoleUI : public DixUIElement {
         m_visibilityCallback = callback;
     }
 
+    void setConsoleColor(const glm::vec4* consoleColor) {
+        m_consoleColor = consoleColor;
+    }
+
     static constexpr size_t LINES_TO_DISPLAY = 25;
 
    private:
@@ -43,6 +47,7 @@ class DixConsoleUI : public DixUIElement {
     std::function<bool()> m_visibilityCallback;
     std::string m_displayText;
     float m_updateTimer = 0.0f;
+    const glm::vec4* m_consoleColor = nullptr;
 };
 
 }  // namespace dix

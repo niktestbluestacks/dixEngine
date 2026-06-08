@@ -52,7 +52,7 @@ void DixConsoleUI::update(float dt, const AdditionalUIInfo& additionalInfo) {
             // IMPORTANT
             // ADD SOME BOOLEAN THAT WILL LOCK CONSOLLE IN CORNER
             buildVerticesForText(displayText, 0,
-                                 additionalInfo.screenExtent.height);
+                                 additionalInfo.screenExtent.height, *m_consoleColor);
             m_displayText = displayText;
         }
     }

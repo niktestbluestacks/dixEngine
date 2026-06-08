@@ -25,7 +25,7 @@ class AppContext {
 
     void initialize() {
         createDescriptorPools();
-        createUBOs();
+        createVKBuffers();
         createSystemSetLayouts();
         createDescriptorSets();
         createModelDescriptorResources();
@@ -110,7 +110,7 @@ class AppContext {
 
     RenderSystemRegistery<RenderSystems...> m_renderSystemRegistery;
 
-    void createUBOs();
+    void createVKBuffers();
 
     template <typename RenderSystemInfo>
     void createSingleUbo(RenderSystemInfo&& info);

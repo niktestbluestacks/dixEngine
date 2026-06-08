@@ -15,7 +15,7 @@
 namespace dix {
 
 template <typename T>
-concept HasUbos = requires { typename T::Ubos; };
+concept HasVKBuffers = requires { typename T::VKBuffers; };
 
 template <typename T>
 concept HasName = requires { T::Name(); };

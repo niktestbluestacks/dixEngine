@@ -30,7 +30,7 @@ using VulkanRenderSystemFlagType =
 // Each tag fully describes one VkDescriptorSetLayoutBinding slot in the
 // per-render-system (set 0) descriptor set managed by AppContext.
 //
-// The type tags serve as a single source of truth from which both `Ubos`
+// The type tags serve as a single source of truth from which both `VKBuffers`
 // (the C++ types AppContext writes each frame) and `getVulkanFlags()` (the
 // Vulkan binding metadata) are automatically derived.  Keeping them in sync
 // by hand — and the resulting null-descriptor validation errors — is no
@@ -100,7 +100,7 @@ struct ExtractUboTypes<B, Rest...> {
 // ---------------------------------------------------------------------------
 // RenderSystemTraits<BindingsTuple>
 //
-// Inherit from this mixin to get `Ubos` and `getVulkanFlags()` for free,
+// Inherit from this mixin to get `VKBuffers` and `getVulkanFlags()` for free,
 // guaranteed to stay in sync because both are derived from the same Bindings.
 //
 // Usage:
@@ -120,7 +120,7 @@ struct ExtractUboTypes<B, Rest...> {
 //       // ... constructor
 //   };
 //
-// The `Ubos` and `getVulkanFlags()` required by RenderSystemRegistery and
+// The `VKBuffers` and `getVulkanFlags()` required by RenderSystemRegistery and
 // AppContext are provided automatically — no manual duplication needed.
 // ---------------------------------------------------------------------------
 template <typename BindingsTuple>
@@ -131,7 +131,7 @@ struct RenderSystemTraits<std::tuple<Bs...>> {
     // Tuple of the C++ UBO types for every buffer-type binding, in
     // declaration order.  AppContext creates one DixBuffer per entry and
     // writes it into set 0 each frame via m_systemUboBuffers.
-    using Ubos = typename detail::ExtractUboTypes<Bs...>::type;
+    using VKBuffers = typename detail::ExtractUboTypes<Bs...>::type;
 
     // Returns (bindingIndex, descriptorType, shaderStages) for every
     // binding in declaration order.  Satisfies the HasVulkanFlags concept

@@ -8,9 +8,9 @@ FirstApp::FirstApp(void) {
     DixLogInfo("Initializing FirstApp...");
     DixLogInfo("Loading Game Objects");
     // FirstApp focuses on game objects and game logic only.
+    loadConsoleCommands();
     loadGameObjects();
     loadUIElements();
-    loadConsoleCommands();
     DixLogInfo("FirstApp initialized successfully!");
 }
 

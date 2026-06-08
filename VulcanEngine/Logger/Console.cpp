@@ -42,20 +42,49 @@ void DixConsole::log(const std::string& message) {
     }
 }
 
+void DixConsole::log(const std::vector<std::string>& message) {
+    for (auto& elem : message) {
+        m_history.push_back(elem);
+        if (m_history.size() > MAX_HISTORY_SIZE) {
+            m_history.pop_front();
+        }
+    }
+}
+
 void DixConsole::logDebug(const std::string& message) {
     log("[DEBUG] " + message);
+}
+
+void DixConsole::logDebug(const std::vector<std::string>& message) {
+    log("[DEBUG]: ");
+    log(message);
 }
 
 void DixConsole::logInfo(const std::string& message) {
     log("[INFO] " + message);
 }
 
+void DixConsole::logInfo(const std::vector<std::string>& message) {
+    log("[INFO]: ");
+    log(message);
+}
+
 void DixConsole::logWarn(const std::string& message) {
     log("[WARN] " + message);
 }
 
+void DixConsole::logWarn(const std::vector<std::string>& message) {
+    log("[WARN]: ");
+    log(message);
+}
+
 void DixConsole::logError(const std::string& message) {
     log("[ERROR] " + message);
+}
+
+void DixConsole::logError(const std::vector<std::string>& message) {
+    log("[ERROR]: ");
+    log(message);
 }
 
 std::string DixConsole::getConsoleText() const {
@@ -85,6 +114,18 @@ void DixConsole::enterCommand() {
     }
 }
 
+// void DixConsole::arrowDown() {
+//     if (m_isVisible) {
+//         m_inputBuffer = m_history.back();
+//     }
+// }
+
+// void DixConsole::arrowUp() {
+//     if (m_isVisible) {
+//         m_inputBuffer = m_history.back();
+//     }
+// }
+
 void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
     switch (args.size()) {
         case 0: {
@@ -102,6 +143,10 @@ void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
                 m_commands[commandName]();
                 found = true;
             }
+            if (!found) {
+                logError("Unknown command: " + commandName);
+            }
+            break;
         }
 
         default: {
@@ -142,19 +187,68 @@ void DixConsole::executeCommand(const std::string& command) {
 }
 
 void DixConsole::fillInternalCommands() {
+    m_internalCommands["help"] = [this]() {
+        log("help <-> helps you\n"
+            "clear <-> clear the history\n"
+            "particle_emitter {--bouncy} float x float y float z uint amount "
+            "<->\n"
+            "creates as particle emitter with or without bouncy property at x "
+            "y z\n"
+            "with amount particles\n"
+            "echo acceps --debug e.t.c. <-> will print on new lines only after spaces\n"
+            "exit <-> calls exit(EXIT_SUCCESS)");
+    };
+
     m_internalCommands["clear"] = [this]() {
         m_history.clear();
         m_history.push_back(">");
     };
-    m_internalCommands["help"] = [this]() {
-        this->log(
-            "help <-> helps you\n"
-            "clear <-> clear the history\n"
-            "particle_emitter {--bouncy} float x float y float z uint amount <->\n"
-            "creates as particle emitter with or without bouncy property at x "
-            "y z\n"
-            "with amount particles");
+    
+    m_internalCommands["exit"] = [this]() {
+        std::exit(EXIT_SUCCESS);
     };
+
+    m_internalCommandsWithArgs["echo"] =
+        [this](const std::vector<std::string>& arguments) {
+            enum class FLAGS {
+                Log,
+                Debug,
+                Info,
+                Warn,
+                Err
+            };
+
+            FLAGS flags = FLAGS::Log;
+
+            std::string flag = arguments[0];
+            if (flag == "--debug") {
+                flags = FLAGS::Debug;
+            } else if (flag == "--info") {
+                flags = FLAGS::Info;
+            } else if (flag == "--warn") {
+                flags = FLAGS::Warn;
+            } else if (flag == "--err") {
+                flags = FLAGS::Err;
+            }
+
+            switch (flags) {
+                case FLAGS::Log:
+                log(arguments);
+                break;
+                case FLAGS::Debug:
+                logDebug(std::vector(arguments.begin() + 1, arguments.end()));
+                break;
+                case FLAGS::Info:
+                logInfo(std::vector(arguments.begin() + 1, arguments.end()));
+                break;
+                case FLAGS::Warn:
+                logWarn(std::vector(arguments.begin() + 1, arguments.end()));
+                break;
+                case FLAGS::Err:
+                logError(std::vector(arguments.begin() + 1, arguments.end()));
+                break;
+            }
+        };
 }
 
 }  // namespace dix

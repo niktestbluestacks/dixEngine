@@ -21,7 +21,7 @@
 // class ShadowMappingRenderSystem : public DixRenderSystem {
 // public:
 //     using DixRenderSystem::DixRenderSystem;
-//     using Ubos = std::tuple<ShadowUbo>;
+//     using VKBuffers = std::tuple<ShadowUbo>;
 //     ShadowMappingRenderSystem(
 //         EngineDevice& device,
 //         VkRenderPass renderPass,

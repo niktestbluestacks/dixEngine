@@ -39,7 +39,6 @@ class ParticleRenderSystem
     : public DixRenderSystem,
       public RenderSystemTraits<ParticleRenderSystemBindings> {
    public:
-    using Ubos = std::tuple<ParticleUbo>;
     using PushConstantData = ParticlePushConstantData;
 
     ParticleRenderSystem(EngineDevice& engineDevice, vk::RenderPass renderPass,

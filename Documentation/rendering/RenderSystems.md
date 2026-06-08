@@ -51,8 +51,8 @@ class RenderSystemRegistery;
 ```
 
 The registry requires each render system to satisfy the following concepts (defined in `Utils/DixConcepts.hpp`):
-- `HasUbos`: Must define a `Ubos` type alias (typically a `std::tuple` of UBO structures)
-- `is_tuple<Ubos>`: The `Ubos` type must be a `std::tuple`
+- `HasVKBuffers`: Must define a `VKBuffers` type alias (typically a `std::tuple` of UBO structures)
+- `is_tuple<VKBuffers>`: The `VKBuffers` type must be a `std::tuple`
 - `HasName`: Must provide a static `Name()` method returning `const char*`
 - `HasVulkanFlags`: Must provide a static `getVulkanFlags()` method returning a tuple of descriptor bindings
 
@@ -61,7 +61,7 @@ Key structure: `RenderSystemDescription<RenderSystem>`
 template <typename RenderSystem>
 struct RenderSystemDescription {
     std::unique_ptr<RenderSystem> renderSystem;  // Pointer to the render system instance
-    RenderSystem::Ubos Ubos;                      // UBO type information
+    RenderSystem::VKBuffers VKBuffers;                      // UBO type information
     const char* renderSystemName = RenderSystem::Name();
 };
 ```
@@ -134,7 +134,7 @@ static constexpr std::tuple<VulkanRenderSystemFlagType, VulkanRenderSystemFlagTy
 
 UBO type alias for registry:
 ```cpp
-using Ubos = std::tuple<SimpleUbo>;
+using VKBuffers = std::tuple<SimpleUbo>;
 ```
 
 ## Using Render Systems with AppContext
@@ -157,7 +157,7 @@ This design allows compile-time registration of render systems without runtime o
 AppContext initializes render systems in a specific order during `initialize()`:
 
 1. `createDescriptorPool()` - Create descriptor pool
-2. `createUBOs()` - Create uniform buffers for each render system
+2. `createVKBuffers()` - Create uniform buffers for each render system
 3. `createSystemSetLayouts()` - Create descriptor set layouts based on `getVulkanFlags()`
 4. `createDescriptorSets()` - Allocate and write descriptor sets
 5. `createModelDescriptorResources()` - Create per-model descriptor resources
@@ -180,7 +180,7 @@ Creates a pool that can allocate descriptor sets for all render systems.
 
 #### Step 3: Create Uniform Buffers
 
-Creates UBOs for each frame in flight for each render system. The size is determined by iterating over the tuple of UBO types defined in each render system's `Ubos` alias.
+Creates VKBuffers for each frame in flight for each render system. The size is determined by iterating over the tuple of UBO types defined in each render system's `VKBuffers` alias.
 
 #### Step 4: Create Descriptor Set Layouts
 
@@ -245,7 +245,7 @@ Inherit from `DixRenderSystem` and implement the required static methods and typ
 class MyRenderSystem : public DixRenderSystem {
 public:
     using DixRenderSystem::DixRenderSystem;  // inherit constructors
-    using Ubos = std::tuple<MyUbo>;           // Required by registry
+    using VKBuffers = std::tuple<MyUbo>;           // Required by registry
 
     MyRenderSystem(
         EngineDevice& engineDevice,
@@ -324,7 +324,7 @@ Multiple render systems can be used for different passes. Each render system is 
 
 1. **Use template parameters**: Declare render systems via AppContext template parameters at compile-time
 2. **Respect alignment requirements**: Always align UBO structures to 16 bytes using `alignas(16)`
-3. **Implement required interfaces**: Ensure custom render systems define `Ubos`, `Name()`, and `getVulkanFlags()`
+3. **Implement required interfaces**: Ensure custom render systems define `VKBuffers`, `Name()`, and `getVulkanFlags()`
 4. **Separate concerns**: Keep application logic in your app, rendering details in AppContext
 5. **Handle window resize**: Check for zero extent before rendering to avoid Vulkan errors
 6. **Use default textures**: Always provide a fallback texture for models without UVs
@@ -356,12 +356,12 @@ Multiple render systems can be used for different passes. Each render system is 
    - Recreate descriptor sets if swapchain images change
 
 6. **Template instantiation errors**
-   - Ensure render system satisfies all concept requirements (`HasUbos`, `HasName`, `HasVulkanFlags`)
-   - Verify `Ubos` is a `std::tuple` type
+   - Ensure render system satisfies all concept requirements (`HasVKBuffers`, `HasName`, `HasVulkanFlags`)
+   - Verify `VKBuffers` is a `std::tuple` type
 
 7. **UBO size calculation issues**
-   - The current implementation uses `sizeof(info.Ubos)` which returns the size of the tuple itself, not the sum of its elements
-   - For multiple UBOs in a tuple, manually calculate the total size with proper alignment
+   - The current implementation uses `sizeof(info.VKBuffers)` which returns the size of the tuple itself, not the sum of its elements
+   - For multiple VKBuffers in a tuple, manually calculate the total size with proper alignment
    - Each UBO member must be aligned to 16 bytes using `alignas(16)`
 
 8. **Multiple render systems limitation**
@@ -370,7 +370,7 @@ Multiple render systems can be used for different passes. Each render system is 
    - When adding multiple render systems, ensure all tuple iterations use proper parameter pack expansion
 
 1. `createDescriptorPool()` - Create descriptor pool
-2. `createUBOs()` - Create uniform buffers for each render system
+2. `createVKBuffers()` - Create uniform buffers for each render system
 3. `createSystemSetLayouts()` - Create descriptor set layouts based on `getVulkanFlags()`
 4. `createDescriptorSets()` - Allocate and write descriptor sets
 5. `createModelDescriptorResources()` - Create per-model descriptor resources
@@ -393,9 +393,9 @@ Creates a pool that can allocate descriptor sets for all render systems.
 
 #### Step 3: Create Uniform Buffers
 
-Creates UBOs for each frame in flight for each render system. The size is determined by `sizeof(info.Ubos)` where `info.Ubos` is the tuple type containing all UBO structures for that render system.
+Creates VKBuffers for each frame in flight for each render system. The size is determined by `sizeof(info.VKBuffers)` where `info.VKBuffers` is the tuple type containing all UBO structures for that render system.
 
-**Note**: The current implementation uses `sizeof(info.Ubos)` directly on the tuple type. For proper UBO sizing, you may need to calculate the total size of all UBO structures within the tuple, ensuring proper alignment (multiples of 16 bytes).
+**Note**: The current implementation uses `sizeof(info.VKBuffers)` directly on the tuple type. For proper UBO sizing, you may need to calculate the total size of all UBO structures within the tuple, ensuring proper alignment (multiples of 16 bytes).
 
 #### Step 4: Create Descriptor Set Layouts
 
@@ -474,7 +474,7 @@ Inherit from `DixRenderSystem` and implement required static methods. Note that 
 class CustomRenderSystem : public DixRenderSystem {
 public:
     using DixRenderSystem::DixRenderSystem;
-    using Ubos = std::tuple<CustomUbo>;
+    using VKBuffers = std::tuple<CustomUbo>;
 
     // Constructor matching base class signature
     CustomRenderSystem(
@@ -530,7 +530,7 @@ gameObjects["CustomRenderSystem"].push_back(obj2);
 ### Descriptor Set Layout
 
 The default descriptor set layout uses two sets:
-- Set 0 (Global): Contains per-frame data like UBOs
+- Set 0 (Global): Contains per-frame data like VKBuffers
 - Set 1 (Per-model): Contains per-object data like textures
 
 ### Push Constants
@@ -563,7 +563,7 @@ std::apply([&](auto&&... renderSystemDescs) {
             m_systemUboBuffers[renderSystemName][frameIndex]->writeToIndex(&ubo, IndexOfWriteToIndex);
             ++IndexOfWriteToIndex;
             m_systemUboBuffers[renderSystemName][frameIndex]->flush();
-        }, desc.Ubos);
+        }, desc.VKBuffers);
 
         // Render geometry
         renderSystem->renderGameObjects(frameInfo, gameObjects[renderSystemName]);
@@ -571,7 +571,7 @@ std::apply([&](auto&&... renderSystemDescs) {
 }, m_renderSystemRegistery.getRenderSystemDescriptions());
 ```
 
-**Note**: The current UBO update logic in `drawFrame()` assumes a single UBO per render system and uses `desc.Ubos` directly. For render systems with multiple UBOs in the tuple, this logic needs to be extended to iterate over all UBOs properly.
+**Note**: The current UBO update logic in `drawFrame()` assumes a single UBO per render system and uses `desc.VKBuffers` directly. For render systems with multiple VKBuffers in the tuple, this logic needs to be extended to iterate over all VKBuffers properly.
 
 ### Thread Safety
 
@@ -614,13 +614,13 @@ std::apply([&](auto&&... renderSystemDescs) {
    - Recreate descriptor sets if swapchain images change
 
 6. **Template instantiation errors**
-   - Ensure your render system satisfies all required concepts: `HasUbos`, `HasName`, `HasVulkanFlags`
-   - Verify `Ubos` is a `std::tuple` type
+   - Ensure your render system satisfies all required concepts: `HasVKBuffers`, `HasName`, `HasVulkanFlags`
+   - Verify `VKBuffers` is a `std::tuple` type
    - Check that the constructor signature matches the base class `DixRenderSystem`
 
 7. **UBO size calculation issues**
-   - The current implementation uses `sizeof(info.Ubos)` which returns the size of the tuple itself, not the sum of its elements
-   - For multiple UBOs in a tuple, manually calculate the total size with proper alignment
+   - The current implementation uses `sizeof(info.VKBuffers)` which returns the size of the tuple itself, not the sum of its elements
+   - For multiple VKBuffers in a tuple, manually calculate the total size with proper alignment
    - Each UBO member must be aligned to 16 bytes using `alignas(16)`
 
 8. **Multiple render systems limitation**

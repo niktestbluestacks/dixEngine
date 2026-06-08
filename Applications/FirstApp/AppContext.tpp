@@ -106,7 +106,7 @@ void AppContext<RenderSystems...>::drawFrame(
             // actually present on each UBO type are populated — no
             // hardcoded assumptions about field names.
             int uboTypeIndex = 0;
-            forEachInTuple(desc.Ubos, [&](auto&& uboArg) {
+            forEachInTuple(desc.VKBuffers, [&](auto&& uboArg) {
                 using UboType = std::remove_reference_t<decltype(uboArg)>;
                 UboType ubo{};
 
@@ -156,10 +156,10 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
     using RenderSystemType = std::decay_t<decltype(*info.renderSystem)>;
     constexpr auto flags = RenderSystemType::getVulkanFlags();
     constexpr size_t uboCount =
-        std::tuple_size_v<std::remove_reference_t<decltype(info.Ubos)>>;
+        std::tuple_size_v<std::remove_reference_t<decltype(info.VKBuffers)>>;
 
     // Build an ordered list of (binding, descriptorType) for every
-    // buffer-type flag.  Index i in this list corresponds to Ubos[i].
+    // buffer-type flag.  Index i in this list corresponds to VKBuffers[i].
     std::vector<std::pair<uint32_t, vk::DescriptorType>> bufferBindings;
     bufferBindings.reserve(uboCount);
     forEachInTuple(flags, [&](const auto& f) {
@@ -174,11 +174,11 @@ void AppContext<RenderSystems...>::createSingleUbo(RenderSystemInfo&& info) {
         frameBuffers.resize(uboCount);
 
         size_t uboTypeIndex = 0;
-        forEachInTuple(info.Ubos, [&](auto&& uboTypeInstance) {
+        forEachInTuple(info.VKBuffers, [&](auto&& uboTypeInstance) {
             using UboType = std::decay_t<decltype(uboTypeInstance)>;
 
             // Pick usage flags from the matching buffer binding, or
-            // fall back to UNIFORM if the Ubos tuple is longer than
+            // fall back to UNIFORM if the VKBuffers tuple is longer than
             // the buffer-type flags (shouldn't happen with a correct
             // render system, but guards against mistakes).
             vk::BufferUsageFlags usage = detail::descriptorTypeToBufferUsage(
@@ -378,7 +378,7 @@ void AppContext<RenderSystems...>::createDescriptorSets() {
 }
 
 template <typename... RenderSystems>
-void AppContext<RenderSystems...>::createUBOs() {
+void AppContext<RenderSystems...>::createVKBuffers() {
     forEachInTuple(m_renderSystemRegistery.getRenderSystemDescriptions(),
                    [this](auto&& arg) {
                        createSingleUbo(std::forward<decltype(arg)>(arg));

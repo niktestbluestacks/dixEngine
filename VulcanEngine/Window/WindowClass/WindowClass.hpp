@@ -39,6 +39,8 @@ class Window {
     bool shouldClose(void) const;
     vk::Extent2D getExtent(void) const;
     bool wasWindowResized(void) const;
+    bool isKeyPressed(int key) const;
+    bool isMouseButtonPressed(int key) const;
     void resetWindowResizedFlag(void);
     GLFWwindow* getGLFWwindow(void) const;
 
@@ -50,7 +52,8 @@ class Window {
     void bindKey(int key, std::function<void()> callback, bool overrideOtherBidngs = false);
     void unbindKey(int key);
     void setCharCallback(std::function<void(char)> callback);
-
+    void setInputMode(int key, int mode);
+    void getCursorPos(double* x, double* y);
    private:
     int m_width;
     int m_height;

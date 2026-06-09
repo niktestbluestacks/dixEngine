@@ -26,7 +26,7 @@ void FirstApp::run(void) {
     dixcamera.setViewTarget(playerPosition, playerLookAt);
 
     auto viewerObject = GameObject::createGameObject();
-    KeyboardAndMouseController cameraController{};
+    KeyboardAndMouseController cameraController { m_context->getDixWindow() };
 
     auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -66,10 +66,7 @@ void FirstApp::run(void) {
                 dixcamera.setViewYXZ(playerPosition, playerLookAt);
             }
         } else {
-            if (!CurrentConsole::getDixConsole().isVisible()) {
-                cameraController.moveInPlaneXZ(m_context->getGLFWwindow(),
-                                               frameTime, viewerObject);
-            }
+            cameraController.moveInPlaneXZ(frameTime, viewerObject);
             playerPosition = viewerObject.transform.translation;
             playerLookAt = viewerObject.transform.rotation;
             dixcamera.setViewYXZ(playerPosition, playerLookAt);
@@ -338,6 +335,40 @@ void FirstApp::loadConsoleCommands(void) {
                 keyCooldown = 0.3f;
             }
         }});
+
+    console.register_function(
+        "sound", std::function([&](const std::vector<std::string>& arguments) {
+            auto volume = m_sounds["Background theme"].getVolume();
+            bool play = m_sounds["Background theme"].isPlaying();
+            bool isNextVolume = false;
+            for (auto& elem : arguments) {
+                auto res = string_to_num(elem);
+                std::visit(
+                    [&](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<std::string, T>) {
+                            isNextVolume = arg == "volume";
+                            if (arg == "resume") {
+                                m_sounds["Background theme"].resume();
+                            } else if (arg == "pause") {
+                                m_sounds["Background theme"].pause();
+                            }
+                        } else if constexpr (std::is_same_v<int, T>) {
+                            if (isNextVolume) {
+                                isNextVolume = false;
+                                m_sounds["Background theme"].setVolume(
+                                    static_cast<float>(arg) / 100.f);
+                            }
+                        } else if constexpr (std::is_same_v<float, T>) {
+                            if (isNextVolume) {
+                                isNextVolume = false;
+                                m_sounds["Background theme"].setVolume(arg);
+                            }
+                        }
+                    },
+                    res);
+            }
+        }));
 
     console.register_function(
         "particle_emitter",

@@ -1,5 +1,5 @@
-#ifndef CONSOLE_HPP
-#define CONSOLE_HPP
+#ifndef DIX_CONSOLE_HPP
+#define DIX_CONSOLE_HPP
 
 // dix
 #include <DixUI/DixConsoleUI.hpp>
@@ -115,7 +115,7 @@ class DixConsole {
                        std::function<void(const std::vector<std::string>&)>>
         m_internalCommandsWithArgs;
     glm::vec4 m_cornerPositions = {0.f, 100.f, 100.f, 100.f};
-    glm::vec4 m_consoleColor{1.f};
+    glm::vec4 m_consoleColor{0.06f, 0.06f, 0.45f, 1.f};
     DixConsoleUI* m_consoleUI_ptr = nullptr;
 
     bool m_isVisible = false;
@@ -130,4 +130,4 @@ class DixConsole {
 
 #include <Logger/Console.tpp>
 
-#endif  // CONSOLE_HPP
+#endif  // DIX_CONSOLE_HPP

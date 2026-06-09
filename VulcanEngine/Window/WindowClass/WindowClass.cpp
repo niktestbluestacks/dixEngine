@@ -27,6 +27,16 @@ vk::Extent2D Window::getExtent(void) const {
 
 bool Window::wasWindowResized(void) const { return m_framebufferResized; }
 
+bool Window::isKeyPressed(int key) const {
+    return (
+        (glfwGetKey(m_window, key) == GLFW_PRESS) &&
+        (m_currentKey == key || m_currentKey == -69420));
+}
+
+bool Window::isMouseButtonPressed(int key) const {
+    return (glfwGetMouseButton(m_window, key));
+}
+
 void Window::resetWindowResizedFlag(void) { m_framebufferResized = false; }
 
 GLFWwindow* Window::getGLFWwindow(void) const { return m_window; }
@@ -64,12 +74,13 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width,
 }
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
-                        int mods) {
+                         int mods) {
     if (action != GLFW_PRESS) {
         return;
     }
 
-    auto dixWindow = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    auto dixWindow =
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
     auto it = dixWindow->m_keyBindings.find(key);
     if (it != dixWindow->m_keyBindings.end()) {
         if (dixWindow->m_currentKey == -69420) {
@@ -87,7 +98,8 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
 }
 
 void Window::charCallback(GLFWwindow* window, unsigned int codepoint) {
-    auto dixWindow = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    auto dixWindow =
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
     if (dixWindow->m_charCallback && codepoint < 128) {
         dixWindow->m_charCallback(static_cast<char>(codepoint));
     }
@@ -103,16 +115,22 @@ void Window::setWindowIcon(const std::string& filepath) {
     }
 }
 
-void Window::bindKey(int key, std::function<void()> callback, bool overrideOtherBidngs) {
+void Window::bindKey(int key, std::function<void()> callback,
+                     bool overrideOtherBidngs) {
     m_keyBindings[key] = std::make_pair(callback, overrideOtherBidngs);
 }
 
-void Window::unbindKey(int key) {
-    m_keyBindings.erase(key);
-}
+void Window::unbindKey(int key) { m_keyBindings.erase(key); }
 
 void Window::setCharCallback(std::function<void(char)> callback) {
     m_charCallback = callback;
 }
 
+void Window::setInputMode(int key, int mode) {
+    glfwSetInputMode(m_window, key, mode);
+}
+
+void Window::getCursorPos(double* x, double* y) {
+    glfwGetCursorPos(m_window, x, y);
+}
 }  // namespace dix

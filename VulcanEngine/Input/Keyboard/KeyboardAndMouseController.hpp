@@ -6,6 +6,7 @@
 #include <Window/WindowClass/WindowClass.hpp>
 
 namespace dix {
+
 class KeyboardAndMouseController {
    public:
     struct KeyMappings {
@@ -21,8 +22,11 @@ class KeyboardAndMouseController {
         int lookDown = GLFW_KEY_DOWN;
         int speedUp = GLFW_KEY_LEFT_SHIFT;
     };
+    KeyboardAndMouseController(Window& dixWindow): m_window(dixWindow) {}
 
-    void moveInPlaneXZ(GLFWwindow* window, float dt, GameObject& gameObject);
+    ~KeyboardAndMouseController() = default;
+
+    void moveInPlaneXZ(float dt, GameObject& gameObject);
 
     KeyMappings keys{};
     float moveSpeed{3.f};
@@ -36,6 +40,8 @@ class KeyboardAndMouseController {
     constexpr static float minMoveSpeed{3.f};
     constexpr static float maxMoveSpeed{10.f};
     constexpr static float AccelerationCoefficient{5.f};
+private:
+    Window& m_window;
 };
 }  // namespace dix
 #endif  // KEYBOARD_CONTROLLER_HPP

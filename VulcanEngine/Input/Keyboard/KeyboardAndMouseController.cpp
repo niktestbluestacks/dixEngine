@@ -3,15 +3,16 @@
 #include <Logger/Logger.hpp>
 
 namespace dix {
-void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt,
+
+void KeyboardAndMouseController::moveInPlaneXZ(float dt,
                                                GameObject& gameObject) {
     glm::vec3 rotate{0.f};
-    if (glfwGetKey(window, keys.lookRight) == GLFW_PRESS) rotate.y += 1.f;
-    if (glfwGetKey(window, keys.lookLeft) == GLFW_PRESS) rotate.y -= 1.f;
-    if (glfwGetKey(window, keys.lookUp) == GLFW_PRESS) rotate.x -= 1.f;
-    if (glfwGetKey(window, keys.lookDown) == GLFW_PRESS) rotate.x += 1.f;
+    if (m_window.isKeyPressed(keys.lookRight)) rotate.y += 1.f;
+    if (m_window.isKeyPressed(keys.lookLeft)) rotate.y -= 1.f;
+    if (m_window.isKeyPressed(keys.lookUp)) rotate.x -= 1.f;
+    if (m_window.isKeyPressed(keys.lookDown)) rotate.x += 1.f;
 
-    if (glfwGetKey(window, keys.speedUp) == GLFW_PRESS) {
+    if (m_window.isKeyPressed(keys.speedUp)) {
         moveSpeed =
             std::min(maxMoveSpeed, moveSpeed + AccelerationCoefficient * dt);
     } else {
@@ -35,14 +36,12 @@ void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt,
     const glm::vec3 upDir{0.f, 1.f, 0.f};
 
     glm::vec3 moveDir{0.f};
-    if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS)
-        moveDir += forwardDir;
-    if (glfwGetKey(window, keys.moveBackward) == GLFW_PRESS)
-        moveDir -= forwardDir;
-    if (glfwGetKey(window, keys.moveRight) == GLFW_PRESS) moveDir += rightDir;
-    if (glfwGetKey(window, keys.moveLeft) == GLFW_PRESS) moveDir -= rightDir;
-    if (glfwGetKey(window, keys.moveUp) == GLFW_PRESS) moveDir += upDir;
-    if (glfwGetKey(window, keys.moveDown) == GLFW_PRESS) moveDir -= upDir;
+    if (m_window.isKeyPressed(keys.moveForward)) moveDir += forwardDir;
+    if (m_window.isKeyPressed(keys.moveBackward)) moveDir -= forwardDir;
+    if (m_window.isKeyPressed(keys.moveRight)) moveDir += rightDir;
+    if (m_window.isKeyPressed(keys.moveLeft)) moveDir -= rightDir;
+    if (m_window.isKeyPressed(keys.moveUp)) moveDir += upDir;
+    if (m_window.isKeyPressed(keys.moveDown)) moveDir -= upDir;
 
     if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
         gameObject.transform.translation +=
@@ -52,15 +51,15 @@ void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt,
     // Mouse look: when right mouse button is pressed capture the cursor and use
     // relative mouse movement to adjust rotation. Release capture when button
     // released.
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+    if (m_window.isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
         if (!mouseCaptured) {
             mouseCaptured = true;
             firstMouse = true;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            m_window.setInputMode(GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
         double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
+        m_window.getCursorPos(&xpos, &ypos);
         if (firstMouse) {
             lastMouseX = xpos;
             lastMouseY = ypos;
@@ -87,7 +86,7 @@ void KeyboardAndMouseController::moveInPlaneXZ(GLFWwindow* window, float dt,
     } else {
         if (mouseCaptured) {
             mouseCaptured = false;
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            m_window.setInputMode(GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }
     }
 }

@@ -36,6 +36,12 @@ void DixConsole::setConsoleUI(DixConsoleUI* ui) {
     }
 }
 
+void DixConsole::newFrame() {
+    if (m_triggerDeleteEvent.exchange(false) && !m_inputBuffer.empty()) {
+        m_inputBuffer.pop_back();
+    }
+}
+
 void DixConsole::log(const std::string& message) {
     m_history.push_back(message);
     if (m_history.size() > MAX_HISTORY_SIZE) {
@@ -103,8 +109,41 @@ void DixConsole::addCharacter(char c) {
 }
 
 void DixConsole::backspace() {
-    if (!m_inputBuffer.empty()) {
-        m_inputBuffer.pop_back();
+    m_triggerDeleteEvent.store(true);
+    {
+        std::lock_guard lock(m_backspaceMutex);
+        m_backspaceHeld = true;
+    }
+    m_backspaceCV.notify_one();
+}
+
+void DixConsole::backspaceRealeased() { 
+    {
+        std::lock_guard lock(m_backspaceMutex);
+        m_backspaceHeld = false;
+    }
+    m_backspaceCV.notify_one();
+}
+
+void DixConsole::backspaceHeldImpl(std::stop_token stopToken) {
+    while (!stopToken.stop_requested()) {
+        std::unique_lock lock(m_backspaceMutex);
+        m_backspaceCV.wait(lock, stopToken,
+                           [this] { return m_backspaceHeld; });
+
+        if (stopToken.stop_requested()) break;
+
+        if (m_backspaceCV.wait_for(
+                lock, std::chrono::milliseconds(500),
+                [this]() { return !m_backspaceHeld; })) {
+            continue;
+        }
+
+        while (m_backspaceHeld && !stopToken.stop_requested()) {
+            m_triggerDeleteEvent.store(true);
+            m_backspaceCV.wait_for(lock, std::chrono::milliseconds(40),
+                                   [this]() { return !m_backspaceHeld; });
+        }
     }
 }
 

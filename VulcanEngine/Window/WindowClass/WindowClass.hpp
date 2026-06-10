@@ -9,15 +9,24 @@
 
 // std
 #include <cwctype>
-#include <string>
-#include <map>
 #include <functional>
+#include <map>
+#include <string>
 #include <vector>
+
 
 namespace dix {
 
+struct keyCallbacksType {
+    std::function<void()> callback = nullptr;
+    bool overrideOtherCallbacks = false;
+    std::function<void()> callbackWhenHeld = nullptr;
+    std::function<void()> callbackWhenRealeased = nullptr;
+};
+
 inline bool GLFWIsLetterOrNumber(int key) {
-    return (key >= GLFW_KEY_A && key <= GLFW_KEY_Z) || (key >= GLFW_KEY_0 && key <= GLFW_KEY_9);
+    return (key >= GLFW_KEY_A && key <= GLFW_KEY_Z) ||
+           (key >= GLFW_KEY_0 && key <= GLFW_KEY_9);
 }
 
 class Window {
@@ -25,8 +34,8 @@ class Window {
     void initWindow(void);
     static void framebufferResizeCallback(GLFWwindow* window, int width,
                                           int height);
-    static void keyCallback(GLFWwindow* window, int key, int scancode, int action,
-                           int mods);
+    static void keyCallback(GLFWwindow* window, int key, int scancode,
+                            int action, int mods);
     static void charCallback(GLFWwindow* window, unsigned int codepoint);
 
    public:
@@ -49,11 +58,17 @@ class Window {
 
     void setWindowIcon(const std::string& filepath);
 
-    void bindKey(int key, std::function<void()> callback, bool overrideOtherBidngs = false);
+    void bindKey(int key, std::function<void()> callback = nullptr,
+                 bool overrideOtherCallbacks = false,
+                 std::function<void()> callbackWhenHeld = nullptr,
+                 std::function<void()> callbackWhenRealeased = nullptr);
+
+    void bindKey(int key, keyCallbacksType callbacks);
     void unbindKey(int key);
     void setCharCallback(std::function<void(char)> callback);
     void setInputMode(int key, int mode);
     void getCursorPos(double* x, double* y);
+
    private:
     int m_width;
     int m_height;
@@ -62,9 +77,9 @@ class Window {
 
     std::string m_title;
     GLFWwindow* m_window;
-    std::map<int, std::pair<std::function<void()>, bool>> m_keyBindings;
+    std::map<int, keyCallbacksType> m_keyBindings;
     std::function<void(char)> m_charCallback;
 };  // class Window
-}   // namespace dix
+}  // namespace dix
 
 #endif  // WINDOW_CLASS_HPP

@@ -8,9 +8,14 @@
 
 // std
 #include <any>
+#include <condition_variable>
 #include <deque>
 #include <functional>
+#include <mutex>
+#include <stop_token>
+#include <thread>
 #include <tuple>
+
 
 namespace dix {
 
@@ -30,6 +35,8 @@ class DixConsole {
     void setPosition(float x1, float y1, float x2, float y2);
     void setPosition(const glm::vec4& positions);
     const glm::vec4& getPosition() const;
+
+    void newFrame();
 
     void log(const std::string& message);
     void log(const std::vector<std::string>& message);
@@ -55,6 +62,7 @@ class DixConsole {
 
     void addCharacter(char c);
     void backspace();
+    void backspaceRealeased();
     void enterCommand();
     // void arrowUp();
     // void arrowDown();
@@ -103,7 +111,13 @@ class DixConsole {
     static constexpr size_t MAX_HISTORY_SIZE = DixConsoleUI::LINES_TO_DISPLAY;
 
    private:
-    DixConsole() { fillInternalCommands(); }
+    DixConsole()
+        : m_backspaceHeld{false},
+          m_backspaceThread([this](std::stop_token stopToken) {
+              backspaceHeldImpl(stopToken);
+          }) {
+        fillInternalCommands();
+    }
 
     std::deque<std::string> m_history;
     std::unordered_map<std::string, std::function<void()>> m_commands;
@@ -121,9 +135,15 @@ class DixConsole {
     bool m_isVisible = false;
     std::string m_inputBuffer;
 
-    void executeCommandImpl(const std::vector<std::string>& args);
+    std::jthread m_backspaceThread;
+    std::condition_variable_any m_backspaceCV;
+    std::mutex m_backspaceMutex;
+    bool m_backspaceHeld;
+    std::atomic_bool m_triggerDeleteEvent;
 
+    void executeCommandImpl(const std::vector<std::string>& args);
     void fillInternalCommands();
+    void backspaceHeldImpl(std::stop_token stopToken);
 };
 
 }  // namespace dix

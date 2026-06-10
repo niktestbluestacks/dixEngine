@@ -26,7 +26,7 @@ void FirstApp::run(void) {
     dixcamera.setViewTarget(playerPosition, playerLookAt);
 
     auto viewerObject = GameObject::createGameObject();
-    KeyboardAndMouseController cameraController { m_context->getDixWindow() };
+    KeyboardAndMouseController cameraController{m_context->getDixWindow()};
 
     auto currentTime = std::chrono::high_resolution_clock::now();
 
@@ -40,7 +40,9 @@ void FirstApp::run(void) {
 
     bool initialStructureRecorded = false;
 
+    auto& console = DixConsole::getDixConsole();
     while (!m_context->shouldClose()) {
+        console.newFrame();
         m_context->pollEvents();
 
         auto newTime = std::chrono::high_resolution_clock::now();
@@ -195,11 +197,14 @@ void FirstApp::loadUIElements(void) {
     m_context->getDixWindow().bindKey(
         GLFW_KEY_GRAVE_ACCENT, [&console]() { console.toggleConsole(); }, true);
 
-    m_context->getDixWindow().bindKey(GLFW_KEY_BACKSPACE, [&console]() {
-        if (console.isVisible()) {
-            console.backspace();
-        }
-    });
+    m_context->getDixWindow().bindKey(
+        GLFW_KEY_BACKSPACE,
+        [&console]() {
+            if (console.isVisible()) {
+                console.backspace();
+            }
+        },
+        false, nullptr, [&console]() { console.backspaceRealeased(); });
 
     m_context->getDixWindow().bindKey(GLFW_KEY_ENTER, [&console]() {
         if (console.isVisible()) {

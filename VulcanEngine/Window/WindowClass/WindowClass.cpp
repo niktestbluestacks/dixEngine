@@ -28,9 +28,8 @@ vk::Extent2D Window::getExtent(void) const {
 bool Window::wasWindowResized(void) const { return m_framebufferResized; }
 
 bool Window::isKeyPressed(int key) const {
-    return (
-        (glfwGetKey(m_window, key) == GLFW_PRESS) &&
-        (m_currentKey == key || m_currentKey == -69420));
+    return ((glfwGetKey(m_window, key) == GLFW_PRESS) &&
+            (m_currentKey == key || m_currentKey == -69420));
 }
 
 bool Window::isMouseButtonPressed(int key) const {
@@ -75,24 +74,59 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width,
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
                          int mods) {
-    if (action != GLFW_PRESS) {
-        return;
-    }
-
     auto dixWindow =
         reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
     auto it = dixWindow->m_keyBindings.find(key);
     if (it != dixWindow->m_keyBindings.end()) {
-        if (dixWindow->m_currentKey == -69420) {
-            it->second.first();
-            if (it->second.second) {
-                dixWindow->m_currentKey = key;
+        switch (action) {
+            case GLFW_PRESS: {
+                if (it->second.callback) {
+                    if (dixWindow->m_currentKey == -69420) {
+                        it->second.callback();
+                        if (it->second.overrideOtherCallbacks) {
+                            dixWindow->m_currentKey = key;
+                        }
+                    } else if (dixWindow->m_currentKey == key) {
+                        it->second.callback();
+                        dixWindow->m_currentKey = -69420;
+                    } else if (!GLFWIsLetterOrNumber(key)) {
+                        it->second.callback();
+                    }
+                }
+                break;
             }
-        } else if (dixWindow->m_currentKey == key) {
-            it->second.first();
-            dixWindow->m_currentKey = -69420;
-        } else if (!GLFWIsLetterOrNumber(key)) {
-            it->second.first();
+            case GLFW_REPEAT: {
+                if (it->second.callbackWhenHeld) {
+                    if (dixWindow->m_currentKey == -69420) {
+                        it->second.callbackWhenHeld();
+                        if (it->second.overrideOtherCallbacks) {
+                            dixWindow->m_currentKey = key;
+                        }
+                    } else if (dixWindow->m_currentKey == key) {
+                        it->second.callbackWhenHeld();
+                        dixWindow->m_currentKey = -69420;
+                    } else if (!GLFWIsLetterOrNumber(key)) {
+                        it->second.callbackWhenHeld();
+                    }
+                }
+                break;
+            }
+            case GLFW_RELEASE: {
+                if (it->second.callbackWhenRealeased) {
+                    if (dixWindow->m_currentKey == -69420) {
+                        it->second.callbackWhenRealeased();
+                        if (it->second.overrideOtherCallbacks) {
+                            dixWindow->m_currentKey = key;
+                        }
+                    } else if (dixWindow->m_currentKey == key) {
+                        it->second.callbackWhenRealeased();
+                        dixWindow->m_currentKey = -69420;
+                    } else if (!GLFWIsLetterOrNumber(key)) {
+                        it->second.callbackWhenRealeased();
+                    }
+                }
+                break;
+            }
         }
     }
 }
@@ -116,8 +150,11 @@ void Window::setWindowIcon(const std::string& filepath) {
 }
 
 void Window::bindKey(int key, std::function<void()> callback,
-                     bool overrideOtherBidngs) {
-    m_keyBindings[key] = std::make_pair(callback, overrideOtherBidngs);
+                     bool overrideOtherCallbacks,
+                     std::function<void()> callbackWhenHeld,
+                     std::function<void()> callbackWhenRealeased) {
+    m_keyBindings[key] = {callback, overrideOtherCallbacks, callbackWhenHeld,
+                          callbackWhenRealeased};
 }
 
 void Window::unbindKey(int key) { m_keyBindings.erase(key); }

@@ -32,11 +32,11 @@ void FirstApp::run(void) {
 
     auto sound = getRandomFile(toAudioPath(""));
 
-    DixLogInfo("Background theme: {}", sound);
+    DixLogInfo("background_theme: {}", sound);
 
-    m_sounds["Background theme"] = DixAudio(sound);
+    m_sounds["background_theme"] = DixAudio(sound);
 
-    m_sounds["Background theme"].play(true);
+    m_sounds["background_theme"].play(true);
 
     bool initialStructureRecorded = false;
 
@@ -199,9 +199,10 @@ void FirstApp::loadUIElements(void) {
 
     m_context->getDixWindow().bindKey(
         GLFW_KEY_BACKSPACE,
-        [&console]() {
+        [&console, &window = m_context->getDixWindow()]() {
             if (console.isVisible()) {
-                console.backspace();
+                console.backspace(
+                    window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL));
             }
         },
         false, nullptr, [&console]() { console.backspaceRealeased(); });
@@ -342,32 +343,54 @@ void FirstApp::loadConsoleCommands(void) {
         }});
 
     console.register_function(
-        "sound", std::function([&](const std::vector<std::string>& arguments) {
-            auto volume = m_sounds["Background theme"].getVolume();
-            bool play = m_sounds["Background theme"].isPlaying();
+        "background_theme", std::function([&](const std::vector<std::string>& arguments) {
+            auto volume = m_sounds["background_theme"].getVolume();
+            bool play = m_sounds["background_theme"].isPlaying();
             bool isNextVolume = false;
+            bool isNextSoundName = false;
             for (auto& elem : arguments) {
                 auto res = string_to_num(elem);
                 std::visit(
                     [&](auto&& arg) {
                         using T = std::decay_t<decltype(arg)>;
                         if constexpr (std::is_same_v<std::string, T>) {
-                            isNextVolume = arg == "volume";
-                            if (arg == "resume") {
-                                m_sounds["Background theme"].resume();
+                            if (arg == "help") {
+                                console.log(
+                                    "help <-> you know\n"
+                                    "resume <-> resumes\n"
+                                    "pause <-> pauses\n"
+                                    "stop <-> stops\n"
+                                    "play <-> plays\n"
+                                    "volume accepts float or int\n"
+                                    "\tif int then in range of [0, 100]\n"
+                                    "\tif float then in range of [0.0, 1.0]\n"
+                                    "switch_to accepts name of song you want "
+                                    "to change");
+                            } else if (arg == "resume") {
+                                m_sounds["background_theme"].resume();
                             } else if (arg == "pause") {
-                                m_sounds["Background theme"].pause();
+                                m_sounds["background_theme"].pause();
+                            } else if (arg == "stop") {
+                                m_sounds["background_theme"].stop();
+                            } else if (arg == "play") {
+                                m_sounds["background_theme"].play(true);
+                            } else if (isNextSoundName) {
+                                m_sounds["background_theme"] =
+                                    DixAudio(toAudioPath(arg));
+                                m_sounds["background_theme"].play(true);
                             }
+                            isNextVolume = arg == "volume";
+                            isNextSoundName = arg == "switch_to";
                         } else if constexpr (std::is_same_v<int, T>) {
                             if (isNextVolume) {
                                 isNextVolume = false;
-                                m_sounds["Background theme"].setVolume(
+                                m_sounds["background_theme"].setVolume(
                                     static_cast<float>(arg) / 100.f);
                             }
                         } else if constexpr (std::is_same_v<float, T>) {
                             if (isNextVolume) {
                                 isNextVolume = false;
-                                m_sounds["Background theme"].setVolume(arg);
+                                m_sounds["background_theme"].setVolume(arg);
                             }
                         }
                     },

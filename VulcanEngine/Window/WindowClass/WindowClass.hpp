@@ -48,7 +48,8 @@ class Window {
     bool shouldClose(void) const;
     vk::Extent2D getExtent(void) const;
     bool wasWindowResized(void) const;
-    bool isKeyPressed(int key) const;
+    bool isKeyPressedUsual(int key) const;
+    bool isKeyPressedUnUsual(int key) const;
     bool isMouseButtonPressed(int key) const;
     void resetWindowResizedFlag(void);
     GLFWwindow* getGLFWwindow(void) const;

@@ -61,7 +61,7 @@ class DixConsole {
     bool isVisible() const { return m_isVisible; }
 
     void addCharacter(char c);
-    void backspace();
+    void backspace(bool isCtrlPressed);
     void backspaceRealeased();
     void enterCommand();
     // void arrowUp();

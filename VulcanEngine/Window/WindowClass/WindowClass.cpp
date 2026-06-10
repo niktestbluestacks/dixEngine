@@ -27,9 +27,13 @@ vk::Extent2D Window::getExtent(void) const {
 
 bool Window::wasWindowResized(void) const { return m_framebufferResized; }
 
-bool Window::isKeyPressed(int key) const {
+bool Window::isKeyPressedUsual(int key) const {
     return ((glfwGetKey(m_window, key) == GLFW_PRESS) &&
             (m_currentKey == key || m_currentKey == -69420));
+}
+
+bool Window::isKeyPressedUnUsual(int key) const {
+    return (glfwGetKey(m_window, key) == GLFW_PRESS);
 }
 
 bool Window::isMouseButtonPressed(int key) const {

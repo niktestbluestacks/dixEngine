@@ -7,12 +7,12 @@ namespace dix {
 void KeyboardAndMouseController::moveInPlaneXZ(float dt,
                                                GameObject& gameObject) {
     glm::vec3 rotate{0.f};
-    if (m_window.isKeyPressed(keys.lookRight)) rotate.y += 1.f;
-    if (m_window.isKeyPressed(keys.lookLeft)) rotate.y -= 1.f;
-    if (m_window.isKeyPressed(keys.lookUp)) rotate.x -= 1.f;
-    if (m_window.isKeyPressed(keys.lookDown)) rotate.x += 1.f;
+    if (m_window.isKeyPressedUsual(keys.lookRight)) rotate.y += 1.f;
+    if (m_window.isKeyPressedUsual(keys.lookLeft)) rotate.y -= 1.f;
+    if (m_window.isKeyPressedUsual(keys.lookUp)) rotate.x -= 1.f;
+    if (m_window.isKeyPressedUsual(keys.lookDown)) rotate.x += 1.f;
 
-    if (m_window.isKeyPressed(keys.speedUp)) {
+    if (m_window.isKeyPressedUsual(keys.speedUp)) {
         moveSpeed =
             std::min(maxMoveSpeed, moveSpeed + AccelerationCoefficient * dt);
     } else {
@@ -36,12 +36,12 @@ void KeyboardAndMouseController::moveInPlaneXZ(float dt,
     const glm::vec3 upDir{0.f, 1.f, 0.f};
 
     glm::vec3 moveDir{0.f};
-    if (m_window.isKeyPressed(keys.moveForward)) moveDir += forwardDir;
-    if (m_window.isKeyPressed(keys.moveBackward)) moveDir -= forwardDir;
-    if (m_window.isKeyPressed(keys.moveRight)) moveDir += rightDir;
-    if (m_window.isKeyPressed(keys.moveLeft)) moveDir -= rightDir;
-    if (m_window.isKeyPressed(keys.moveUp)) moveDir += upDir;
-    if (m_window.isKeyPressed(keys.moveDown)) moveDir -= upDir;
+    if (m_window.isKeyPressedUsual(keys.moveForward)) moveDir += forwardDir;
+    if (m_window.isKeyPressedUsual(keys.moveBackward)) moveDir -= forwardDir;
+    if (m_window.isKeyPressedUsual(keys.moveRight)) moveDir += rightDir;
+    if (m_window.isKeyPressedUsual(keys.moveLeft)) moveDir -= rightDir;
+    if (m_window.isKeyPressedUsual(keys.moveUp)) moveDir += upDir;
+    if (m_window.isKeyPressedUsual(keys.moveDown)) moveDir -= upDir;
 
     if (glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
         gameObject.transform.translation +=

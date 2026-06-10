@@ -108,13 +108,17 @@ void DixConsole::addCharacter(char c) {
     }
 }
 
-void DixConsole::backspace() {
-    m_triggerDeleteEvent.store(true);
-    {
-        std::lock_guard lock(m_backspaceMutex);
-        m_backspaceHeld = true;
+void DixConsole::backspace(bool isCtrlPressed) {
+    if (!isCtrlPressed) {
+        m_triggerDeleteEvent.store(true);
+        {
+            std::lock_guard lock(m_backspaceMutex);
+            m_backspaceHeld = true;
+        }
+        m_backspaceCV.notify_one();
+    } else {
+        m_inputBuffer.clear();
     }
-    m_backspaceCV.notify_one();
 }
 
 void DixConsole::backspaceRealeased() { 
@@ -230,11 +234,6 @@ void DixConsole::fillInternalCommands() {
     m_internalCommands["help"] = [this]() {
         log("help <-> helps you\n"
             "clear <-> clear the history\n"
-            "particle_emitter {--bouncy} float x float y float z uint amount "
-            "<->\n"
-            "creates as particle emitter with or without bouncy property at x "
-            "y z\n"
-            "with amount particles\n"
             "echo acceps --debug e.t.c. <-> will print on new lines only after "
             "spaces\n"
             "exit <-> calls exit(EXIT_SUCCESS)\n"

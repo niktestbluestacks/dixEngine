@@ -106,10 +106,10 @@ class DixRenderSystem {
     DIX_DISABLE_COPY(DixRenderSystem)
 
     virtual void renderGameObjects(FrameInfo& frameInfo,
-                                   std::vector<GameObject>& gameObjects) const;
+                                   std::vector<std::shared_ptr<GameObject>>& gameObjects) const;
 
     virtual void renderGameObjects(FrameInfo& frameInfo,
-                                   std::vector<GameObject>& gameObjects);
+                                   std::vector<std::shared_ptr<GameObject>>& gameObjects);
 
     void setDescriptorPool(std::unique_ptr<DixDescriptorPool> pool) {
         m_descriptorPool = std::move(pool);
@@ -126,7 +126,7 @@ class DixRenderSystem {
 
     // Override in subclasses that use compute.
     // Must be called outside a render pass (before or after graphics).
-    virtual void dispatchCompute(vk::CommandBuffer /*commandBuffer*/) {}
+    virtual void dispatchCompute(vk::CommandBuffer commandBuffer, std::vector<std::shared_ptr<GameObject>>& gameObjects) {}
 
    protected:
     // Override hooks for advanced pipeline customisation.

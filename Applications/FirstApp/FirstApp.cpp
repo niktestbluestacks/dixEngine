@@ -131,7 +131,7 @@ void FirstApp::loadGameObjects() {
         gameObj.model = dixModel;
         gameObj.transform.translation = {dist(gen), dist(gen), dist(gen)};
         gameObj.transform.scale = {1.f, 1.f, 1.f};
-        m_gameObjects["SimpleRenderSystem"].push_back(std::move(gameObj));
+        m_gameObjects["SimpleRenderSystem"].push_back(std::move(std::make_unique<GameObject>(gameObj)));
     }
 
     // skybox
@@ -145,7 +145,7 @@ void FirstApp::loadGameObjects() {
     auto Skybox = GameObject::createGameObject();
     Skybox.model = dixModel;
     dixModel.reset();
-    m_gameObjects["SkyboxRenderSystem"].push_back(std::move(Skybox));
+    m_gameObjects["SkyboxRenderSystem"].push_back(std::move(std::make_unique<GameObject>(Skybox)));
 }
 
 void FirstApp::loadUIElements(void) {
@@ -226,7 +226,7 @@ void FirstApp::loadUIElements(void) {
         static auto lastFrame = std::chrono::steady_clock::now();
         auto currentFrame = std::chrono::steady_clock::now();
         float frameTime =
-            (currentFrame - lastFrame) / std::chrono_literals::operator""s(1);
+            (currentFrame - lastFrame) / std::chrono::seconds(1);
         lastFrame = currentFrame;
 
         keyCooldown -= frameTime;
@@ -253,7 +253,7 @@ void FirstApp::loadUIElements(void) {
         static auto lastFrame = std::chrono::steady_clock::now();
         auto currentFrame = std::chrono::steady_clock::now();
         float frameTime =
-            (currentFrame - lastFrame) / std::chrono_literals::operator""s(1);
+            (currentFrame - lastFrame) / std::chrono::seconds(1);
         lastFrame = currentFrame;
 
         keyCooldown -= frameTime;
@@ -288,7 +288,7 @@ void FirstApp::loadConsoleCommands(void) {
             static auto lastFrame = std::chrono::steady_clock::now();
             auto currentFrame = std::chrono::steady_clock::now();
             float frameTime = (currentFrame - lastFrame) /
-                              std::chrono_literals::operator""s(1);
+                              std::chrono::seconds(1);
             lastFrame = currentFrame;
 
             keyCooldown -= frameTime;
@@ -320,7 +320,7 @@ void FirstApp::loadConsoleCommands(void) {
             static auto lastFrame = std::chrono::steady_clock::now();
             auto currentFrame = std::chrono::steady_clock::now();
             float frameTime = (currentFrame - lastFrame) /
-                              std::chrono_literals::operator""s(1);
+                              std::chrono::seconds(1);
             lastFrame = currentFrame;
 
             keyCooldown -= frameTime;
@@ -439,7 +439,7 @@ void FirstApp::loadConsoleCommands(void) {
             if (is_bouncy) {
                 m_gameObjects["BouncyParticleRenderSystem"].push_back(std::move(
                     m_context->getRenderSystem<BouncyParticleRenderSystem>()
-                        .createParticleEmitter(position, amount)));
+                        .createBouncyParticleEmitter(position, amount)));
             } else {
                 m_gameObjects["ParticleRenderSystem"].push_back(
                     std::move(m_context->getRenderSystem<ParticleRenderSystem>()

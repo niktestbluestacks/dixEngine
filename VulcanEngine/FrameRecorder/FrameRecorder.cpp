@@ -66,7 +66,7 @@ void FrameRecorder::stopRecording() {
 }
 
 void FrameRecorder::recordInitialStructure(
-    const std::unordered_map<std::string, std::vector<GameObject>>&
+    const std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>&
         gameObjects) {
     if (!m_isRecording) {
         return;
@@ -81,11 +81,11 @@ void FrameRecorder::recordInitialStructure(
 
         for (const auto& obj : objects) {
             RecordedGameObject recorded;
-            recorded.id = obj.getId();
-            recorded.translation = obj.transform.translation;
-            recorded.rotation = obj.transform.rotation;
-            recorded.scale = obj.transform.scale;
-            recorded.modelPath = getModelPath(obj);
+            recorded.id = obj->getId();
+            recorded.translation = obj->transform.translation;
+            recorded.rotation = obj->transform.rotation;
+            recorded.scale = obj->transform.scale;
+            recorded.modelPath = getModelPath(*obj);
             recordedObjects.push_back(recorded);
 
             // Store initial state for change detection
@@ -97,7 +97,7 @@ void FrameRecorder::recordInitialStructure(
 }
 
 void FrameRecorder::recordFrame(
-    const std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+    const std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
     const glm::vec3& cameraPosition, const glm::vec3& cameraLookAt,
     float frameTime) {
     if (!m_isRecording) {
@@ -112,30 +112,30 @@ void FrameRecorder::recordFrame(
     // Find changed objects by comparing with previous state
     for (const auto& [renderSystemName, objects] : gameObjects) {
         for (const auto& obj : objects) {
-            auto id = obj.getId();
+            auto id = obj->getId();
             bool changed = false;
 
             // Check translation change
             auto prevTransIt = m_prevTranslations.find(id);
             if (prevTransIt == m_prevTranslations.end() ||
-                prevTransIt->second != obj.transform.translation) {
-                frame.translations[id] = obj.transform.translation;
+                prevTransIt->second != obj->transform.translation) {
+                frame.translations[id] = obj->transform.translation;
                 changed = true;
             }
 
             // Check rotation change
             auto prevRotIt = m_prevRotations.find(id);
             if (prevRotIt == m_prevRotations.end() ||
-                prevRotIt->second != obj.transform.rotation) {
-                frame.rotations[id] = obj.transform.rotation;
+                prevRotIt->second != obj->transform.rotation) {
+                frame.rotations[id] = obj->transform.rotation;
                 changed = true;
             }
 
             // Check scale change
             auto prevScaleIt = m_prevScales.find(id);
             if (prevScaleIt == m_prevScales.end() ||
-                prevScaleIt->second != obj.transform.scale) {
-                frame.scales[id] = obj.transform.scale;
+                prevScaleIt->second != obj->transform.scale) {
+                frame.scales[id] = obj->transform.scale;
                 changed = true;
             }
 
@@ -144,9 +144,9 @@ void FrameRecorder::recordFrame(
             }
 
             // Update previous state
-            m_prevTranslations[id] = obj.transform.translation;
-            m_prevRotations[id] = obj.transform.rotation;
-            m_prevScales[id] = obj.transform.scale;
+            m_prevTranslations[id] = obj->transform.translation;
+            m_prevRotations[id] = obj->transform.rotation;
+            m_prevScales[id] = obj->transform.scale;
         }
     }
 
@@ -240,7 +240,7 @@ void FrameRecorder::writeFrame(const RecordedFrame& frame, size_t frameNumber) {
 
 void FrameRecorder::startPlayback(
     const std::string& filename,
-    std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+    std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
     glm::vec3& cameraPosition, glm::vec3& cameraLookAt) {
     m_filename = filename;
     m_inputStream.open(filename);
@@ -278,7 +278,7 @@ void FrameRecorder::startPlayback(
         auto& models = originalModels[renderSystemName];
         models.reserve(objects.size());
         for (const auto& obj : objects) {
-            models.push_back(obj.model);  // Save the model shared_ptr
+            models.push_back(obj->model);  // Save the model shared_ptr
         }
     }
 
@@ -305,7 +305,7 @@ void FrameRecorder::startPlayback(
 
             // Store the recorded ID mapping: index -> recorded ID
             m_playbackIdMap[{renderSystemName, objectIndex}] = recorded.id;
-            objects.push_back(std::move(obj));
+            objects.push_back(std::move(std::make_unique<GameObject>(obj)));
             objectIndex++;
         }
     }
@@ -336,7 +336,7 @@ void FrameRecorder::stopPlayback() {
 }
 
 bool FrameRecorder::updatePlayback(
-    std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+    std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
     glm::vec3& cameraPosition, glm::vec3& cameraLookAt) {
     if (!m_isPlaying || m_currentFrameIndex >= m_frames.size()) {
         return false;
@@ -356,7 +356,7 @@ bool FrameRecorder::updatePlayback(
             auto rsIt = gameObjects.find(renderSystemName);
             if (rsIt != gameObjects.end() &&
                 objectIndex < rsIt->second.size()) {
-                rsIt->second[objectIndex].transform.translation = translation;
+                rsIt->second[objectIndex]->transform.translation = translation;
             }
         }
     }
@@ -368,7 +368,7 @@ bool FrameRecorder::updatePlayback(
             auto rsIt = gameObjects.find(renderSystemName);
             if (rsIt != gameObjects.end() &&
                 objectIndex < rsIt->second.size()) {
-                rsIt->second[objectIndex].transform.rotation = rotation;
+                rsIt->second[objectIndex]->transform.rotation = rotation;
             }
         }
     }
@@ -380,7 +380,7 @@ bool FrameRecorder::updatePlayback(
             auto rsIt = gameObjects.find(renderSystemName);
             if (rsIt != gameObjects.end() &&
                 objectIndex < rsIt->second.size()) {
-                rsIt->second[objectIndex].transform.scale = scale;
+                rsIt->second[objectIndex]->transform.scale = scale;
             }
         }
     }

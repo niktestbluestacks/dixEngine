@@ -54,11 +54,11 @@ class FrameRecorder {
     void stopRecording();
 
     void recordInitialStructure(
-        const std::unordered_map<std::string, std::vector<GameObject>>&
+        const std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>&
             gameObjects);
 
     void recordFrame(
-        const std::unordered_map<std::string, std::vector<GameObject>>&
+        const std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>&
             gameObjects,
         const glm::vec3& cameraPosition, const glm::vec3& cameraLookAt,
         float frameTime);
@@ -66,13 +66,13 @@ class FrameRecorder {
     // Playback API
     void startPlayback(
         const std::string& filename,
-        std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+        std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
         glm::vec3& cameraPosition, glm::vec3& cameraLookAt);
 
     void stopPlayback();
 
     bool updatePlayback(
-        std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+        std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
         glm::vec3& cameraPosition, glm::vec3& cameraLookAt);
 
     const RecordedFrame* getCurrentFrame() const;

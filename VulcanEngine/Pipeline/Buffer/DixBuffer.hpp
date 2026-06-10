@@ -3,6 +3,7 @@
 
 // dix
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
+#include <Utils/Class.hpp>
 
 // libs
 #include <vulkan/vulkan.hpp>

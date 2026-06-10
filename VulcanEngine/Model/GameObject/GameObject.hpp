@@ -28,26 +28,40 @@ class GameObject {
     using id_t = unsigned int;
 
     static GameObject createGameObject() {
-        return GameObject{GameObject::getNewId()};
+        return GameObject{};
     }
 
-    DIX_ENABLE_COPY(GameObject)
+    GameObject(const GameObject& other) {
+        model = other.model;
+        color = other.color;
+        transform = other.transform;
+        id = getNewId();
+    }
+
+    GameObject& operator=(const GameObject& other) {
+        model = other.model;
+        color = other.color;
+        transform = other.transform;
+        id = getNewId();
+        return *this;
+    }
+
     GameObject(GameObject&& other) {
         model = other.model;
         color = other.color;
         transform = other.transform;
-        id = getNewId();    
+        id = getNewId();
     }
 
     GameObject operator=(GameObject&& other) {
         model = other.model;
         color = other.color;
         transform = other.transform;
-        id = getNewId();  
+        id = getNewId();
         return *this;
     }
-    
-    ~GameObject() = default;
+
+    virtual ~GameObject() = default;
 
     const id_t getId() const { return id; };
 
@@ -55,25 +69,26 @@ class GameObject {
     glm::vec3 color{};
     TransformComponent transform{};
 
-   private:
+   protected:
     static id_t getNewId() {
         static id_t currentId = 0;
         return currentId++;
     }
 
-    GameObject(id_t objId) : id{objId} {};
+    GameObject(): id(getNewId()) {}
 
+   private:
     id_t id;
 };
 }  // namespace dix
 
 namespace std {
-    template<>
-    struct hash<dix::GameObject> {
-        size_t operator()(const dix::GameObject& obj) {
-            return hash<unsigned int>()(obj.getId());
-        }
-    };
-}   // namespace std
+template <>
+struct hash<dix::GameObject> {
+    size_t operator()(const dix::GameObject& obj) {
+        return hash<unsigned int>()(obj.getId());
+    }
+};
+}  // namespace std
 
 #endif  // GAME_OBJECT_HPP

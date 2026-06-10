@@ -1,6 +1,6 @@
 // dix
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
-#include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
+#include <Rendering/RenderSystem/BouncyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
 
 // std
@@ -11,40 +11,41 @@
 
 namespace dix {
 
-ParticleRenderSystem::ParticleRenderSystem(
+BouncyParticleRenderSystem::BouncyParticleRenderSystem(
     EngineDevice& engineDevice, vk::RenderPass renderPass,
     vk::DescriptorSetLayout globalSetLayout,
     vk::DescriptorSetLayout modelSetLayout)
     : DixRenderSystem(
           engineDevice, renderPass, globalSetLayout, modelSetLayout,
           DixRenderSystemConfig{
-              .vertShaderPath = "ParticleShader/particle.vert.spv",
-              .fragShaderPath = "ParticleShader/particle.frag.spv",
+              .vertShaderPath = "BouncyParticleShader/bouncy_particle.vert.spv",
+              .fragShaderPath = "BouncyParticleShader/bouncy_particle.frag.spv",
 
               // Point-list: each particle is a screen-space point / sprite.
               .topology = vk::PrimitiveTopology::ePointList,
 
-              // Vertex layout mirrors the Particle struct.
-              .vertexBindings = {{0, sizeof(Particle),
+              // Vertex layout mirrors the BouncyParticle struct.
+              .vertexBindings = {{0, sizeof(BouncyParticle),
                                   vk::VertexInputRate::eVertex}},
               .vertexAttributes =
                   {
                       {0, 0, vk::Format::eR32G32B32A32Sfloat,
-                       offsetof(Particle, positionLifetime)},
+                       offsetof(BouncyParticle, positionLifetime)},
                       {1, 0, vk::Format::eR32G32B32A32Sfloat,
-                       offsetof(Particle, velocitySize)},
+                       offsetof(BouncyParticle, velocitySize)},
                       {2, 0, vk::Format::eR32G32B32A32Sfloat,
-                       offsetof(Particle, color)},
+                       offsetof(BouncyParticle, color)},
                       {3, 0, vk::Format::eR32G32B32A32Sfloat,
-                       offsetof(Particle, initPosLife)},
+                       offsetof(BouncyParticle, initPosLife)},
                   },
 
               .transformGameObject =
                   [](void* push, GameObject& obj, FrameInfo& frameInfo) {
-                      auto* p = static_cast<ParticlePushConstantData*>(push);
+                      auto* p =
+                          static_cast<BouncyParticlePushConstantData*>(push);
                       p->modelMatrix = obj.transform.mat4();
                   },
-              .pushConstantSize = sizeof(ParticlePushConstantData),
+              .pushConstantSize = sizeof(BouncyParticlePushConstantData),
 
               // Compute pipeline: the base constructor wires up the
               // descriptor-set layout, pipeline layout, ComputePipeline, and
@@ -52,7 +53,8 @@ ParticleRenderSystem::ParticleRenderSystem(
               // is called below once the data buffers have been created.
               .compute =
                   ComputePipelineConfig{
-                      .shaderPath = "ParticleShader/particle_compute.comp.spv",
+                      .shaderPath =
+                          "BouncyParticleShader/bouncy_particle.comp.spv",
                       .bindings =
                           {
                               // binding 0: particle SSBO (read/write by vertex
@@ -64,23 +66,24 @@ ParticleRenderSystem::ParticleRenderSystem(
                               {1, vk::DescriptorType::eUniformBuffer,
                                vk::ShaderStageFlagBits::eCompute},
                           },
-                        .descriptorPoolMaxSets = ParticleRenderSystem::MAX_PARTICLE_EMITTERS
+                        .descriptorPoolMaxSets = BouncyParticleRenderSystem::MAX_PARTICLE_EMITTERS
                   },
           }) {}
 
-void ParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
-    assert(obj.particleBuffer && "Particle buffer must be created first");
+void BouncyParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
+    assert(obj.particleBuffer && "BouncyParticle buffer must be created first");
     assert(obj.simulationParamsBuffer &&
            "Sim-params buffer must be created first");
     assert(m_computeSetLayout && "Compute set layout not initialised");
     assert(m_computeDescriptorPool &&
            "Compute descriptor pool not initialised");
 
-    // Particle SSBO: skip the leading uint32_t particle-count header.
+    // BouncyParticle SSBO: skip the leading uint32_t particle-count header.
     vk::DescriptorBufferInfo particleInfo{};
     particleInfo.buffer = obj.particleBuffer->getBuffer();
     particleInfo.offset = 0;
-    particleInfo.range = 16 + sizeof(Particle) * ParticleEmitter::MAX_PARTICLES;
+    particleInfo.range =
+        16 + sizeof(BouncyParticle) * ParticleEmitter::MAX_PARTICLES;
 
     vk::DescriptorBufferInfo simParamsInfo =
         obj.simulationParamsBuffer->descriptorInfo(
@@ -93,22 +96,25 @@ void ParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
 
     if (!ok) {
         throw std::runtime_error(
-            "ParticleRenderSystem: failed to build compute descriptor set");
+            "BouncyParticleRenderSystem: failed to build compute descriptor "
+            "set");
     }
 }
 
+// dispatchCompute  (overrides base no-op)
+//
 // Dispatches the particle simulation compute shader, then
-// inserts a compute -> vertex/shader memory barrier so the
+// inserts a compute → vertex/shader memory barrier so the
 // GPU sees the updated SSBO contents during the subsequent
 // graphics pass.  Must be called OUTSIDE a render pass.
 
-void ParticleRenderSystem::dispatchCompute(
+void BouncyParticleRenderSystem::dispatchCompute(
     vk::CommandBuffer commandBuffer,
     std::vector<std::shared_ptr<GameObject>>& gameObjects) {
     for (auto& unObject : gameObjects) {
         decltype(auto) obj =
             std::static_pointer_cast<ParticleEmitter>(unObject);
-        if (obj->particleCount == 0 || !hasComputePipeline()) return;
+        if (obj->particleCount == 0 || !hasComputePipeline()) continue;
 
         m_computePipeline->bind(commandBuffer);
 
@@ -136,7 +142,7 @@ void ParticleRenderSystem::dispatchCompute(
     }
 }
 
-void ParticleRenderSystem::renderGameObjects(
+void BouncyParticleRenderSystem::renderGameObjects(
     FrameInfo& frameInfo,
     std::vector<std::shared_ptr<GameObject>>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
@@ -160,20 +166,18 @@ void ParticleRenderSystem::renderGameObjects(
     vk::Rect2D scissor{{}, frameInfo.screenExtent};
     frameInfo.commandBuffer.setScissor(0, 1, &scissor);
 
-    updateParticles(frameInfo.frameTime, particleEmitters);
+    updateBouncyParticles(frameInfo.frameTime, particleEmitters);
 
     for (auto& obj : particleEmitters) {
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
         bindBuffers(frameInfo.commandBuffer, obj);
         m_config.transformGameObject(pushBuffer.data(), *obj, frameInfo);
-
         frameInfo.commandBuffer.pushConstants(
             m_pipelineLayout, m_config.pushConstantStages, 0,
             m_config.pushConstantSize, pushBuffer.data());
 
-
-        // set 0: system descriptor set — BouncyParticleUbo (projectionView
-        // matrix).
+        // set 0: system descriptor set — BouncyBouncyParticleUbo
+        // (projectionView matrix).
         //        Written by AppContext each frame from m_systemUboBuffers.
         //
         // m_computeDescriptorSet is the compute-pipeline set (particle SSBO +
@@ -197,9 +201,8 @@ void ParticleRenderSystem::renderGameObjects(
     }
 }
 
-void ParticleRenderSystem::bindBuffers(
-    vk::CommandBuffer commandBuffer,
-    std::shared_ptr<ParticleEmitter>& particleEmitter) const {
+void BouncyParticleRenderSystem::bindBuffers(vk::CommandBuffer commandBuffer,
+                        std::shared_ptr<ParticleEmitter>& particleEmitter) const {
     // vk::Buffer buffers[] = { m_particleBuffer->getBuffer() };
     // vk::DeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
     // commandBuffer.bindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
@@ -212,7 +215,7 @@ void ParticleRenderSystem::bindBuffers(
     commandBuffer.bindVertexBuffers(0, 1, buffers, offsets);
 }
 
-void ParticleRenderSystem::updateParticles(
+void BouncyParticleRenderSystem::updateBouncyParticles(
     float deltaTime,
     const std::vector<std::shared_ptr<ParticleEmitter>>& particleEmitters) {
     for (auto& obj : particleEmitters) {
@@ -224,12 +227,13 @@ void ParticleRenderSystem::updateParticles(
     }
 }
 
-std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
-    glm::vec3 position, uint32_t count) {
+std::shared_ptr<ParticleEmitter>
+BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
+                                                        uint32_t count) {
     std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
-    // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
+    // 1. BouncyParticle storage buffer  [uint32_t count | BouncyParticle × MAX]
     vk::DeviceSize particleBufferSize =
-        16 + sizeof(Particle) * ParticleEmitter::MAX_PARTICLES;
+        16 + sizeof(BouncyParticle) * ParticleEmitter::MAX_PARTICLES;
     obj->particleBuffer = std::make_unique<DixBuffer>(
         m_dixDevice, particleBufferSize, 1,
         vk::BufferUsageFlagBits::eStorageBuffer |
@@ -277,7 +281,7 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
         static_cast<uint32_t*>(obj->particleBuffer->getMappedMemory());
     *countPtr = obj->particleCount + count;
 
-    auto* particles = reinterpret_cast<Particle*>(
+    auto* particles = reinterpret_cast<BouncyParticle*>(
         static_cast<uint8_t*>(obj->particleBuffer->getMappedMemory()) + 16);
 
     const uint32_t NUM_THREADS =
@@ -306,7 +310,7 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
 
             for (uint32_t i = 0; i < current_count; ++i) {
                 uint32_t global_idx = current_start + i;
-                Particle& p = particles[global_idx];
+                BouncyParticle& p = particles[global_idx];
 
                 p.positionLifetime =
                     glm::vec4(position + glm::vec3(posDist(gen), posDist(gen),

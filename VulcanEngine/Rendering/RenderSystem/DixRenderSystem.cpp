@@ -107,14 +107,14 @@ void DixRenderSystem::createPipeline(vk::RenderPass renderPass) {
 }
 
 void DixRenderSystem::renderGameObjects(
-    FrameInfo& frameInfo, std::vector<GameObject>& gameObjects) const {
+    FrameInfo& frameInfo, std::vector<std::shared_ptr<GameObject>>& gameObjects) const {
     m_pipeline->bind(frameInfo.commandBuffer);
 
     for (auto& obj : gameObjects) {
         // Use a fixed-size stack buffer — avoids heap allocation per object
         // while supporting any push-constant size up to 256 bytes.
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
-        m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
+        m_config.transformGameObject(pushBuffer.data(), *obj, frameInfo);
 
         if (m_config.pushConstantSize > 0) {
             frameInfo.commandBuffer.pushConstants(
@@ -124,8 +124,8 @@ void DixRenderSystem::renderGameObjects(
 
         std::array<vk::DescriptorSet, 2> descriptorSets{
             frameInfo.globalDescriptorSet, nullptr};
-        if (obj.model) {
-            descriptorSets[1] = obj.model->getDescriptorSet();
+        if (obj->model) {
+            descriptorSets[1] = obj->model->getDescriptorSet();
         }
 
         frameInfo.commandBuffer.bindDescriptorSets(
@@ -133,22 +133,22 @@ void DixRenderSystem::renderGameObjects(
             static_cast<uint32_t>(descriptorSets.size()), descriptorSets.data(),
             0, nullptr);
 
-        if (obj.model) {
-            obj.model->bind(frameInfo.commandBuffer);
-            obj.model->draw(frameInfo.commandBuffer);
+        if (obj->model) {
+            obj->model->bind(frameInfo.commandBuffer);
+            obj->model->draw(frameInfo.commandBuffer);
         }
     }
 }
 
 void DixRenderSystem::renderGameObjects(FrameInfo& frameInfo,
-                                        std::vector<GameObject>& gameObjects) {
+                                        std::vector<std::shared_ptr<GameObject>>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
 
     for (auto& obj : gameObjects) {
         // Use a fixed-size stack buffer — avoids heap allocation per object
         // while supporting any push-constant size up to 256 bytes.
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
-        m_config.transformGameObject(pushBuffer.data(), obj, frameInfo);
+        m_config.transformGameObject(pushBuffer.data(), *obj, frameInfo);
 
         if (m_config.pushConstantSize > 0) {
             frameInfo.commandBuffer.pushConstants(
@@ -158,8 +158,8 @@ void DixRenderSystem::renderGameObjects(FrameInfo& frameInfo,
 
         std::array<vk::DescriptorSet, 2> descriptorSets{
             frameInfo.globalDescriptorSet, nullptr};
-        if (obj.model) {
-            descriptorSets[1] = obj.model->getDescriptorSet();
+        if (obj->model) {
+            descriptorSets[1] = obj->model->getDescriptorSet();
         }
 
         frameInfo.commandBuffer.bindDescriptorSets(
@@ -167,9 +167,9 @@ void DixRenderSystem::renderGameObjects(FrameInfo& frameInfo,
             static_cast<uint32_t>(descriptorSets.size()), descriptorSets.data(),
             0, nullptr);
 
-        if (obj.model) {
-            obj.model->bind(frameInfo.commandBuffer);
-            obj.model->draw(frameInfo.commandBuffer);
+        if (obj->model) {
+            obj->model->bind(frameInfo.commandBuffer);
+            obj->model->draw(frameInfo.commandBuffer);
         }
     }
 }

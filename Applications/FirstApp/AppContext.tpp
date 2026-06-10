@@ -48,7 +48,7 @@ inline constexpr vk::BufferUsageFlags descriptorTypeToBufferUsage(
 template <typename... RenderSystems>
 void AppContext<RenderSystems...>::drawFrame(
     DixCamera& camera, float frameTime,
-    std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+    std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
     const glm::vec3& playerPosition) {
     auto extent = m_Window.getExtent();
     if (extent.width == 0 || extent.height == 0) return;
@@ -82,7 +82,7 @@ void AppContext<RenderSystems...>::drawFrame(
     forEachInTuple(
         m_renderSystemRegistery.getRenderSystemDescriptions(),
         [&](auto&& renderSystemDesc) {
-            renderSystemDesc.renderSystem->dispatchCompute(commandBuffer);
+            renderSystemDesc.renderSystem->dispatchCompute(commandBuffer, gameObjects[renderSystemDesc.renderSystemName]);
         });
 
     // Graphics pass

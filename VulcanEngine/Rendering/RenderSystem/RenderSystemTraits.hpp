@@ -23,7 +23,6 @@ namespace dix {
 using VulkanRenderSystemFlagType =
     std::tuple<uint32_t, vk::DescriptorType, vk::ShaderStageFlags>;
 
-// ---------------------------------------------------------------------------
 // Binding descriptor tags
 //
 // Use these as the elements of a render system's `Bindings` tuple.
@@ -35,7 +34,6 @@ using VulkanRenderSystemFlagType =
 // Vulkan binding metadata) are automatically derived.  Keeping them in sync
 // by hand — and the resulting null-descriptor validation errors — is no
 // longer possible.
-// ---------------------------------------------------------------------------
 
 // UniformBinding<UboT, Slot, Stages>
 //
@@ -65,9 +63,6 @@ struct SamplerBinding {
         vk::DescriptorType::eCombinedImageSampler;
 };
 
-// ---------------------------------------------------------------------------
-// Internal metafunctions (not part of the public API)
-// ---------------------------------------------------------------------------
 namespace detail {
 
 // Concept: B has an associated UBO type — i.e. it is a buffer-type binding
@@ -97,7 +92,6 @@ struct ExtractUboTypes<B, Rest...> {
 
 }  // namespace detail
 
-// ---------------------------------------------------------------------------
 // RenderSystemTraits<BindingsTuple>
 //
 // Inherit from this mixin to get `VKBuffers` and `getVulkanFlags()` for free,
@@ -122,7 +116,7 @@ struct ExtractUboTypes<B, Rest...> {
 //
 // The `VKBuffers` and `getVulkanFlags()` required by RenderSystemRegistery and
 // AppContext are provided automatically — no manual duplication needed.
-// ---------------------------------------------------------------------------
+
 template <typename BindingsTuple>
 struct RenderSystemTraits;
 

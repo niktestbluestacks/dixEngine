@@ -57,7 +57,7 @@ class AppContext {
     // draw helper which hides rendering/shader details from the app
     void drawFrame(
         DixCamera& camera, float frameTime,
-        std::unordered_map<std::string, std::vector<GameObject>>& gameObjects,
+        std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
         const glm::vec3& playerPosition);
 
     void addUIElement(std::unique_ptr<DixUIElement> element) {

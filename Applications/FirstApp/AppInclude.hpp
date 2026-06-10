@@ -13,7 +13,7 @@
 #include <Pipeline/EngineDevice/EngineDevice.hpp>
 
 // RENDERING
-#include <Rendering/RenderSystem/BoucyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
+#include <Rendering/RenderSystem/BouncyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
 #include <Rendering/RenderSystem/ParticleRenderSystem/ParticleRenderSystem.hpp>
 #include <Rendering/RenderSystem/SimpleRenderSystem/SimpleRenderSystem.hpp>
 #include <Rendering/RenderSystem/SkyboxRenderSystem/SkyboxRenderSystem.hpp>

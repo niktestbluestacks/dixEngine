@@ -68,7 +68,7 @@ class DixDescriptorPool {
        private:
         EngineDevice& engineDevice;
         std::vector<vk::DescriptorPoolSize> poolSizes{};
-        uint32_t maxSets = 1000;
+        uint32_t maxSets = 2000;
         vk::DescriptorPoolCreateFlags poolFlags = {};
     };
 

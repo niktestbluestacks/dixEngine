@@ -207,6 +207,29 @@ void FirstApp::loadUIElements(void) {
         },
         false, nullptr, [&console]() { console.backspaceRealeased(); });
 
+    m_context->getDixWindow().bindKeyUnUsual(
+        GLFW_KEY_UP, [&console, &window = m_context->getDixWindow()]() {
+            console.arrowUpPressed(window.isKeyPressedUnUsual(GLFW_KEY_DOWN));
+        }, nullptr, [&console, &window = m_context->getDixWindow()]() {
+            console.arrowUpRealeased();
+        }
+    );
+
+    m_context->getDixWindow().bindKeyUnUsual(
+        GLFW_KEY_DOWN, [&console, &window = m_context->getDixWindow()]() {
+            console.arrowDownPressed(window.isKeyPressedUnUsual(GLFW_KEY_UP));
+        }, nullptr, [&console, &window = m_context->getDixWindow()]() {
+            console.arrowDownRealeased();
+        }
+    );
+
+    m_context->getDixWindow().bindKeyUnUsual(GLFW_KEY_V, [&console, &window = m_context->getDixWindow()]() {
+        if (window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL)) {
+            console.fillFromClipboard(std::string(window.getClipboardText()));
+        }
+    }
+    );
+
     m_context->getDixWindow().bindKey(GLFW_KEY_ENTER, [&console]() {
         if (console.isVisible()) {
             console.enterCommand();

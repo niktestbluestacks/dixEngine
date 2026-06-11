@@ -44,6 +44,10 @@ void Window::resetWindowResizedFlag(void) { m_framebufferResized = false; }
 
 GLFWwindow* Window::getGLFWwindow(void) const { return m_window; }
 
+const char* Window::getClipboardText() const {
+    return glfwGetClipboardString(m_window);
+}
+
 void Window::createWindowSurface(vk::Instance instance,
                                  vk::SurfaceKHR* surface) const {
     if (glfwCreateWindowSurface(
@@ -77,11 +81,15 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width,
 }
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
-                         int mods) {
+                         int modes) {
     auto dixWindow =
         reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
     auto it = dixWindow->m_keyBindings.find(key);
     if (it != dixWindow->m_keyBindings.end()) {
+        if (it->second.bindedUnusually) {
+            keyCallbackUnUsual(window, key, scancode, action, modes);
+            return;
+        }
         switch (action) {
             case GLFW_PRESS: {
                 if (it->second.callback) {
@@ -135,6 +143,35 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
     }
 }
 
+void Window::keyCallbackUnUsual(GLFWwindow* window, int key, int scancode,
+                                int action, int modes) {
+    auto dixWindow =
+        reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    auto it = dixWindow->m_keyBindings.find(key);
+    if (it != dixWindow->m_keyBindings.end()) {
+        switch (action) {
+            case GLFW_PRESS: {
+                if (it->second.callback) {
+                    it->second.callback();
+                }
+                break;
+            }
+            case GLFW_REPEAT: {
+                if (it->second.callbackWhenHeld) {
+                    it->second.callbackWhenHeld();
+                }
+                break;
+            }
+            case GLFW_RELEASE: {
+                if (it->second.callbackWhenRealeased) {
+                    it->second.callbackWhenRealeased();
+                }
+                break;
+            }
+        }
+    }
+}
+
 void Window::charCallback(GLFWwindow* window, unsigned int codepoint) {
     auto dixWindow =
         reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
@@ -157,8 +194,15 @@ void Window::bindKey(int key, std::function<void()> callback,
                      bool overrideOtherCallbacks,
                      std::function<void()> callbackWhenHeld,
                      std::function<void()> callbackWhenRealeased) {
-    m_keyBindings[key] = {callback, overrideOtherCallbacks, callbackWhenHeld,
-                          callbackWhenRealeased};
+    m_keyBindings[key] = {callback, callbackWhenHeld, callbackWhenRealeased,
+                          overrideOtherCallbacks};
+}
+
+void Window::bindKeyUnUsual(int key, std::function<void()> callback,
+                            std::function<void()> callbackWhenHeld,
+                            std::function<void()> callbackWhenRealeased) {
+    m_keyBindings[key] = {callback, callbackWhenHeld, callbackWhenRealeased,
+                          false, true};
 }
 
 void Window::unbindKey(int key) { m_keyBindings.erase(key); }

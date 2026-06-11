@@ -312,7 +312,8 @@ void EngineDevice::hasGflwRequiredInstanceExtensions() {
     std::unordered_set<std::string> available;
     for (const auto& extension : extensions) {
         if (enableValidationLayers) {
-            DixLogDebug("\t{}", static_cast<std::string>(extension.extensionName));
+            DixLogDebug("\t{}",
+                        static_cast<std::string>(extension.extensionName));
         }
         available.insert(extension.extensionName);
     }

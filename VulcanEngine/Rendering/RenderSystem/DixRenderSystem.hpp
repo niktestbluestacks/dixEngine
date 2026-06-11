@@ -50,7 +50,7 @@ struct ComputePipelineConfig {
     std::vector<vk::PushConstantRange> pushRanges = {};
 
     // How many descriptor sets the pool can allocate.
-    uint32_t descriptorPoolMaxSets = 1;
+    uint32_t descriptorPoolMaxSets = 2000;
 };
 
 // DixRenderSystemConfig
@@ -105,11 +105,13 @@ class DixRenderSystem {
 
     DIX_DISABLE_COPY(DixRenderSystem)
 
-    virtual void renderGameObjects(FrameInfo& frameInfo,
-                                   std::vector<std::shared_ptr<GameObject>>& gameObjects) const;
+    virtual void renderGameObjects(
+        FrameInfo& frameInfo,
+        std::vector<std::shared_ptr<GameObject>>& gameObjects) const;
 
-    virtual void renderGameObjects(FrameInfo& frameInfo,
-                                   std::vector<std::shared_ptr<GameObject>>& gameObjects);
+    virtual void renderGameObjects(
+        FrameInfo& frameInfo,
+        std::vector<std::shared_ptr<GameObject>>& gameObjects);
 
     void setDescriptorPool(std::unique_ptr<DixDescriptorPool> pool) {
         m_descriptorPool = std::move(pool);
@@ -126,7 +128,9 @@ class DixRenderSystem {
 
     // Override in subclasses that use compute.
     // Must be called outside a render pass (before or after graphics).
-    virtual void dispatchCompute(vk::CommandBuffer commandBuffer, std::vector<std::shared_ptr<GameObject>>& gameObjects) {}
+    virtual void dispatchCompute(
+        vk::CommandBuffer commandBuffer,
+        std::vector<std::shared_ptr<GameObject>>& gameObjects) {}
 
    protected:
     // Override hooks for advanced pipeline customisation.
@@ -141,14 +145,11 @@ class DixRenderSystem {
     // Helper methods for creating pipelines with custom configurations
     // These provide better abstraction for pipeline creation
     std::unique_ptr<Pipeline> createGraphicsPipeline(
-        EngineDevice& device,
-        const std::string& vertShaderPath,
-        const std::string& fragShaderPath,
-        PipelineConfigInfo& configInfo);
+        EngineDevice& device, const std::string& vertShaderPath,
+        const std::string& fragShaderPath, PipelineConfigInfo& configInfo);
 
     std::unique_ptr<ComputePipeline> createComputePipeline(
-        EngineDevice& device,
-        const std::string& compShaderPath,
+        EngineDevice& device, const std::string& compShaderPath,
         ComputePipelineConfigInfo& configInfo);
 
     DixRenderSystemConfig m_config;

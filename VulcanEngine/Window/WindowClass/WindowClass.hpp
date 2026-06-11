@@ -14,14 +14,14 @@
 #include <string>
 #include <vector>
 
-
 namespace dix {
 
 struct keyCallbacksType {
     std::function<void()> callback = nullptr;
-    bool overrideOtherCallbacks = false;
     std::function<void()> callbackWhenHeld = nullptr;
     std::function<void()> callbackWhenRealeased = nullptr;
+    bool overrideOtherCallbacks = false;
+    bool bindedUnusually = false;
 };
 
 inline bool GLFWIsLetterOrNumber(int key) {
@@ -35,7 +35,9 @@ class Window {
     static void framebufferResizeCallback(GLFWwindow* window, int width,
                                           int height);
     static void keyCallback(GLFWwindow* window, int key, int scancode,
-                            int action, int mods);
+                            int action, int modes);
+    static void keyCallbackUnUsual(GLFWwindow* window, int key, int scancode,
+                                   int action, int modes);
     static void charCallback(GLFWwindow* window, unsigned int codepoint);
 
    public:
@@ -51,6 +53,7 @@ class Window {
     bool isKeyPressedUsual(int key) const;
     bool isKeyPressedUnUsual(int key) const;
     bool isMouseButtonPressed(int key) const;
+    const char* getClipboardText() const;
     void resetWindowResizedFlag(void);
     GLFWwindow* getGLFWwindow(void) const;
 
@@ -63,6 +66,10 @@ class Window {
                  bool overrideOtherCallbacks = false,
                  std::function<void()> callbackWhenHeld = nullptr,
                  std::function<void()> callbackWhenRealeased = nullptr);
+
+    void bindKeyUnUsual(int key, std::function<void()> callback = nullptr,
+                        std::function<void()> callbackWhenHeld = nullptr,
+                        std::function<void()> callbackWhenRealeased = nullptr);
 
     void bindKey(int key, keyCallbacksType callbacks);
     void unbindKey(int key);

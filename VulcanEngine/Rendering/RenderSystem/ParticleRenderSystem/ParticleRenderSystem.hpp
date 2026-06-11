@@ -53,11 +53,14 @@ class ParticleRenderSystem
                                                            uint32_t count);
 
     // Dispatches the compute shader. Call outside a render pass.
-    void dispatchCompute(vk::CommandBuffer commandBuffer, std::vector<std::shared_ptr<GameObject>>& obj) override;
+    void dispatchCompute(
+        vk::CommandBuffer commandBuffer,
+        std::vector<std::shared_ptr<GameObject>>& obj) override;
     void renderGameObjects(
         FrameInfo& frameInfo,
         std::vector<std::shared_ptr<GameObject>>& gameObjects) override;
     static constexpr size_t MAX_PARTICLE_EMITTERS = 100;
+
    protected:
     // Writes m_particleBuffer and m_simulationParamsBuffer into
     // the compute descriptor set allocated by the base class.

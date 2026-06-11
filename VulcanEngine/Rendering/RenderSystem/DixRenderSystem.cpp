@@ -107,7 +107,8 @@ void DixRenderSystem::createPipeline(vk::RenderPass renderPass) {
 }
 
 void DixRenderSystem::renderGameObjects(
-    FrameInfo& frameInfo, std::vector<std::shared_ptr<GameObject>>& gameObjects) const {
+    FrameInfo& frameInfo,
+    std::vector<std::shared_ptr<GameObject>>& gameObjects) const {
     m_pipeline->bind(frameInfo.commandBuffer);
 
     for (auto& obj : gameObjects) {
@@ -140,8 +141,9 @@ void DixRenderSystem::renderGameObjects(
     }
 }
 
-void DixRenderSystem::renderGameObjects(FrameInfo& frameInfo,
-                                        std::vector<std::shared_ptr<GameObject>>& gameObjects) {
+void DixRenderSystem::renderGameObjects(
+    FrameInfo& frameInfo,
+    std::vector<std::shared_ptr<GameObject>>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
 
     for (auto& obj : gameObjects) {
@@ -230,17 +232,14 @@ void DixRenderSystem::initComputeDescriptorPool(uint32_t maxSets) {
 }
 
 std::unique_ptr<Pipeline> DixRenderSystem::createGraphicsPipeline(
-    EngineDevice& device,
-    const std::string& vertShaderPath,
-    const std::string& fragShaderPath,
-    PipelineConfigInfo& configInfo) {
-    return std::make_unique<Pipeline>(
-        device, toShaderPath(vertShaderPath), toShaderPath(fragShaderPath), configInfo);
+    EngineDevice& device, const std::string& vertShaderPath,
+    const std::string& fragShaderPath, PipelineConfigInfo& configInfo) {
+    return std::make_unique<Pipeline>(device, toShaderPath(vertShaderPath),
+                                      toShaderPath(fragShaderPath), configInfo);
 }
 
 std::unique_ptr<ComputePipeline> DixRenderSystem::createComputePipeline(
-    EngineDevice& device,
-    const std::string& compShaderPath,
+    EngineDevice& device, const std::string& compShaderPath,
     ComputePipelineConfigInfo& configInfo) {
     return std::make_unique<ComputePipeline>(
         device, toShaderPath(compShaderPath), configInfo);

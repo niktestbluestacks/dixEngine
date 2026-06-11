@@ -66,8 +66,8 @@ BouncyParticleRenderSystem::BouncyParticleRenderSystem(
                               {1, vk::DescriptorType::eUniformBuffer,
                                vk::ShaderStageFlagBits::eCompute},
                           },
-                        .descriptorPoolMaxSets = BouncyParticleRenderSystem::MAX_PARTICLE_EMITTERS
-                  },
+                      .descriptorPoolMaxSets =
+                          BouncyParticleRenderSystem::MAX_PARTICLE_EMITTERS},
           }) {}
 
 void BouncyParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
@@ -118,9 +118,9 @@ void BouncyParticleRenderSystem::dispatchCompute(
 
         m_computePipeline->bind(commandBuffer);
 
-        commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute,
-                                         m_computePipelineLayout, 0, 1,
-                                         &obj->computeDescriptorSet, 0, nullptr);
+        commandBuffer.bindDescriptorSets(
+            vk::PipelineBindPoint::eCompute, m_computePipelineLayout, 0, 1,
+            &obj->computeDescriptorSet, 0, nullptr);
 
         // local_size_x = 64 in the compute shader
         uint32_t workGroups = (obj->particleCount + 63) / 64;
@@ -201,8 +201,9 @@ void BouncyParticleRenderSystem::renderGameObjects(
     }
 }
 
-void BouncyParticleRenderSystem::bindBuffers(vk::CommandBuffer commandBuffer,
-                        std::shared_ptr<ParticleEmitter>& particleEmitter) const {
+void BouncyParticleRenderSystem::bindBuffers(
+    vk::CommandBuffer commandBuffer,
+    std::shared_ptr<ParticleEmitter>& particleEmitter) const {
     // vk::Buffer buffers[] = { m_particleBuffer->getBuffer() };
     // vk::DeviceSize offsets[] = { sizeof(uint32_t) }; // skip the count header
     // commandBuffer.bindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);

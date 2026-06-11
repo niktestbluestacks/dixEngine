@@ -12,9 +12,10 @@
 #include <tuple>
 
 #ifndef __clang__
-#include <type_traits>
 #include <concepts>
-#endif // __clang_
+#include <type_traits>
+
+#endif  // __clang_
 
 namespace dix {
 

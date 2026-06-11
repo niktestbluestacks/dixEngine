@@ -64,8 +64,8 @@ ParticleRenderSystem::ParticleRenderSystem(
                               {1, vk::DescriptorType::eUniformBuffer,
                                vk::ShaderStageFlagBits::eCompute},
                           },
-                        .descriptorPoolMaxSets = ParticleRenderSystem::MAX_PARTICLE_EMITTERS
-                  },
+                      .descriptorPoolMaxSets =
+                          ParticleRenderSystem::MAX_PARTICLE_EMITTERS},
           }) {}
 
 void ParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
@@ -112,9 +112,9 @@ void ParticleRenderSystem::dispatchCompute(
 
         m_computePipeline->bind(commandBuffer);
 
-        commandBuffer.bindDescriptorSets(vk::PipelineBindPoint::eCompute,
-                                         m_computePipelineLayout, 0, 1,
-                                         &obj->computeDescriptorSet, 0, nullptr);
+        commandBuffer.bindDescriptorSets(
+            vk::PipelineBindPoint::eCompute, m_computePipelineLayout, 0, 1,
+            &obj->computeDescriptorSet, 0, nullptr);
 
         // local_size_x = 64 in the compute shader
         uint32_t workGroups = (obj->particleCount + 63) / 64;
@@ -170,7 +170,6 @@ void ParticleRenderSystem::renderGameObjects(
         frameInfo.commandBuffer.pushConstants(
             m_pipelineLayout, m_config.pushConstantStages, 0,
             m_config.pushConstantSize, pushBuffer.data());
-
 
         // set 0: system descriptor set — BouncyParticleUbo (projectionView
         // matrix).

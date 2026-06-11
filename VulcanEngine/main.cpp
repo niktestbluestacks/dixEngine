@@ -16,9 +16,9 @@ int main() {
         DixLogErr(e.what());
         app.~FirstApp();
         std::cin.get();
-        return EXIT_FAILURE;
+        std::exit(EXIT_FAILURE);
     }
     app.~FirstApp();
     std::cin.get();
-    return EXIT_SUCCESS;
+    std::exit(EXIT_SUCCESS);
 }

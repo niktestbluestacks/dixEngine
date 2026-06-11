@@ -40,6 +40,22 @@ void DixConsole::newFrame() {
     if (m_triggerDeleteEvent.exchange(false) && !m_inputBuffer.empty()) {
         m_inputBuffer.pop_back();
     }
+    if (m_triggerArrowEvent.exchange(false) && !m_inputHistory.empty()) {
+        if (m_arrow == 'd') {
+            if (m_inputHistoryIndex < m_inputHistory.size() - 1 && m_inputHistoryIndex != -1) {
+                m_inputBuffer = m_inputHistory[m_inputHistoryIndex];
+                m_inputHistoryIndex++;
+            }
+        } else {
+            if (m_inputHistoryIndex > 0) {
+                m_inputBuffer = m_inputHistory[m_inputHistoryIndex];
+                m_inputHistoryIndex--;
+            } else if (m_inputHistoryIndex == -1) {
+                m_inputHistoryIndex = m_inputHistory.size() - 1;
+                m_inputBuffer = m_inputHistory[m_inputHistoryIndex];
+            }
+        }
+    }
 }
 
 void DixConsole::log(const std::string& message) {
@@ -103,6 +119,7 @@ std::string DixConsole::getConsoleText() const {
 }
 
 void DixConsole::addCharacter(char c) {
+    m_inputHistoryIndex = -1;
     if (m_inputBuffer.size() < 256) {
         m_inputBuffer += c;
     }
@@ -114,32 +131,30 @@ void DixConsole::backspace(bool isCtrlPressed) {
         {
             std::lock_guard lock(m_backspaceMutex);
             m_backspaceHeld = true;
+            m_backspaceCV.notify_all();
         }
-        m_backspaceCV.notify_one();
     } else {
         m_inputBuffer.clear();
     }
 }
 
-void DixConsole::backspaceRealeased() { 
+void DixConsole::backspaceRealeased() {
     {
         std::lock_guard lock(m_backspaceMutex);
         m_backspaceHeld = false;
     }
-    m_backspaceCV.notify_one();
+    m_backspaceCV.notify_all();
 }
 
 void DixConsole::backspaceHeldImpl(std::stop_token stopToken) {
     while (!stopToken.stop_requested()) {
         std::unique_lock lock(m_backspaceMutex);
-        m_backspaceCV.wait(lock, stopToken,
-                           [this] { return m_backspaceHeld; });
+        m_backspaceCV.wait(lock, stopToken, [this] { return m_backspaceHeld; });
 
         if (stopToken.stop_requested()) break;
 
-        if (m_backspaceCV.wait_for(
-                lock, std::chrono::milliseconds(500),
-                [this]() { return !m_backspaceHeld; })) {
+        if (m_backspaceCV.wait_for(lock, std::chrono::milliseconds(500),
+                                   [this]() { return !m_backspaceHeld; })) {
             continue;
         }
 
@@ -154,8 +169,103 @@ void DixConsole::backspaceHeldImpl(std::stop_token stopToken) {
 void DixConsole::enterCommand() {
     if (!m_inputBuffer.empty()) {
         executeCommand(m_inputBuffer);
+        m_inputHistory.push_back(m_inputBuffer);
+        if (m_inputHistory.size() > DixConsole::MAX_HISTORY_SIZE) {
+            m_inputHistory.pop_front();
+        }
         m_inputBuffer.clear();
     }
+}
+
+void DixConsole::arrowDownPressed(bool isOtherArrowPressed) {
+    if (!isOtherArrowPressed) {
+        m_arrow = 'd';
+        // if (!m_inputHistory.empty() && m_inputHistoryIndex > 0) {
+        //     m_inputBuffer = m_inputHistoryIndex--;
+        // }m_triggerDeleteEvent.store(true);
+        {
+            std::lock_guard lock(m_arrowMutex);
+            m_triggerArrowEvent.store(true);
+            m_arrowHeldDown = true;
+            m_arrowCV.notify_all();
+        }
+    }
+}
+
+void DixConsole::arrowDownRealeased() {
+    {
+        std::lock_guard lock(m_arrowMutex);
+        m_arrowHeldDown = false;
+        m_arrowCV.notify_all();
+    }
+}
+
+void DixConsole::arrowDownImpl(std::stop_token stopToken) {
+    while (!stopToken.stop_requested()) {
+        std::unique_lock<std::mutex> lock(m_arrowMutex);
+        m_arrowCV.wait(lock, stopToken, [this] { return m_arrowHeldDown; });
+
+        if (stopToken.stop_requested()) break;
+
+        if (m_arrowCV.wait_for(lock, std::chrono::milliseconds(500),
+                               [this]() { return !m_arrowHeldDown; })) {
+            continue;
+        }
+
+        while (m_arrowHeldDown && !stopToken.stop_requested()) {
+            m_triggerArrowEvent.store(true);
+            m_arrowCV.wait_for(lock, std::chrono::milliseconds(100),
+                               [this]() { return !m_arrowHeldDown; });
+        }
+    }
+}
+
+void DixConsole::arrowUpImpl(std::stop_token stopToken) {
+    while (!stopToken.stop_requested()) {
+        std::unique_lock<std::mutex> lock(m_arrowMutex);
+        m_arrowCV.wait(lock, stopToken, [this] { return m_arrowHeldUp; });
+
+        if (stopToken.stop_requested()) break;
+
+        if (m_arrowCV.wait_for(lock, std::chrono::milliseconds(500),
+                               [this]() { return !m_arrowHeldUp; })) {
+            continue;
+        }
+
+        while (m_arrowHeldUp && !stopToken.stop_requested()) {
+            m_triggerArrowEvent.store(true);
+            m_arrowCV.wait_for(lock, std::chrono::milliseconds(100),
+                               [this]() { return !m_arrowHeldUp; });
+        }
+    }
+}
+
+void DixConsole::arrowUpPressed(bool isOtherArrowPressed) {
+    if (!isOtherArrowPressed) {
+        // if (!m_inputHistory.empty() && m_inputHistoryIndex <
+        // m_inputHistory.size()) {
+        //     m_inputBuffer = m_inputHistoryIndex++;
+        // }
+        m_arrow = 'u';
+        {
+            std::lock_guard lock(m_arrowMutex);
+            m_triggerArrowEvent.store(true);
+            m_arrowHeldUp = true;
+            m_arrowCV.notify_all();
+        }
+    }
+}
+
+void DixConsole::arrowUpRealeased() {
+    {
+        std::lock_guard lock(m_arrowMutex);
+        m_arrowHeldUp = false;
+        m_arrowCV.notify_all();
+    }
+}
+
+void DixConsole::fillFromClipboard(const std::string& str) {
+    m_inputBuffer += str;
 }
 
 // void DixConsole::arrowDown() {

@@ -28,7 +28,8 @@
 // };
 
 // using BouncyBouncyParticleRenderSystemBindings = std::tuple<
-//     UniformBinding<BouncyBouncyParticleUbo, 0, vk::ShaderStageFlagBits::eVertex> >;
+//     UniformBinding<BouncyBouncyParticleUbo, 0,
+//     vk::ShaderStageFlagBits::eVertex> >;
 
 // class BouncyBouncyParticleRenderSystem
 //     : public DixRenderSystem,
@@ -42,13 +43,15 @@
 //                                vk::DescriptorSetLayout modelSetLayout);
 //     ~BouncyBouncyParticleRenderSystem() override = default;
 
-//     static constexpr const char* Name() { return "BouncyBouncyParticleRenderSystem"; }
+//     static constexpr const char* Name() { return
+//     "BouncyBouncyParticleRenderSystem"; }
 
 //     DIX_DISABLE_COPY(BouncyBouncyParticleRenderSystem)
 
 //     // BouncyBouncyParticle management
 //     void updateBouncyParticles(float deltaTime);
-//     GameObject createBouncyParticleEmitter(glm::vec3 position, uint32_t count);
+//     GameObject createBouncyParticleEmitter(glm::vec3 position, uint32_t
+//     count);
 
 //     // Dispatches the compute shader. Call outside a render pass.
 //     void dispatchCompute(vk::CommandBuffer commandBuffer) override;
@@ -116,9 +119,10 @@ class BouncyParticleRenderSystem
    public:
     using PushConstantData = BouncyParticlePushConstantData;
 
-    BouncyParticleRenderSystem(EngineDevice& engineDevice, vk::RenderPass renderPass,
-                         vk::DescriptorSetLayout globalSetLayout,
-                         vk::DescriptorSetLayout modelSetLayout);
+    BouncyParticleRenderSystem(EngineDevice& engineDevice,
+                               vk::RenderPass renderPass,
+                               vk::DescriptorSetLayout globalSetLayout,
+                               vk::DescriptorSetLayout modelSetLayout);
     ~BouncyParticleRenderSystem() override = default;
 
     static constexpr const char* Name() { return "BouncyParticleRenderSystem"; }
@@ -129,14 +133,18 @@ class BouncyParticleRenderSystem
     void updateBouncyParticles(
         float deltaTime,
         const std::vector<std::shared_ptr<ParticleEmitter>>& particleEmitters);
-    std::shared_ptr<ParticleEmitter> createBouncyParticleEmitter(glm::vec3 position,
-                                                           uint32_t count);
+    std::shared_ptr<ParticleEmitter> createBouncyParticleEmitter(
+        glm::vec3 position, uint32_t count);
 
     // Dispatches the compute shader. Call outside a render pass.
-    void dispatchCompute(vk::CommandBuffer commandBuffer, std::vector<std::shared_ptr<GameObject>>& obj) override;
-                               void renderGameObjects(FrameInfo& frameInfo,
-                           std::vector<std::shared_ptr<GameObject>>& gameObjects) override;
+    void dispatchCompute(
+        vk::CommandBuffer commandBuffer,
+        std::vector<std::shared_ptr<GameObject>>& obj) override;
+    void renderGameObjects(
+        FrameInfo& frameInfo,
+        std::vector<std::shared_ptr<GameObject>>& gameObjects) override;
     static constexpr size_t MAX_PARTICLE_EMITTERS = 100;
+
    protected:
     // Writes m_particleBuffer and m_simulationParamsBuffer into
     // the compute descriptor set allocated by the base class.
@@ -144,7 +152,7 @@ class BouncyParticleRenderSystem
 
    private:
     void bindBuffers(vk::CommandBuffer commandBuffer,
-                        std::shared_ptr<ParticleEmitter>& obj) const;
+                     std::shared_ptr<ParticleEmitter>& obj) const;
 };
 
 }  // namespace dix

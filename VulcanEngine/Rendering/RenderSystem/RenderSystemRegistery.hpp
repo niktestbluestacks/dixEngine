@@ -24,11 +24,12 @@ struct RenderSystemConstructInfo {
 
 template <typename RenderSystem>
     requires std::derived_from<RenderSystem, DixRenderSystem> &&
-             HasVKBuffers<RenderSystem> && is_tuple_v<typename RenderSystem::VKBuffers> &&
+             HasVKBuffers<RenderSystem> &&
+             is_tuple_v<typename RenderSystem::VKBuffers> &&
              HasName<RenderSystem> && HasVulkanFlags<RenderSystem>
 struct RenderSystemDescription {
     std::unique_ptr<RenderSystem> renderSystem =
-        nullptr;              // will be initialized later
+        nullptr;                        // will be initialized later
     RenderSystem::VKBuffers VKBuffers;  // good already
     const char* renderSystemName = RenderSystem::Name();
 };

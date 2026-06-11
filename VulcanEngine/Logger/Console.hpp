@@ -16,7 +16,6 @@
 #include <thread>
 #include <tuple>
 
-
 namespace dix {
 
 template <typename... Args>
@@ -61,11 +60,19 @@ class DixConsole {
     bool isVisible() const { return m_isVisible; }
 
     void addCharacter(char c);
+
     void backspace(bool isCtrlPressed);
     void backspaceRealeased();
+
     void enterCommand();
-    // void arrowUp();
-    // void arrowDown();
+
+    void fillFromClipboard(const std::string& str);
+
+    void arrowUpPressed(bool isOtherArrowPressed);
+    void arrowUpRealeased();
+
+    void arrowDownPressed(bool isOtherArrowPressed);
+    void arrowDownRealeased();
 
     const std::string& getInputBuffer() const { return m_inputBuffer; }
 
@@ -112,10 +119,10 @@ class DixConsole {
 
    private:
     DixConsole()
-        : m_backspaceHeld{false},
-          m_backspaceThread([this](std::stop_token stopToken) {
-              backspaceHeldImpl(stopToken);
-          }) {
+        : m_backspaceHeld{false}, m_arrowHeldDown{false}, m_arrowHeldUp{false} {
+        m_backspaceThread = std::jthread{&DixConsole::arrowDownImpl, this};
+        m_arrowUpThread = std::jthread{&DixConsole::arrowUpImpl, this};
+        m_arrowDownThread = std::jthread{&DixConsole::arrowDownImpl, this};
         fillInternalCommands();
     }
 
@@ -131,9 +138,19 @@ class DixConsole {
     glm::vec4 m_cornerPositions = {0.f, 100.f, 100.f, 100.f};
     glm::vec4 m_consoleColor{0.06f, 0.06f, 0.45f, 1.f};
     DixConsoleUI* m_consoleUI_ptr = nullptr;
-
     bool m_isVisible = false;
+
+    int m_inputHistoryIndex = 0;
     std::string m_inputBuffer;
+    std::deque<std::string> m_inputHistory;
+    std::jthread m_arrowUpThread;
+    std::jthread m_arrowDownThread;
+    std::condition_variable_any m_arrowCV;
+    std::mutex m_arrowMutex;
+    bool m_arrowHeldUp;
+    bool m_arrowHeldDown;
+    char m_arrow;
+    std::atomic_bool m_triggerArrowEvent;
 
     std::jthread m_backspaceThread;
     std::condition_variable_any m_backspaceCV;
@@ -144,6 +161,8 @@ class DixConsole {
     void executeCommandImpl(const std::vector<std::string>& args);
     void fillInternalCommands();
     void backspaceHeldImpl(std::stop_token stopToken);
+    void arrowUpImpl(std::stop_token stopToken);
+    void arrowDownImpl(std::stop_token stopToken);
 };
 
 }  // namespace dix

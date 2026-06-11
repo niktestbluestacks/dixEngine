@@ -91,6 +91,41 @@ void DixUIElement::loadFontAtlas(const std::string& path) {
     }
 }
 
+void DixUIElement::loadFontAtlasInverse(const std::string& path,
+                                        std::vector<unsigned char>& pixels) {
+    // Minimal uncompressed TGA loader (assumes type 2, true-color)
+    std::ifstream in(toModelPath(path), std::ios::binary);
+    if (!in.is_open()) throw std::runtime_error("failed to open font tga");
+    unsigned char header[18];
+    in.read(reinterpret_cast<char*>(header), 18);
+    if (!in) throw std::runtime_error("failed to read tga header");
+    uint16_t width = header[12] | (header[13] << 8);
+    uint16_t height = header[14] | (header[15] << 8);
+    unsigned char depth = header[16];
+    unsigned char type = header[2];
+    if (type != 2) throw std::runtime_error("unsupported tga type");
+    int channels = depth / 8;
+    size_t rawSize = static_cast<size_t>(width) * height * channels;
+    std::vector<unsigned char> raw(rawSize);
+    in.read(reinterpret_cast<char*>(raw.data()), rawSize);
+    if (!in) throw std::runtime_error("failed to read tga image data");
+
+    // convert to RGBA
+    m_fontWidth = width;
+    m_fontHeight = height;
+    m_fontPixels.resize(static_cast<size_t>(width) * height * 4);
+    for (size_t i = 0; i < static_cast<size_t>(width) * height; ++i) {
+        unsigned char b = raw[i * channels + 0];
+        unsigned char g = raw[i * channels + 1];
+        unsigned char r = raw[i * channels + 2];
+        unsigned char a = (channels >= 4) ? raw[i * channels + 3] : 255;
+        m_fontPixels[i * 4 + 0] = r;
+        m_fontPixels[i * 4 + 1] = g;
+        m_fontPixels[i * 4 + 2] = b;
+        m_fontPixels[i * 4 + 3] = 255 - a;
+    }
+}
+
 void DixUIElement::update(float dt, const AdditionalUIInfo& additionalInfo) {
     // default implementation does nothing
 }
@@ -133,7 +168,8 @@ void DixUIElement::render(FrameInfo& fi) {
     fi.commandBuffer.draw(m_vertexCount, 1, 0, 0);
 }
 
-void DixUIElement::buildVerticesForText(const std::string& text, const glm::vec4& color) {
+void DixUIElement::buildVerticesForText(const std::string& text,
+                                        const glm::vec4& color) {
     std::vector<DixUIVert> verts;
     float x = 8.f;
     float y = 8.f;

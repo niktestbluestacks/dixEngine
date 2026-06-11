@@ -3,6 +3,7 @@
 
 // dix
 #include <UI/DixUIElement.hpp>
+#include <Utils/Converter.hpp>
 
 // std
 #include <deque>

@@ -53,6 +53,8 @@ class DixUIElement {
    protected:
     virtual void loadFontTxt(const std::string& path);
     virtual void loadFontAtlas(const std::string& path);
+    void loadFontAtlasInverse(const std::string& path,
+                              std::vector<unsigned char>& pixels);
 
    public:
     virtual void update(float dt, const AdditionalUIInfo& additionalInfo);
@@ -62,9 +64,15 @@ class DixUIElement {
     virtual void upload(FrameInfo& fi);
 
    protected:
-    void buildVerticesForText(const std::string& text, const glm::vec4& color = glm::vec4(1.f));
-    void buildVerticesForText(const std::string& text, float x, float y, const glm::vec4& color = glm::vec4(1.f));
-    void clearVertices() { m_vertexCount = 0; m_vertexStaging.clear(); }
+    void buildVerticesForText(const std::string& text,
+                              const glm::vec4& color = glm::vec4(1.f));
+
+    void buildVerticesForText(const std::string& text, float x, float y,
+                              const glm::vec4& color = glm::vec4(1.f));
+    void clearVertices() {
+        m_vertexCount = 0;
+        m_vertexStaging.clear();
+    }
 
    protected:
     UIRenderer& m_uiRenderer;

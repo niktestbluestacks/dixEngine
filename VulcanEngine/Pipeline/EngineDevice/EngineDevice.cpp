@@ -145,13 +145,15 @@ void EngineDevice::pickPhysicalDevice() {
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
     }
     if (enableValidationLayers) {
-        DixLogDebug("Device count: ");
+        DixLogDebug("Device count: {}", devices.size());
     }
 
     for (const auto& device : devices) {
-        if (isDeviceSuitable(device)) {
+        static int bestScore = 0;
+        auto score = rateDeviceSuitability(device);
+        if (bestScore < score) {
+            bestScore = score;
             physicalDevice = device;
-            break;
         }
     }
 
@@ -161,8 +163,30 @@ void EngineDevice::pickPhysicalDevice() {
 
     properties = physicalDevice.getProperties();
     if (enableValidationLayers) {
-        DixLogDebug("physical device: ", properties.deviceName);
+        DixLogDebug("physical device: {}", static_cast<std::string>(properties.deviceName));
     }
+}
+
+int EngineDevice::rateDeviceSuitability(vk::PhysicalDevice device) {
+    vk::PhysicalDeviceProperties deviceProperties = device.getProperties();
+    vk::PhysicalDeviceFeatures deviceFeatures = device.getFeatures();
+
+    int score = 0;
+
+    if (!deviceFeatures.geometryShader) {
+        return 0;
+    }
+
+    if (deviceProperties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu) {
+        score += 10000;
+    } else if (deviceProperties.deviceType ==
+               vk::PhysicalDeviceType::eIntegratedGpu) {
+        score += 999;
+    }
+
+    score += deviceProperties.limits.maxImageDimension2D;
+
+    return score;
 }
 
 void EngineDevice::createLogicalDevice() {

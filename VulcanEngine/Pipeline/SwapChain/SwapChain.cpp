@@ -35,6 +35,11 @@ void SwapChain::init() {
 }
 
 SwapChain::~SwapChain() {
+    for (auto frameBuffer : swapChainFramebuffers) {
+        device.device().destroyFramebuffer(frameBuffer);
+    }
+    swapChainFramebuffers.clear();
+
     for (auto imageView : swapChainImageViews) {
         device.device().destroyImageView(imageView);
     }
@@ -49,10 +54,6 @@ SwapChain::~SwapChain() {
         device.device().destroyImageView(depthImageViews[i]);
         device.device().destroyImage(depthImages[i]);
         device.device().freeMemory(depthImageMemorys[i]);
-    }
-
-    for (auto framebuffer : swapChainFramebuffers) {
-        device.device().destroyFramebuffer(framebuffer);
     }
 
     device.device().destroyRenderPass(renderPass);
@@ -109,9 +110,12 @@ vk::Result SwapChain::submitCommandBuffers(const vk::CommandBuffer* buffers,
         .setSwapchainCount(1)
         .setPSwapchains(&swapChain)
         .setPImageIndices(imageIndex);
-
-    auto result = device.presentQueue().presentKHR(presentInfo);
-
+    vk::Result result;
+    try {
+        result = device.presentQueue().presentKHR(presentInfo);
+    } catch (const vk::OutOfDateKHRError& e) {
+        throw e;
+    }
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 
     return result;
@@ -142,13 +146,13 @@ void SwapChain::createSwapChain() {
         .setImageUsage(vk::ImageUsageFlagBits::eColorAttachment);
 
     QueueFamilyIndices indices = device.findPhysicalQueueFamilies();
-    uint32_t queueFamilyIndices[] = {indices.graphicsFamily,
-                                     indices.presentFamily};
+    std::vector<uint32_t> queueFamilyIndices = {indices.graphicsFamily,
+                                                indices.presentFamily};
 
     if (indices.graphicsFamily != indices.presentFamily) {
         createInfo.setImageSharingMode(vk::SharingMode::eConcurrent)
             .setQueueFamilyIndexCount(2)
-            .setPQueueFamilyIndices(queueFamilyIndices);
+            .setPQueueFamilyIndices(queueFamilyIndices.data());
     } else {
         createInfo.setImageSharingMode(vk::SharingMode::eExclusive);
     }
@@ -361,13 +365,13 @@ vk::PresentModeKHR SwapChain::chooseSwapPresentMode(
         }
     }
 
-    // for (const auto& availablePresentMode : availablePresentModes) {
-    //     if (availablePresentMode == vk::PresentModeKHR::eImmediate) {
-    //         DixLogInfo("Present mode: Immediate");
-    //         return availablePresentMode;
-    //     }
-    // }
-    DixLogInfo("Present mode: V-Sync");
+    for (const auto& availablePresentMode : availablePresentModes) {
+        if (availablePresentMode == vk::PresentModeKHR::eFifo) {
+            DixLogInfo("Present mode: V-Sync");
+            return availablePresentMode;
+        }
+    }
+    DixLogInfo("Present mode: Immediate");
     return vk::PresentModeKHR::eFifo;
 }
 

@@ -5,7 +5,6 @@
 #include <chrono>
 #include <iostream>
 #include <sstream>
-
 #ifndef _WIN32
 #define localtime_s(tm_ptr, time_ptr) localtime_r(time_ptr, tm_ptr)
 #endif
@@ -46,7 +45,7 @@ void Logger::log(LogLevel level, const std::string message) {
             std::cerr << oss.str() << std::endl;
             break;
         case ERR:
-            std::cerr << oss.str() << "\n";
+            std::cerr << oss.str() << std::endl;
             // std::cerr << "The program had been running for " +
             // std::to_string(
             //     std::chrono::duration_cast<std::chrono::seconds>(

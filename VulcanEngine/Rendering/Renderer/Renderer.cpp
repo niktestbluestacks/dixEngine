@@ -23,7 +23,7 @@ void Renderer::recreateSwapChain(void) {
         extent = m_Window.getExtent();
         glfwWaitEvents();
     }
-    vkDeviceWaitIdle(m_dixDevice.device());
+    m_dixDevice.device().waitIdle();
     if (m_dixSwapChain == nullptr) {
         m_dixSwapChain = std::make_unique<SwapChain>(m_dixDevice, extent);
     } else {
@@ -74,8 +74,13 @@ int Renderer::getFrameIndex(void) const {
 vk::CommandBuffer Renderer::beginFrame(void) {
     assert(!m_isFrameStarted &&
            "Can't call begin frame while already in progress");
-    auto result = m_dixSwapChain->acquireNextImage(&m_currentImageIndex);
-
+    vk::Result result;
+    try {
+        result = m_dixSwapChain->acquireNextImage(&m_currentImageIndex);
+    } catch (const vk::OutOfDateKHRError& e) {
+        recreateSwapChain();
+        return nullptr;
+    }
     if (result == vk::Result::eErrorOutOfDateKHR) {
         recreateSwapChain();
         return nullptr;
@@ -107,8 +112,13 @@ void Renderer::endFrame(void) {
 
     commandBuffer.end();
 
-    auto result = m_dixSwapChain->submitCommandBuffers(&commandBuffer,
-                                                       &m_currentImageIndex);
+    vk::Result result;
+    try {
+        result = m_dixSwapChain->submitCommandBuffers(&commandBuffer,
+                                                      &m_currentImageIndex);
+    } catch (const vk::OutOfDateKHRError& e) {
+        recreateSwapChain();
+    }
     if (result == vk::Result::eErrorOutOfDateKHR ||
         result == vk::Result::eSuboptimalKHR || m_Window.wasWindowResized()) {
         m_Window.resetWindowResizedFlag();

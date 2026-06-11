@@ -33,7 +33,32 @@ class DixBuffer {
                                             vk::DeviceSize offset = 0);
     vk::Result invalidate(vk::DeviceSize size = VK_WHOLE_SIZE,
                           vk::DeviceSize offset = 0);
+    void CopyBuffer(DixBuffer& stagingBuffer, vk::DeviceSize size) {
+        vk::CommandBufferAllocateInfo allocInfo{};
+        allocInfo.setCommandPool(m_dixDevice.getCommandPool());
+        allocInfo.setLevel(vk::CommandBufferLevel::ePrimary);
+        allocInfo.setCommandBufferCount(1);
 
+        auto tempCmdBuffers = m_dixDevice.device().allocateCommandBuffers(allocInfo);
+        vk::CommandBuffer cmdBuf = tempCmdBuffers[0];
+
+        vk::CommandBufferBeginInfo beginInfo{};
+        beginInfo.setFlags(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+        cmdBuf.begin(beginInfo);
+
+        vk::BufferCopy copyRegion{};
+        copyRegion.setSize(size);
+        cmdBuf.copyBuffer(stagingBuffer.getBuffer(), this->getBuffer(), {copyRegion});
+
+        cmdBuf.end();
+
+        vk::SubmitInfo submitInfo{};
+        submitInfo.setCommandBufferCount(1).setPCommandBuffers(&cmdBuf);
+        m_dixDevice.graphicsQueue().submit({submitInfo}, nullptr);
+        m_dixDevice.graphicsQueue().waitIdle();
+
+        m_dixDevice.device().freeCommandBuffers(m_dixDevice.getCommandPool(), {cmdBuf});
+    }
     void writeToIndex(void* data, int index);
     vk::Result flushIndex(int index);
     vk::DescriptorBufferInfo descriptorInfoForIndex(int index);

@@ -92,6 +92,7 @@ class EngineDevice {
     }
 
    private:
+    int rateDeviceSuitability(vk::PhysicalDevice device);
     void createInstance();
     void setupDebugMessenger();
     void createSurface();

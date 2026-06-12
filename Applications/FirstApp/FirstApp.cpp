@@ -75,7 +75,7 @@ void FirstApp::run(void) {
         }
 
         float aspect = m_context->getAspectRatio();
-        dixcamera.setPerspectiveProjection(glm::radians(75.f), aspect, .1f,
+        dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f,
                                            100.f);
 
         // Record frame if recording
@@ -195,6 +195,13 @@ void FirstApp::loadUIElements(void) {
     consoleUIPtr->setHistoryRef(&console.getHistory());
     consoleUIPtr->setInputBufferCallback(
         [&console]() { return console.getInputBuffer(); });
+
+    m_context->getDixWindow().bindKey(
+        GLFW_KEY_F11, [&window = m_context->getDixWindow()]() {
+            static bool fullscreen = false;
+            window.setWindowMode(fullscreen = !fullscreen);
+        }
+    );
 
     m_context->getDixWindow().bindKey(
         GLFW_KEY_GRAVE_ACCENT, [&console]() { console.toggleConsole(); }, true);

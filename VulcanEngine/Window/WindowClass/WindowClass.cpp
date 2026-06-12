@@ -65,10 +65,15 @@ void Window::initWindow(void) {
     m_window =
         glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
 
+    m_monitor = glfwGetPrimaryMonitor();
+
+    m_mode = glfwGetVideoMode(m_monitor);
+
     glfwSetWindowUserPointer(m_window, this);
     glfwSetFramebufferSizeCallback(m_window, framebufferResizeCallback);
     glfwSetKeyCallback(m_window, keyCallback);
     glfwSetCharCallback(m_window, charCallback);
+    setWindowMode(false);
 }
 
 void Window::framebufferResizeCallback(GLFWwindow* window, int width,
@@ -78,6 +83,15 @@ void Window::framebufferResizeCallback(GLFWwindow* window, int width,
     dixWindow->m_framebufferResized = true;
     dixWindow->m_width = width;
     dixWindow->m_height = height;
+}
+
+void Window::setWindowMode(bool fullscreen) {
+    if (fullscreen) {
+        glfwSetWindowMonitor(m_window, m_monitor, 0, 0, m_mode->width,
+                             m_mode->height, m_mode->refreshRate);
+    } else {
+        glfwSetWindowMonitor(m_window, nullptr, 0, 30, m_width, m_height, 0);
+    }
 }
 
 void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,

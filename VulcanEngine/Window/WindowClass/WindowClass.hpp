@@ -76,7 +76,7 @@ class Window {
     void setCharCallback(std::function<void(char)> callback);
     void setInputMode(int key, int mode);
     void getCursorPos(double* x, double* y);
-
+    void setWindowMode(bool fullscreen);
    private:
     int m_width;
     int m_height;
@@ -85,6 +85,8 @@ class Window {
 
     std::string m_title;
     GLFWwindow* m_window;
+    GLFWmonitor* m_monitor;
+    const GLFWvidmode* m_mode = nullptr;
     std::map<int, keyCallbacksType> m_keyBindings;
     std::function<void(char)> m_charCallback;
 };  // class Window

@@ -7,7 +7,7 @@ namespace dix {
 struct ParticleSimulationParams {
     alignas(16) glm::vec4 gravityDeltaTime{0.f, -.1f, 0.f, 0.f};
     alignas(16) glm::vec4 windDamping{0.f, 0.f, 0.f, .999f};
-    alignas(16) glm::vec4 particlesPosLife{0.f, 0.f, 0.f, 100.f};
+    alignas(16) glm::vec4 particlesPosLife{0.f, 0.f, 0.f, 1000.f};
 };
 
 class ParticleEmitter : public GameObject {

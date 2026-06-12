@@ -50,7 +50,7 @@ class ParticleRenderSystem
         float deltaTime,
         const std::vector<std::shared_ptr<ParticleEmitter>>& particleEmitters);
     std::shared_ptr<ParticleEmitter> createParticleEmitter(glm::vec3 position,
-                                                           uint32_t count);
+                                                           uint32_t count, glm::vec2 colorDist = glm::vec2{0.f, 1.f});
 
     // Dispatches the compute shader. Call outside a render pass.
     void dispatchCompute(

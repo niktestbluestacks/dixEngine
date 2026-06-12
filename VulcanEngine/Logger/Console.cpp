@@ -266,7 +266,7 @@ void DixConsole::arrowUpRealeased() {
 }
 
 void DixConsole::tabCommand() {
-    if (!m_inputBuffer.find(' ')) {
+    if (!m_inputBuffer.contains(' ')) {
         auto it = m_internalCommands.lower_bound(m_inputBuffer);
         if (it != m_internalCommands.end() &&
             it->first.starts_with(m_inputBuffer)) {
@@ -296,6 +296,9 @@ void DixConsole::tabCommand() {
         }
     } else {
         size_t space_pos = m_inputBuffer.find(' ');
+        if (space_pos == std::string::npos) {
+            return;
+        }
         std::string command(m_inputBuffer.data(),
                             (space_pos != std::string::npos)
                                 ? space_pos

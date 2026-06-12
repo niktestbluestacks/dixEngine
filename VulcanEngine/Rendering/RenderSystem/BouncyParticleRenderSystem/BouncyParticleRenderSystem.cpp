@@ -1,8 +1,8 @@
 // dix
+#include <Logger/Console.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Rendering/RenderSystem/BouncyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
-#include <Logger/Console.hpp>
 
 // std
 #include <cassert>
@@ -229,15 +229,17 @@ void BouncyParticleRenderSystem::updateBouncyParticles(
 
 std::shared_ptr<ParticleEmitter>
 BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
-                                                        uint32_t count) {
-       std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
+                                                        uint32_t count,
+                                                        glm::vec2 colorDist) {
+    std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
     vk::DeviceSize particleBufferSize =
         16 + sizeof(BouncyParticle) * ParticleEmitter::MAX_PARTICLES;
     obj->particleBuffer =
         std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
                                     vk::BufferUsageFlagBits::eStorageBuffer |
-                                        vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
+                                        vk::BufferUsageFlagBits::eVertexBuffer |
+                                        vk::BufferUsageFlagBits::eTransferDst,
                                     vk::MemoryPropertyFlagBits::eDeviceLocal);
 
     vk::Buffer stagingBuffer;
@@ -262,29 +264,22 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
 
     obj->transform.translation = position;
     if (obj->particleCount + count > ParticleEmitter::MAX_PARTICLES) {
-        count =
-            std::min(ParticleEmitter::MAX_PARTICLES, count);
+        count = std::min(ParticleEmitter::MAX_PARTICLES, count);
     }
 
     obj->simParams.particlesPosLife =
         glm::vec4(position, obj->simParams.particlesPosLife.w);
 
-    std::mt19937 gen{std::random_device{}()};
-    std::uniform_real_distribution<float> posDist(-0.5f, 0.5f);
-    std::uniform_real_distribution<float> velDist(-2.0f, 2.0f);
-    std::uniform_real_distribution<float> colDist(0.5f, 1.0f);
-
     // obj->particleBuffer->map();
 
-    auto* countPtr =
-        static_cast<uint32_t*>(stagingData);
+    auto* countPtr = static_cast<uint32_t*>(stagingData);
     *countPtr = count;
 
-    auto* particles =
-        reinterpret_cast<BouncyParticle*>(static_cast<uint8_t*>(stagingData) + 16);
+    auto* particles = reinterpret_cast<BouncyParticle*>(
+        static_cast<uint8_t*>(stagingData) + 16);
 
     const uint32_t NUM_THREADS =
-        std::min(4u, std::thread::hardware_concurrency());
+        std::max(4u, std::thread::hardware_concurrency());
     std::vector<std::jthread> threads;
     threads.reserve(NUM_THREADS);
 
@@ -300,22 +295,25 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
         uint32_t current_count = chunk_size + (t < remainder ? 1 : 0);
 
         threads.emplace_back([t, current_start, current_count, &position,
-                              particles, baseSeed, &obj, this]() {
+                              particles, baseSeed, &obj, colorDist, this]() {
             std::mt19937 gen{baseSeed + t};
             std::uniform_real_distribution<float> posDist(-0.5f, 0.5f);
             std::uniform_real_distribution<float> velDist(-2.0f, 2.0f);
-            std::uniform_real_distribution<float> colDist(0.5f, 1.0f);
+            std::uniform_real_distribution<float> colDist(colorDist.x,
+                                                          colorDist.y);
 
             for (uint32_t i = 0; i < current_count; ++i) {
                 uint32_t global_idx = current_start + i;
                 BouncyParticle& p = particles[global_idx];
-
                 p.positionLifetime =
-                    glm::vec4(position + glm::vec3(posDist(gen), posDist(gen),
-                                                   posDist(gen)),
+                    glm::vec4(position + glm::normalize(glm::vec3(posDist(gen), posDist(gen),
+                                                   posDist(gen))),
                               obj->simParams.particlesPosLife.w);
-                p.initVelocity =
-                    glm::vec3(velDist(gen), velDist(gen) * 0.5f, velDist(gen));
+                auto randomVel =
+                    glm::vec3{velDist(gen), velDist(gen), velDist(gen)};
+                // MAKES A SHPERE
+                randomVel = glm::normalize(randomVel);
+                p.initVelocity = randomVel;
                 p.velocitySize = glm::vec4(p.initVelocity, 3.f);
                 p.color =
                     glm::vec4(colDist(gen), colDist(gen), colDist(gen), 1.0f);

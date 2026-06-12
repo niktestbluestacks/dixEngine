@@ -50,6 +50,7 @@ void FirstApp::run(void) {
             std::chrono::duration<float, std::chrono::seconds::period>(
                 newTime - currentTime)
                 .count();
+        frameTime *= m_gameSpeed;
         currentTime = newTime;
 
         frameTime = glm::min(frameTime, MAX_FRAME_TIME);
@@ -457,6 +458,9 @@ void FirstApp::loadConsoleCommands(void) {
         std::function{[&](const std::vector<std::string>& arguments) {
             bool is_bouncy = false;
             bool to_clear = false;
+            bool is_color_dist = false;
+            glm::vec2 colorDist{0.f, 1.f};
+            std::array<bool, 2> distCleared{};
             glm::vec3 position{0.f, 0.f, 0.f};
             std::array<bool, 4> cleared{};
             int amount = 0;
@@ -480,6 +484,16 @@ void FirstApp::loadConsoleCommands(void) {
                                 }
                             }
                         } else if constexpr (std::is_same_v<T, float>) {
+                            if (is_color_dist) {
+                                if (!distCleared[0]) {
+                                    distCleared[0] = true;
+                                    colorDist.x = std::clamp(arg, 0.f, 1.f);
+                                } else {
+                                    distCleared[1] = true;
+                                    colorDist.y = std::clamp(arg, 0.f, 1.f);
+                                    is_color_dist = false;
+                                }
+                            }
                             if (!cleared[0]) {
                                 cleared[0] = true;
                                 position.x = arg;
@@ -509,6 +523,8 @@ void FirstApp::loadConsoleCommands(void) {
                                     bouncyParticleEmitters.end(),
                                     std::back_inserter(m_pendingDestruction));
                                 bouncyParticleEmitters.clear();
+                            } else if (arg == "--colordist") {
+                                is_color_dist = true;
                             }
                         }
                     },
@@ -520,16 +536,34 @@ void FirstApp::loadConsoleCommands(void) {
                         std::move(
                             m_context
                                 ->getRenderSystem<BouncyParticleRenderSystem>()
-                                .createBouncyParticleEmitter(position,
-                                                             amount)));
+                                .createBouncyParticleEmitter(position, amount,
+                                                             colorDist)));
                 } else {
                     m_gameObjects["ParticleRenderSystem"].push_back(std::move(
                         m_context->getRenderSystem<ParticleRenderSystem>()
-                            .createParticleEmitter(position, amount)));
+                            .createParticleEmitter(position, amount,
+                                                   colorDist)));
                 }
             }
         }},
-        {"--bouncy", "--clearall"});
+        {"--bouncy", "--clearall", "--colordist"});
+
+    console.register_function(
+        "gamespeed",
+        std::function([this](const std::vector<std::string>& arguments) {
+            for (auto& elem : arguments) {
+                auto result = string_to_num(elem);
+                std::visit(
+                    [&](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<T, float> || std::is_same_v<T, int>) {
+                            m_gameSpeed = arg;
+                        }
+                    },
+                    result);
+            }
+        }),
+        {});
 }
 
 }  // namespace dix

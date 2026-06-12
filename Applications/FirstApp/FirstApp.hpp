@@ -41,6 +41,7 @@ class FirstApp {
         std::make_unique<CurrentAppContext>(
             WIDTH, HEIGHT, static_cast<std::string>("First Application"))};
     std::vector<std::shared_ptr<GameObject>> m_pendingDestruction{};
+    float m_gameSpeed{1.f};
     bool m_recording = false;
     bool m_playing = false;
 };

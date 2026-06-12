@@ -76,7 +76,7 @@ void FirstApp::run(void) {
 
         float aspect = m_context->getAspectRatio();
         dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f,
-                                           100.f);
+                                           5000.f);
 
         // Record frame if recording
         if (m_recording) {
@@ -252,6 +252,9 @@ void FirstApp::loadUIElements(void) {
         }
     });
 
+    m_context->getDixWindow().bindKey(GLFW_KEY_TAB,
+                                      [&console]() { console.tabCommand(); });
+
     m_context->getDixWindow().setCharCallback([&console](char c) {
         if (console.isVisible() && c != '`') {
             console.addCharacter(c);
@@ -260,7 +263,9 @@ void FirstApp::loadUIElements(void) {
 
     console.logInfo("Console initialized");
 
-    m_context->getDixWindow().bindKey(GLFW_KEY_R, [this]() {
+    m_context->getDixWindow().bindKey(GLFW_KEY_R, [this, &console]() {
+        console.logError("This function is currently disabled");
+        return;
         static float keyCooldown = 0.f;
         static auto lastFrame = std::chrono::steady_clock::now();
         auto currentFrame = std::chrono::steady_clock::now();
@@ -286,7 +291,9 @@ void FirstApp::loadUIElements(void) {
         }
     });
 
-    m_context->getDixWindow().bindKey(GLFW_KEY_P, [this]() {
+    m_context->getDixWindow().bindKey(GLFW_KEY_P, [this, &console]() {
+        console.logError("This function is currently disabled");
+        return;
         static float keyCooldown = 0.f;
         static auto lastFrame = std::chrono::steady_clock::now();
         auto currentFrame = std::chrono::steady_clock::now();
@@ -298,6 +305,7 @@ void FirstApp::loadUIElements(void) {
         if (keyCooldown > 0.f) {
             return;
         }
+        m_context->device().device().waitIdle();
 
         if (!this->m_playing && !this->m_recording) {
             this->m_playing = true;
@@ -321,6 +329,8 @@ void FirstApp::loadConsoleCommands(void) {
     auto& console = CurrentConsole::getDixConsole();
     console.register_function(
         "play", std::function{[&]() {
+            console.logError("This function is currently disabled");
+            return;
             static float keyCooldown = 0.f;
             static auto lastFrame = std::chrono::steady_clock::now();
             auto currentFrame = std::chrono::steady_clock::now();
@@ -333,6 +343,8 @@ void FirstApp::loadConsoleCommands(void) {
             if (keyCooldown > 0.f) {
                 return;
             }
+
+            m_context->device().device().waitIdle();
 
             if (!this->m_playing && !this->m_recording) {
                 this->m_playing = true;
@@ -353,6 +365,8 @@ void FirstApp::loadConsoleCommands(void) {
 
     console.register_function(
         "record", std::function{[&]() {
+            console.logError("This function is currently disabled");
+            return;
             static float keyCooldown = 0.f;
             static auto lastFrame = std::chrono::steady_clock::now();
             auto currentFrame = std::chrono::steady_clock::now();
@@ -392,7 +406,7 @@ void FirstApp::loadConsoleCommands(void) {
                     [&](auto&& arg) {
                         using T = std::decay_t<decltype(arg)>;
                         if constexpr (std::is_same_v<std::string, T>) {
-                            if (arg == "help") {
+                            if (arg == "--help") {
                                 console.log(
                                     "help <-> you know\n"
                                     "resume <-> resumes\n"
@@ -404,21 +418,21 @@ void FirstApp::loadConsoleCommands(void) {
                                     "\tif float then in range of [0.0, 1.0]\n"
                                     "switch_to accepts name of song you want "
                                     "to change");
-                            } else if (arg == "resume") {
+                            } else if (arg == "--resume") {
                                 m_sounds["background_theme"].resume();
-                            } else if (arg == "pause") {
+                            } else if (arg == "--pause") {
                                 m_sounds["background_theme"].pause();
-                            } else if (arg == "stop") {
+                            } else if (arg == "--stop") {
                                 m_sounds["background_theme"].stop();
-                            } else if (arg == "play") {
+                            } else if (arg == "--play") {
                                 m_sounds["background_theme"].play(true);
                             } else if (isNextSoundName) {
                                 m_sounds["background_theme"] =
                                     DixAudio(toAudioPath(arg));
                                 m_sounds["background_theme"].play(true);
                             }
-                            isNextVolume = arg == "volume";
-                            isNextSoundName = arg == "switch_to";
+                            isNextVolume = arg == "--volume";
+                            isNextSoundName = arg == "--switch_to";
                         } else if constexpr (std::is_same_v<int, T>) {
                             if (isNextVolume) {
                                 isNextVolume = false;
@@ -434,7 +448,9 @@ void FirstApp::loadConsoleCommands(void) {
                     },
                     res);
             }
-        }));
+        }),
+        {"--help", "--resume", "--pause", "--stop", "--play", "--volume",
+         "--switch_to"});
 
     console.register_function(
         "particle_emitter",
@@ -512,7 +528,8 @@ void FirstApp::loadConsoleCommands(void) {
                             .createParticleEmitter(position, amount)));
                 }
             }
-        }});
+        }},
+        {"--bouncy", "--clearall"});
 }
 
 }  // namespace dix

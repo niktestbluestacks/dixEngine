@@ -265,21 +265,57 @@ void DixConsole::arrowUpRealeased() {
     }
 }
 
+void DixConsole::tabCommand() {
+    if (!m_inputBuffer.find(' ')) {
+        auto it = m_internalCommands.lower_bound(m_inputBuffer);
+        if (it != m_internalCommands.end() &&
+            it->first.starts_with(m_inputBuffer)) {
+            m_inputBuffer = it->first;
+            return;
+        } else {
+            it = m_commands.lower_bound(m_inputBuffer);
+            if (it != m_commands.end() &&
+                it->first.starts_with(m_inputBuffer)) {
+                m_inputBuffer = it->first;
+                return;
+            } else {
+                auto it = m_internalCommandsWithArgs.lower_bound(m_inputBuffer);
+                if (it != m_internalCommandsWithArgs.end() &&
+                    it->first.starts_with(m_inputBuffer)) {
+                    m_inputBuffer = it->first;
+                    return;
+                } else {
+                    it = m_commandsWithArgs.lower_bound(m_inputBuffer);
+                    if (it != m_commandsWithArgs.end() &&
+                        it->first.starts_with(m_inputBuffer)) {
+                        m_inputBuffer = it->first;
+                        return;
+                    }
+                }
+            }
+        }
+    } else {
+        size_t space_pos = m_inputBuffer.find(' ');
+        std::string command(m_inputBuffer.data(),
+                            (space_pos != std::string::npos)
+                                ? space_pos
+                                : m_inputBuffer.length());
+        size_t space_pos_last = m_inputBuffer.rfind(' ');
+        std::string flag(m_inputBuffer.data() + space_pos_last + sizeof(char));
+        if (m_commandsArgs.contains(command)) {
+            auto it = std::lower_bound(m_commandsArgs[command].begin(),
+                                       m_commandsArgs[command].end(), flag);
+            if (it != m_commandsArgs[command].end() && it->starts_with(flag)) {
+                m_inputBuffer.replace(space_pos_last + 1, std::string::npos,
+                                      *it);
+            }
+        }
+    }
+}
+
 void DixConsole::fillFromClipboard(const std::string& str) {
     m_inputBuffer += str;
 }
-
-// void DixConsole::arrowDown() {
-//     if (m_isVisible) {
-//         m_inputBuffer = m_history.back();
-//     }
-// }
-
-// void DixConsole::arrowUp() {
-//     if (m_isVisible) {
-//         m_inputBuffer = m_history.back();
-//     }
-// }
 
 void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
     switch (args.size()) {
@@ -364,34 +400,16 @@ void DixConsole::fillInternalCommands() {
     m_internalCommandsWithArgs["termcolor"] =
         [this](const std::vector<std::string>& arguments) {
             glm::vec4 newColor = m_consoleColor;
-            std::array<bool, 4> visited{};
-            int nextToFill = -1;
+            int nextToFill = 0;
             for (auto& elem : arguments) {
                 auto res = string_to_num(elem);
                 std::visit(
                     [&](auto&& arg) {
                         using T = std::decay_t<decltype(arg)>;
                         if constexpr (std::is_same_v<T, float>) {
-                            if (nextToFill == -1) {
-                                if (!visited[0]) {
-                                    visited[0] = true;
-                                    newColor[0] = std::clamp(arg, 0.f, 1.f);
-                                } else if (!visited[1]) {
-                                    visited[1] = true;
-                                    newColor[1] = std::clamp(arg, 0.f, 1.f);
-                                } else if (!visited[2]) {
-                                    visited[2] = true;
-                                    newColor[2] = std::clamp(arg, 0.f, 1.f);
-                                } else if (!visited[3]) {
-                                    visited[3] = true;
-                                    newColor[3] = std::clamp(arg, 0.f, 1.f);
-                                } else
-                                    return;
-                            } else {
-                                visited[nextToFill] = true;
+                            if (nextToFill < 4) {
                                 newColor[nextToFill] =
                                     std::clamp(arg, 0.f, 1.f);
-                                nextToFill = -1;
                             }
                         } else if constexpr (std::is_same_v<T, std::string>) {
                             if (arg == "--red") {
@@ -403,13 +421,20 @@ void DixConsole::fillInternalCommands() {
                             } else if (arg == "--alpha") {
                                 nextToFill = 3;
                             }
+                        } else if constexpr (std::is_same_v<T, int>) {
+                            if (nextToFill < 4) {
+                                newColor[nextToFill] = std::clamp(
+                                    static_cast<float>(arg) / 255.f, 0.f, 1.f);
+                            }
                         }
                     },
                     res);
             }
             m_consoleColor = newColor;
         };
-
+    m_commandsArgs["termcolor"] = {"--red", "--green", "--blue", "--alpha"};
+    std::sort(m_commandsArgs["termcolor"].begin(),
+              m_commandsArgs["termcolor"].end());
     m_internalCommandsWithArgs["echo"] = [this](const std::vector<std::string>&
                                                     arguments) {
         enum class FLAGS { Log, Debug, Info, Warn, Err };

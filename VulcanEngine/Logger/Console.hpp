@@ -11,6 +11,7 @@
 #include <condition_variable>
 #include <deque>
 #include <functional>
+#include <map>
 #include <mutex>
 #include <stop_token>
 #include <thread>
@@ -19,8 +20,10 @@
 namespace dix {
 
 template <typename... Args>
-using DixCommandInputType =
-    std::pair<std::string, std::function<void(Args...)>>;
+struct DixCommandInputType
+    : public std::pair<std::string, std::function<void(Args...)>> {
+    std::vector<std::string> flags;
+};
 
 class DixConsole {
    public:
@@ -74,6 +77,8 @@ class DixConsole {
     void arrowDownPressed(bool isOtherArrowPressed);
     void arrowDownRealeased();
 
+    void tabCommand();
+
     const std::string& getInputBuffer() const { return m_inputBuffer; }
 
     void register_function(const std::string& name,
@@ -83,6 +88,7 @@ class DixConsole {
                                      " already exists!");
         }
         m_commands[name] = func;
+        m_commandsArgs[name] = {};
     }
 
     void register_function(DixCommandInputType<>& command) {
@@ -92,17 +98,21 @@ class DixConsole {
                                      " already exists!");
         }
         m_commands[command.first] = command.second;
+        m_commandsArgs[command.first] = {};
     }
 
     void register_function(
         const std::string& name,
-        std::function<void(const std::vector<std::string>&)> func) {
+        std::function<void(const std::vector<std::string>&)> func,
+        const std::vector<std::string>& flags) {
         if (m_internalCommandsWithArgs.contains(name) ||
             m_commandsWithArgs.contains(name)) {
             throw std::runtime_error("The command with name " + name +
                                      " already exists!");
         }
         m_commandsWithArgs[name] = func;
+        m_commandsArgs[name] = flags;
+        std::sort(m_commandsArgs[name].begin(), m_commandsArgs[name].end());
     }
 
     void register_function(
@@ -113,6 +123,9 @@ class DixConsole {
                                      " already exists!");
         }
         m_commandsWithArgs[command.first] = command.second;
+        m_commandsArgs[command.first] = command.flags;
+        std::sort(m_commandsArgs[command.first].begin(),
+                  m_commandsArgs[command.first].end());
     }
 
     static constexpr size_t MAX_HISTORY_SIZE = DixConsoleUI::LINES_TO_DISPLAY;
@@ -127,14 +140,14 @@ class DixConsole {
     }
 
     std::deque<std::string> m_history;
-    std::unordered_map<std::string, std::function<void()>> m_commands;
-    std::unordered_map<std::string,
-                       std::function<void(const std::vector<std::string>&)>>
+    std::map<std::string, std::function<void()>> m_commands;
+    std::map<std::string, std::function<void(const std::vector<std::string>&)>>
         m_commandsWithArgs;
-    std::unordered_map<std::string, std::function<void()>> m_internalCommands;
-    std::unordered_map<std::string,
-                       std::function<void(const std::vector<std::string>&)>>
+    std::map<std::string, std::function<void()>> m_internalCommands;
+    std::map<std::string, std::function<void(const std::vector<std::string>&)>>
         m_internalCommandsWithArgs;
+
+    std::map<std::string, std::vector<std::string>> m_commandsArgs;
     glm::vec4 m_cornerPositions = {0.f, 100.f, 100.f, 100.f};
     glm::vec4 m_consoleColor{0.06f, 0.06f, 0.45f, 1.f};
     DixConsoleUI* m_consoleUI_ptr = nullptr;

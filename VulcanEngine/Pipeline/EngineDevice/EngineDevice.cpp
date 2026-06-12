@@ -163,7 +163,8 @@ void EngineDevice::pickPhysicalDevice() {
 
     properties = physicalDevice.getProperties();
     if (enableValidationLayers) {
-        DixLogDebug("physical device: {}", static_cast<std::string>(properties.deviceName));
+        DixLogDebug("physical device: {}",
+                    static_cast<std::string>(properties.deviceName));
     }
 }
 

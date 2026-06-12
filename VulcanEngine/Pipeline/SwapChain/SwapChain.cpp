@@ -358,12 +358,12 @@ vk::SurfaceFormatKHR SwapChain::chooseSwapSurfaceFormat(
 
 vk::PresentModeKHR SwapChain::chooseSwapPresentMode(
     const std::vector<vk::PresentModeKHR>& availablePresentModes) {
-    for (const auto& availablePresentMode : availablePresentModes) {
-        if (availablePresentMode == vk::PresentModeKHR::eFifoLatestReadyEXT) {
-            DixLogInfo("Present mode: Fifo latest ready ext");
-            return availablePresentMode;
-        }
-    }
+    // for (const auto& availablePresentMode : availablePresentModes) {
+    //     if (availablePresentMode == vk::PresentModeKHR::eFifoLatestReadyEXT) {
+    //         DixLogInfo("Present mode: Fifo latest ready ext");
+    //         return availablePresentMode;
+    //     }
+    // }
 
     for (const auto& availablePresentMode : availablePresentModes) {
         if (availablePresentMode == vk::PresentModeKHR::eFifo) {

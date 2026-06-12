@@ -75,7 +75,7 @@ void FirstApp::run(void) {
         }
 
         float aspect = m_context->getAspectRatio();
-        dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f,
+        dixcamera.setPerspectiveProjection(glm::radians(75.f), aspect, .1f,
                                            100.f);
 
         // Record frame if recording
@@ -131,7 +131,8 @@ void FirstApp::loadGameObjects() {
         gameObj.model = dixModel;
         gameObj.transform.translation = {dist(gen), dist(gen), dist(gen)};
         gameObj.transform.scale = {1.f, 1.f, 1.f};
-        m_gameObjects["SimpleRenderSystem"].push_back(std::move(std::make_unique<GameObject>(gameObj)));
+        m_gameObjects["SimpleRenderSystem"].push_back(
+            std::move(std::make_unique<GameObject>(gameObj)));
     }
 
     // skybox
@@ -145,7 +146,8 @@ void FirstApp::loadGameObjects() {
     auto Skybox = GameObject::createGameObject();
     Skybox.model = dixModel;
     dixModel.reset();
-    m_gameObjects["SkyboxRenderSystem"].push_back(std::move(std::make_unique<GameObject>(Skybox)));
+    m_gameObjects["SkyboxRenderSystem"].push_back(
+        std::move(std::make_unique<GameObject>(Skybox)));
 }
 
 void FirstApp::loadUIElements(void) {
@@ -208,27 +210,32 @@ void FirstApp::loadUIElements(void) {
         false, nullptr, [&console]() { console.backspaceRealeased(); });
 
     m_context->getDixWindow().bindKeyUnUsual(
-        GLFW_KEY_UP, [&console, &window = m_context->getDixWindow()]() {
+        GLFW_KEY_UP,
+        [&console, &window = m_context->getDixWindow()]() {
             console.arrowUpPressed(window.isKeyPressedUnUsual(GLFW_KEY_DOWN));
-        }, nullptr, [&console, &window = m_context->getDixWindow()]() {
+        },
+        nullptr,
+        [&console, &window = m_context->getDixWindow()]() {
             console.arrowUpRealeased();
-        }
-    );
+        });
 
     m_context->getDixWindow().bindKeyUnUsual(
-        GLFW_KEY_DOWN, [&console, &window = m_context->getDixWindow()]() {
+        GLFW_KEY_DOWN,
+        [&console, &window = m_context->getDixWindow()]() {
             console.arrowDownPressed(window.isKeyPressedUnUsual(GLFW_KEY_UP));
-        }, nullptr, [&console, &window = m_context->getDixWindow()]() {
+        },
+        nullptr,
+        [&console, &window = m_context->getDixWindow()]() {
             console.arrowDownRealeased();
-        }
-    );
+        });
 
-    m_context->getDixWindow().bindKeyUnUsual(GLFW_KEY_V, [&console, &window = m_context->getDixWindow()]() {
-        if (window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL)) {
-            console.fillFromClipboard(std::string(window.getClipboardText()));
-        }
-    }
-    );
+    m_context->getDixWindow().bindKeyUnUsual(
+        GLFW_KEY_V, [&console, &window = m_context->getDixWindow()]() {
+            if (window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL)) {
+                console.fillFromClipboard(
+                    std::string(window.getClipboardText()));
+            }
+        });
 
     m_context->getDixWindow().bindKey(GLFW_KEY_ENTER, [&console]() {
         if (console.isVisible()) {
@@ -248,8 +255,7 @@ void FirstApp::loadUIElements(void) {
         static float keyCooldown = 0.f;
         static auto lastFrame = std::chrono::steady_clock::now();
         auto currentFrame = std::chrono::steady_clock::now();
-        float frameTime =
-            (currentFrame - lastFrame) / std::chrono::seconds(1);
+        float frameTime = (currentFrame - lastFrame) / std::chrono::seconds(1);
         lastFrame = currentFrame;
 
         keyCooldown -= frameTime;
@@ -275,8 +281,7 @@ void FirstApp::loadUIElements(void) {
         static float keyCooldown = 0.f;
         static auto lastFrame = std::chrono::steady_clock::now();
         auto currentFrame = std::chrono::steady_clock::now();
-        float frameTime =
-            (currentFrame - lastFrame) / std::chrono::seconds(1);
+        float frameTime = (currentFrame - lastFrame) / std::chrono::seconds(1);
         lastFrame = currentFrame;
 
         keyCooldown -= frameTime;
@@ -310,8 +315,8 @@ void FirstApp::loadConsoleCommands(void) {
             static float keyCooldown = 0.f;
             static auto lastFrame = std::chrono::steady_clock::now();
             auto currentFrame = std::chrono::steady_clock::now();
-            float frameTime = (currentFrame - lastFrame) /
-                              std::chrono::seconds(1);
+            float frameTime =
+                (currentFrame - lastFrame) / std::chrono::seconds(1);
             lastFrame = currentFrame;
 
             keyCooldown -= frameTime;
@@ -342,8 +347,8 @@ void FirstApp::loadConsoleCommands(void) {
             static float keyCooldown = 0.f;
             static auto lastFrame = std::chrono::steady_clock::now();
             auto currentFrame = std::chrono::steady_clock::now();
-            float frameTime = (currentFrame - lastFrame) /
-                              std::chrono::seconds(1);
+            float frameTime =
+                (currentFrame - lastFrame) / std::chrono::seconds(1);
             lastFrame = currentFrame;
 
             keyCooldown -= frameTime;
@@ -366,7 +371,8 @@ void FirstApp::loadConsoleCommands(void) {
         }});
 
     console.register_function(
-        "background_theme", std::function([&](const std::vector<std::string>& arguments) {
+        "background_theme",
+        std::function([&](const std::vector<std::string>& arguments) {
             auto volume = m_sounds["background_theme"].getVolume();
             bool play = m_sounds["background_theme"].isPlaying();
             bool isNextVolume = false;
@@ -439,6 +445,15 @@ void FirstApp::loadConsoleCommands(void) {
                             if (!cleared[3]) {
                                 cleared[3] = true;
                                 amount = arg;
+                                if (arg > ParticleEmitter::MAX_PARTICLES) {
+                                    console.logWarn(
+                                        "You are creating too much particles!\n"
+                                        "Maximum amount per emitter: " +
+                                        std::to_string(
+                                            ParticleEmitter::MAX_PARTICLES) +
+                                        ".\nThe amount had been limited to "
+                                        "that.");
+                                }
                             }
                         } else if constexpr (std::is_same_v<T, float>) {
                             if (!cleared[0]) {

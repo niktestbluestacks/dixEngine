@@ -2,6 +2,7 @@
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Rendering/RenderSystem/BouncyParticleRenderSystem/BouncyParticleRenderSystem.hpp>
 #include <Utils/Converter.hpp>
+#include <Logger/Console.hpp>
 
 // std
 #include <cassert>
@@ -231,40 +232,40 @@ void BouncyParticleRenderSystem::updateBouncyParticles(
 std::shared_ptr<ParticleEmitter>
 BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
                                                         uint32_t count) {
-    std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
-    // 1. BouncyParticle storage buffer  [uint32_t count | BouncyParticle × MAX]
+       std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
+    // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
     vk::DeviceSize particleBufferSize =
         16 + sizeof(BouncyParticle) * ParticleEmitter::MAX_PARTICLES;
-    obj->particleBuffer = std::make_unique<DixBuffer>(
-        m_dixDevice, particleBufferSize, 1,
-        vk::BufferUsageFlagBits::eStorageBuffer |
-            vk::BufferUsageFlagBits::eVertexBuffer,
-        vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCoherent);
-    obj->particleBuffer->map();
+    obj->particleBuffer =
+        std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
+                                    vk::BufferUsageFlagBits::eStorageBuffer |
+                                        vk::BufferUsageFlagBits::eVertexBuffer,
+                                    vk::MemoryPropertyFlagBits::eDeviceLocal);
+
+    vk::Buffer stagingBuffer;
+    vk::DeviceMemory stagingBufferMemory;
+    m_dixDevice.createBuffer(particleBufferSize,
+                             vk::BufferUsageFlagBits::eTransferSrc,
+                             vk::MemoryPropertyFlagBits::eHostVisible |
+                                 vk::MemoryPropertyFlagBits::eHostCoherent,
+                             stagingBuffer, stagingBufferMemory);
+
+    void* stagingData;
+    auto res = m_dixDevice.device().mapMemory(
+        stagingBufferMemory, 0, particleBufferSize, {}, &stagingData);
+    if (res != vk::Result::eSuccess) {
+        auto& console = DixConsole::getDixConsole();
+        console.logError("Failed to create particle emitter!");
+        m_dixDevice.device().unmapMemory(stagingBufferMemory);
+        return nullptr;
+    }
     uint32_t zeroCount = 0;
-    obj->particleBuffer->writeToBuffer(&zeroCount, sizeof(uint32_t));
-    obj->particleBuffer->unmap();
+    *static_cast<uint32_t*>(stagingData) = 0;
 
-    // 2. Simulation params UBO
-    obj->simulationParamsBuffer = std::make_unique<DixBuffer>(
-        m_dixDevice, sizeof(ParticleSimulationParams), 1,
-        vk::BufferUsageFlagBits::eUniformBuffer,
-        vk::MemoryPropertyFlagBits::eHostVisible |
-            vk::MemoryPropertyFlagBits::eHostCoherent);
-    obj->simParams.gravityDeltaTime.w = 0.016f;
-    obj->simulationParamsBuffer->map();
-    obj->simulationParamsBuffer->writeToBuffer(
-        &obj->simParams, sizeof(ParticleSimulationParams));
-    obj->simulationParamsBuffer->unmap();
-
-    // 3. Write the compute descriptor set now that both buffers exist.
-    //    The base constructor already created the layout, pipeline, and pool.
-    buildComputeDescriptors(*obj);
     obj->transform.translation = position;
     if (obj->particleCount + count > ParticleEmitter::MAX_PARTICLES) {
         count =
-            std::max(ParticleEmitter::MAX_PARTICLES - obj->particleCount, 0u);
+            std::min(ParticleEmitter::MAX_PARTICLES, count);
     }
     if (count == 0) return std::move(obj);
 
@@ -276,14 +277,14 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
     std::uniform_real_distribution<float> velDist(-2.0f, 2.0f);
     std::uniform_real_distribution<float> colDist(0.5f, 1.0f);
 
-    obj->particleBuffer->map();
+    // obj->particleBuffer->map();
 
     auto* countPtr =
-        static_cast<uint32_t*>(obj->particleBuffer->getMappedMemory());
-    *countPtr = obj->particleCount + count;
+        static_cast<uint32_t*>(stagingData);
+    *countPtr = count;
 
-    auto* particles = reinterpret_cast<BouncyParticle*>(
-        static_cast<uint8_t*>(obj->particleBuffer->getMappedMemory()) + 16);
+    auto* particles =
+        reinterpret_cast<BouncyParticle*>(static_cast<uint8_t*>(stagingData) + 16);
 
     const uint32_t NUM_THREADS =
         std::min(4u, std::thread::hardware_concurrency());
@@ -330,8 +331,30 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
     }
     threads.clear();
 
-    obj->particleBuffer->unmap();
+    m_dixDevice.device().unmapMemory(stagingBufferMemory);
+
+    m_dixDevice.copyBuffer(stagingBuffer, obj->particleBuffer->getBuffer(),
+                           particleBufferSize);
+    m_dixDevice.device().destroyBuffer(stagingBuffer);
+    m_dixDevice.device().freeMemory(stagingBufferMemory);
+
     obj->particleCount += count;
+
+    // 2. Simulation params UBO
+    obj->simulationParamsBuffer = std::make_unique<DixBuffer>(
+        m_dixDevice, sizeof(ParticleSimulationParams), 1,
+        vk::BufferUsageFlagBits::eUniformBuffer,
+        vk::MemoryPropertyFlagBits::eHostVisible |
+            vk::MemoryPropertyFlagBits::eHostCoherent);
+    obj->simParams.gravityDeltaTime.w = 0.016f;
+    obj->simulationParamsBuffer->map();
+    obj->simulationParamsBuffer->writeToBuffer(
+        &obj->simParams, sizeof(ParticleSimulationParams));
+    obj->simulationParamsBuffer->unmap();
+
+    // 3. Write the compute descriptor set now that both buffers exist.
+    //    The base constructor already created the layout, pipeline, and pool.
+    buildComputeDescriptors(*obj);
 
     return obj;
 }

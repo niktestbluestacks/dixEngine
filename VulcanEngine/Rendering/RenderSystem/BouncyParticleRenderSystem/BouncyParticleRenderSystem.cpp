@@ -103,7 +103,6 @@ void BouncyParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
 }
 
 // dispatchCompute  (overrides base no-op)
-//
 // Dispatches the particle simulation compute shader, then
 // inserts a compute → vertex/shader memory barrier so the
 // GPU sees the updated SSBO contents during the subsequent
@@ -115,7 +114,6 @@ void BouncyParticleRenderSystem::dispatchCompute(
     for (auto& unObject : gameObjects) {
         decltype(auto) obj =
             std::static_pointer_cast<ParticleEmitter>(unObject);
-        if (obj->particleCount == 0 || !hasComputePipeline()) continue;
 
         m_computePipeline->bind(commandBuffer);
 
@@ -239,7 +237,7 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
     obj->particleBuffer =
         std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
                                     vk::BufferUsageFlagBits::eStorageBuffer |
-                                        vk::BufferUsageFlagBits::eVertexBuffer,
+                                        vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
                                     vk::MemoryPropertyFlagBits::eDeviceLocal);
 
     vk::Buffer stagingBuffer;
@@ -267,7 +265,6 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
         count =
             std::min(ParticleEmitter::MAX_PARTICLES, count);
     }
-    if (count == 0) return std::move(obj);
 
     obj->simParams.particlesPosLife =
         glm::vec4(position, obj->simParams.particlesPosLife.w);
@@ -301,7 +298,6 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
 
     for (uint32_t t = 0; t < NUM_THREADS; ++t) {
         uint32_t current_count = chunk_size + (t < remainder ? 1 : 0);
-        if (current_count == 0) continue;
 
         threads.emplace_back([t, current_start, current_count, &position,
                               particles, baseSeed, &obj, this]() {

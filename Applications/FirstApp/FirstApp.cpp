@@ -89,7 +89,6 @@ void FirstApp::run(void) {
             recorder.recordFrame(m_gameObjects, playerPosition, playerLookAt,
                                  frameTime);
         }
-
         try {
             m_context->drawFrame(dixcamera, frameTime, m_gameObjects,
                                  playerPosition);
@@ -97,8 +96,12 @@ void FirstApp::run(void) {
             DixLogErr("Render error: {}", e.what());
             break;
         }
+        if (!m_pendingDestruction.empty()) {
+            m_context->device().device().waitIdle();
+            m_pendingDestruction.clear();
+        }
     }
-
+    m_context->device().device().waitIdle();
     // Stop recording if app closes while recording
     if (m_recording) {
         getFrameRecorder().stopRecording();
@@ -200,13 +203,12 @@ void FirstApp::loadUIElements(void) {
         GLFW_KEY_F11, [&window = m_context->getDixWindow()]() {
             static bool fullscreen = false;
             window.setWindowMode(fullscreen = !fullscreen);
-        }
-    );
+        });
 
     m_context->getDixWindow().bindKey(
         GLFW_KEY_GRAVE_ACCENT, [&console]() { console.toggleConsole(); }, true);
 
-    m_context->getDixWindow().bindKey(
+    m_context->getDixWindow().bindKeyUnUsual(
         GLFW_KEY_BACKSPACE,
         [&console, &window = m_context->getDixWindow()]() {
             if (console.isVisible()) {
@@ -214,7 +216,7 @@ void FirstApp::loadUIElements(void) {
                     window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL));
             }
         },
-        false, nullptr, [&console]() { console.backspaceRealeased(); });
+        nullptr, [&console]() { console.backspaceRealeased(); });
 
     m_context->getDixWindow().bindKeyUnUsual(
         GLFW_KEY_UP,
@@ -437,10 +439,9 @@ void FirstApp::loadConsoleCommands(void) {
     console.register_function(
         "particle_emitter",
         std::function{[&](const std::vector<std::string>& arguments) {
-            std::string flag{"--bouncy"};
-
             bool is_bouncy = false;
-            glm::vec3 position{0.f};
+            bool to_clear = false;
+            glm::vec3 position{0.f, 0.f, 0.f};
             std::array<bool, 4> cleared{};
             int amount = 0;
             for (auto& elem : arguments) {
@@ -476,19 +477,40 @@ void FirstApp::loadConsoleCommands(void) {
                         } else if constexpr (std::is_same_v<T, std::string>) {
                             if (arg == "--bouncy") {
                                 is_bouncy = true;
+                            } else if (arg == "--clearall") {
+                                to_clear = true;
+                                auto& particleEmitters =
+                                    m_gameObjects["ParticleRenderSystem"];
+                                std::move(
+                                    particleEmitters.begin(),
+                                    particleEmitters.end(),
+                                    std::back_inserter(m_pendingDestruction));
+                                particleEmitters.clear();
+                                auto& bouncyParticleEmitters =
+                                    m_gameObjects["BouncyParticleRenderSystem"];
+                                std::move(
+                                    bouncyParticleEmitters.begin(),
+                                    bouncyParticleEmitters.end(),
+                                    std::back_inserter(m_pendingDestruction));
+                                bouncyParticleEmitters.clear();
                             }
                         }
                     },
                     result);
             }
-            if (is_bouncy) {
-                m_gameObjects["BouncyParticleRenderSystem"].push_back(std::move(
-                    m_context->getRenderSystem<BouncyParticleRenderSystem>()
-                        .createBouncyParticleEmitter(position, amount)));
-            } else {
-                m_gameObjects["ParticleRenderSystem"].push_back(
-                    std::move(m_context->getRenderSystem<ParticleRenderSystem>()
-                                  .createParticleEmitter(position, amount)));
+            if (!to_clear) {
+                if (is_bouncy) {
+                    m_gameObjects["BouncyParticleRenderSystem"].push_back(
+                        std::move(
+                            m_context
+                                ->getRenderSystem<BouncyParticleRenderSystem>()
+                                .createBouncyParticleEmitter(position,
+                                                             amount)));
+                } else {
+                    m_gameObjects["ParticleRenderSystem"].push_back(std::move(
+                        m_context->getRenderSystem<ParticleRenderSystem>()
+                            .createParticleEmitter(position, amount)));
+                }
             }
         }});
 }

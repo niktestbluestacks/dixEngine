@@ -109,7 +109,6 @@ void ParticleRenderSystem::dispatchCompute(
     for (auto& unObject : gameObjects) {
         decltype(auto) obj =
             std::static_pointer_cast<ParticleEmitter>(unObject);
-        if (obj->particleCount == 0 || !hasComputePipeline()) return;
 
         m_computePipeline->bind(commandBuffer);
 
@@ -233,7 +232,7 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
     obj->particleBuffer =
         std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
                                     vk::BufferUsageFlagBits::eStorageBuffer |
-                                        vk::BufferUsageFlagBits::eVertexBuffer,
+                                        vk::BufferUsageFlagBits::eVertexBuffer | vk::BufferUsageFlagBits::eTransferDst,
                                     vk::MemoryPropertyFlagBits::eDeviceLocal);
 
     vk::Buffer stagingBuffer;
@@ -261,7 +260,6 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
         count =
             std::min(ParticleEmitter::MAX_PARTICLES, count);
     }
-    if (count == 0) return std::move(obj);
 
     obj->simParams.particlesPosLife =
         glm::vec4(position, obj->simParams.particlesPosLife.w);
@@ -295,8 +293,6 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
 
     for (uint32_t t = 0; t < NUM_THREADS; ++t) {
         uint32_t current_count = chunk_size + (t < remainder ? 1 : 0);
-        if (current_count == 0) continue;
-
         threads.emplace_back([t, current_start, current_count, &position,
                               particles, baseSeed, &obj, this]() {
             std::mt19937 gen{baseSeed + t};

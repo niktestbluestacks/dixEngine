@@ -34,10 +34,14 @@ DixBuffer::DixBuffer(EngineDevice& device, vk::DeviceSize instanceSize,
 }
 
 DixBuffer::~DixBuffer() {
-    if (m_mapped && m_buffer) {
+    if (m_mapped) {
         m_dixDevice.device().unmapMemory(m_memory);
         m_mapped = nullptr;
+    }
+    if (m_buffer) {
         m_dixDevice.device().destroyBuffer(m_buffer);
+    }
+    if (m_memory) {
         m_dixDevice.device().freeMemory(m_memory);
     }
 }

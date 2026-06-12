@@ -42,7 +42,8 @@ void DixConsole::newFrame() {
     }
     if (m_triggerArrowEvent.exchange(false) && !m_inputHistory.empty()) {
         if (m_arrow == 'd') {
-            if (m_inputHistoryIndex < m_inputHistory.size() - 1 && m_inputHistoryIndex != -1) {
+            if (m_inputHistoryIndex < m_inputHistory.size() - 1 &&
+                m_inputHistoryIndex != -1) {
                 m_inputBuffer = m_inputHistory[m_inputHistoryIndex];
                 m_inputHistoryIndex++;
             }
@@ -131,7 +132,7 @@ void DixConsole::backspace(bool isCtrlPressed) {
         {
             std::lock_guard lock(m_backspaceMutex);
             m_backspaceHeld = true;
-            m_backspaceCV.notify_all();
+            m_backspaceCV.notify_one();
         }
     } else {
         m_inputBuffer.clear();
@@ -143,7 +144,7 @@ void DixConsole::backspaceRealeased() {
         std::lock_guard lock(m_backspaceMutex);
         m_backspaceHeld = false;
     }
-    m_backspaceCV.notify_all();
+    m_backspaceCV.notify_one();
 }
 
 void DixConsole::backspaceHeldImpl(std::stop_token stopToken) {

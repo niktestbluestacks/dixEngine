@@ -120,7 +120,7 @@ class DixConsole {
    private:
     DixConsole()
         : m_backspaceHeld{false}, m_arrowHeldDown{false}, m_arrowHeldUp{false} {
-        m_backspaceThread = std::jthread{&DixConsole::arrowDownImpl, this};
+        m_backspaceThread = std::jthread{&DixConsole::backspaceHeldImpl, this};
         m_arrowUpThread = std::jthread{&DixConsole::arrowUpImpl, this};
         m_arrowDownThread = std::jthread{&DixConsole::arrowDownImpl, this};
         fillInternalCommands();

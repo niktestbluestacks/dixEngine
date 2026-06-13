@@ -31,6 +31,14 @@ endif()
 
 message(STATUS "Shader compiler found: ${GLSLC}")
 
+include(FetchContent)
+FetchContent_Declare(
+    jolt
+    GIT_REPOSITORY https://github.com/jrouwe/joltphysics
+    GIT_TAG        master 
+    SOURCE_SUBDIR  Build
+)
+FetchContent_MakeAvailable(jolt)
 
 # 2. SHADER COMPILATION
 set(SHADER_SOURCE_DIR "${CMAKE_SOURCE_DIR}/VulcanEngine/Shaders")
@@ -106,6 +114,12 @@ target_link_libraries(VulcanApp PRIVATE
     Vulkan::Vulkan
     glfw
     glm::glm
+    Jolt
+)
+
+target_compile_definitions(VulcanApp PRIVATE
+    JPH_PROFILE_ENABLED
+    JPH_DEBUG_RENDERER
 )
 
 # Copy compile_commands.json to project root for clangd

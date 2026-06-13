@@ -52,8 +52,41 @@ void main() {
     // Simple floor collision
     if (p.positionLife.y < 0.0) {
         p.positionLife.y = 0.0;
-        p.velocitySize.y *= -1.3; // Bounce with energy gain
+        p.velocitySize.y *= -0.999; // Bounce with energy loss
+
+        // // SUPER CHAOS 
+        // p.velocitySize.xyz *= 1.05;
+        
+        // // Generate a pseudo-random 3D vector based on the particle's index
+        // float seed = float(index) * 12.9898 + p.positionLife.x * 78.233;
+        // vec3 randomKick = vec3(
+        //     fract(sin(seed) * 43758.5453),
+        //     fract(sin(seed * 1.2) * 24651.123),
+        //     fract(sin(seed * 1.5) * 65432.321)
+        // ) * 2.0 - 1.0; // Maps to range [-1.0, 1.0]
+        
+        // // Apply the random explosion kick
+        // p.velocitySize.xyz += randomKick * 3.0; // 3.0 is the kick strength
     }
+
+    // // MAGNETIC FIELD
+    // vec3 magneticField = vec3(0.0, 1.0, 0.0); // Direction of the magnetic field
+    // // F = q(v x B)
+    // vec3 lorentzForce = cross(p.velocitySize.xyz, magneticField) * 2.0; 
+    // p.velocitySize.xyz += lorentzForce * params.gravityDeltaTime.w;
+
+    // // LIGHTWEIGHT CURL NOISE
+    // vec3 pos = p.positionLife.xyz * 0.5; // Scale down to make swirls larger
+    
+    // // This specific combination of sin/cos derivatives mathematically 
+    // // approximates a divergence-free vector field.
+    // vec3 curlForce = vec3(
+    //     sin(pos.y) * cos(pos.z),
+    //     sin(pos.z) * cos(pos.x),
+    //     sin(pos.x) * cos(pos.y)
+    // );
+    
+    // p.velocitySize.xyz += curlForce * 3.0 * params.gravityDeltaTime.w;
 
     // Write back updated particle
     particleBuffer.particles[index] = p;

@@ -48,6 +48,10 @@ const char* Window::getClipboardText() const {
     return glfwGetClipboardString(m_window);
 }
 
+void Window::setClipboardText(const char* text) const {
+    glfwSetClipboardString(m_window, text);
+}
+
 void Window::createWindowSurface(vk::Instance instance,
                                  vk::SurfaceKHR* surface) const {
     if (glfwCreateWindowSurface(

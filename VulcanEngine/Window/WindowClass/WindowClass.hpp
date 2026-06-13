@@ -54,6 +54,7 @@ class Window {
     bool isKeyPressedUnUsual(int key) const;
     bool isMouseButtonPressed(int key) const;
     const char* getClipboardText() const;
+    void setClipboardText(const char* text) const;
     void resetWindowResizedFlag(void);
     GLFWwindow* getGLFWwindow(void) const;
 

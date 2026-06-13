@@ -21,7 +21,9 @@ class AppContext {
         m_uiRenderer = std::make_unique<dix::UIRenderer>(
             m_dixDevice, m_dixRenderer.getSwapChainRenderPass());
     }
-    ~AppContext() = default;
+    ~AppContext() {
+        m_dixDevice.device().waitIdle();
+    }
 
     void initialize() {
         createDescriptorPools();

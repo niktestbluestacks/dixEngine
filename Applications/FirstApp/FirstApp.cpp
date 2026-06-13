@@ -4,7 +4,7 @@
 
 namespace dix {
 
-FirstApp::FirstApp(void) {
+FirstApp::FirstApp(void) : viewerObject(GameObject::createGameObject()) {
     DixLogInfo("Initializing FirstApp...");
     DixLogInfo("Loading Game Objects");
     // FirstApp focuses on game objects and game logic only.
@@ -16,16 +16,14 @@ FirstApp::FirstApp(void) {
 
 FirstApp::~FirstApp(void) {
     DixLogInfo("Closing FirstApp...");
-    m_context.reset();
     m_gameObjects.clear();
+    m_context.reset();
     DixLogInfo("FirstApp closed successfully!");
 }
 
 void FirstApp::run(void) {
     DixCamera dixcamera{};
     dixcamera.setViewTarget(playerPosition, playerLookAt);
-
-    auto viewerObject = GameObject::createGameObject();
     KeyboardAndMouseController cameraController{m_context->getDixWindow()};
 
     auto currentTime = std::chrono::high_resolution_clock::now();
@@ -200,7 +198,7 @@ void FirstApp::loadUIElements(void) {
     consoleUIPtr->setInputBufferCallback(
         [&console]() { return console.getInputBuffer(); });
 
-    m_context->getDixWindow().bindKey(
+    m_context->getDixWindow().bindKeyUnUsual(
         GLFW_KEY_F11, [&window = m_context->getDixWindow()]() {
             static bool fullscreen = false;
             window.setWindowMode(fullscreen = !fullscreen);
@@ -244,6 +242,13 @@ void FirstApp::loadUIElements(void) {
             if (window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL)) {
                 console.fillFromClipboard(
                     std::string(window.getClipboardText()));
+            }
+        });
+
+    m_context->getDixWindow().bindKeyUnUsual(
+        GLFW_KEY_C, [&console, &window = m_context->getDixWindow()]() {
+            if (window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL)) {
+                window.setClipboardText(console.getInputBuffer().c_str());
             }
         });
 
@@ -556,8 +561,40 @@ void FirstApp::loadConsoleCommands(void) {
                 std::visit(
                     [&](auto&& arg) {
                         using T = std::decay_t<decltype(arg)>;
-                        if constexpr (std::is_same_v<T, float> || std::is_same_v<T, int>) {
+                        if constexpr (std::is_same_v<T, float> ||
+                                      std::is_same_v<T, int>) {
                             m_gameSpeed = arg;
+                        }
+                    },
+                    result);
+            }
+        }),
+        {});
+
+    console.register_function(
+        "tp", std::function([this](const std::vector<std::string>& arguments) {
+            std::array<bool, 3> visited{};
+            m_context->device().device().waitIdle();
+            for (auto& elem : arguments) {
+                auto result = string_to_num(elem);
+                std::visit(
+                    [this, &visited](auto&& arg) {
+                        using T = std::decay_t<decltype(arg)>;
+                        if constexpr (std::is_same_v<T, float> ||
+                                      std::is_same_v<T, int>) {
+                            if (!visited[0]) {
+                                visited[0] = true;
+                                this->viewerObject.transform.translation.x =
+                                    arg;
+                            } else if (!visited[1]) {
+                                visited[1] = true;
+                                this->viewerObject.transform.translation.y =
+                                    arg;
+                            } else if (!visited[2]) {
+                                visited[2] = true;
+                                this->viewerObject.transform.translation.z =
+                                    arg;
+                            }
                         }
                     },
                     result);

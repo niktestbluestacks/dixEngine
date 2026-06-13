@@ -19,7 +19,7 @@ class FirstApp {
    public:
     static constexpr int WIDTH = 800;
     static constexpr int HEIGHT = 600;
-    static constexpr float MAX_FRAME_TIME = 0.05f;
+    static constexpr float MAX_FRAME_TIME = 0.2f;
     static constexpr std::string_view MODEL_FILEPATH_RELATIVE =
         "Applications/models";
 
@@ -44,6 +44,7 @@ class FirstApp {
     float m_gameSpeed{1.f};
     bool m_recording = false;
     bool m_playing = false;
+    GameObject viewerObject;
 };
 }  // namespace dix
 

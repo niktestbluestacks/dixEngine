@@ -4,7 +4,7 @@
 
 namespace dix {
 
-FirstApp::FirstApp(void) : viewerObject(GameObject::createGameObject()) {
+FirstApp::FirstApp(void) : viewerObject{GameObject::createGameObject()} {
     DixLogInfo("Initializing FirstApp...");
     DixLogInfo("Loading Game Objects");
     // FirstApp focuses on game objects and game logic only.
@@ -134,7 +134,7 @@ void FirstApp::loadGameObjects() {
         gameObj.transform.translation = {dist(gen), dist(gen), dist(gen)};
         gameObj.transform.scale = {1.f, 1.f, 1.f};
         m_gameObjects["SimpleRenderSystem"].push_back(
-            std::move(std::make_unique<GameObject>(gameObj)));
+            std::make_shared<GameObject>(gameObj));
     }
 
     // skybox
@@ -149,29 +149,28 @@ void FirstApp::loadGameObjects() {
     Skybox.model = dixModel;
     dixModel.reset();
     m_gameObjects["SkyboxRenderSystem"].push_back(
-        std::move(std::make_unique<GameObject>(Skybox)));
+        std::make_shared<GameObject>(Skybox));
 }
 
 void FirstApp::loadUIElements(void) {
     m_context->getDixWindow().setWindowIcon(toModelPath("Images/icon.ico"));
 
-    auto fps = std::make_unique<DixFpsCounter>(DixUIInfo{
+    m_context->addUIElement<DixFpsCounter>(DixUIInfo{
         *m_context->getUIRenderer(), m_context->getExtent()
         // "",
         // "UI/font.txt",
         // "UI/font02.tga"
     });
-    m_context->addUIElement(std::move(fps));
-    auto timeCounter = std::make_unique<DixTimeCounter>(DixUIInfo{
+
+    m_context->addUIElement<DixTimeCounter>(DixUIInfo{
         *m_context->getUIRenderer(),
         m_context->getExtent(),
         // "",
         // "UI/font.txt",
         // "UI/font02.tga"
     });
-    m_context->addUIElement(std::move(timeCounter));
 
-    auto playerInfo = std::make_unique<DixPlayerInfo>(
+    m_context->addUIElement<DixPlayerInfo>(
         DixUIInfo{
             *m_context->getUIRenderer(),
             m_context->getExtent(),
@@ -180,7 +179,6 @@ void FirstApp::loadUIElements(void) {
             // "UI/font02.tga"
         },
         playerPosition);
-    m_context->addUIElement(std::move(playerInfo));
 
     auto consoleUI = std::make_unique<DixConsoleUI>(DixUIInfo{
         *m_context->getUIRenderer(),
@@ -188,7 +186,7 @@ void FirstApp::loadUIElements(void) {
     });
 
     auto* consoleUIPtr = consoleUI.get();
-    m_context->addUIElement(std::move(consoleUI));
+    m_context->addUIElement<DixConsoleUI>(std::move(consoleUI));
 
     auto& console = CurrentConsole::getDixConsole();
     console.setConsoleUI(consoleUIPtr);
@@ -241,7 +239,7 @@ void FirstApp::loadUIElements(void) {
         GLFW_KEY_V, [&console, &window = m_context->getDixWindow()]() {
             if (window.isKeyPressedUnUsual(GLFW_KEY_LEFT_CONTROL)) {
                 console.fillFromClipboard(
-                    std::string(window.getClipboardText()));
+                    std::string{window.getClipboardText()});
             }
         });
 

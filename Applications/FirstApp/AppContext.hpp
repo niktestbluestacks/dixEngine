@@ -23,6 +23,7 @@ class AppContext {
     }
     ~AppContext() {
         m_dixDevice.device().waitIdle();
+        shutdown();
     }
 
     void initialize() {
@@ -62,11 +63,19 @@ class AppContext {
         std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
         const glm::vec3& playerPosition);
 
-    void addUIElement(std::unique_ptr<DixUIElement> element) {
-        if (m_uiManager) {
-            m_uiManager->addElement(std::move(element));
-        }
-    }
+    // void addUIElement(std::unique_ptr<DixUIElement> element) {
+    //     if (m_uiManager) {
+    //         m_uiManager->addElement(std::move(element));
+    //     }
+    // }
+
+    template <typename T, typename... Args>
+    requires std::derived_from<T, DixUIElement>
+    void addUIElement(DixUIInfo&& info, Args&&... args);
+
+    template <typename T>
+    requires std::derived_from<T, DixUIElement>
+    void addUIElement(std::unique_ptr<T> ui);
     // void addGameObject(std::unique_ptr<GameObject> object);
     DixDescriptorPool& getDescriptorPool() { return *m_modelDescriptorPool; }
     DixDescriptorSetLayout& getModelSetLayout() { return *m_modelSetLayout; }

@@ -81,7 +81,7 @@ void ParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
     vk::DescriptorBufferInfo particleInfo{};
     particleInfo.buffer = obj.particleBuffer->getBuffer();
     particleInfo.offset = 0;
-    particleInfo.range = 16 + sizeof(Particle) * ParticleEmitter::MAX_PARTICLES;
+    particleInfo.range = 16 + sizeof(Particle) * obj.particleCount;
 
     vk::DescriptorBufferInfo simParamsInfo =
         obj.simulationParamsBuffer->descriptorInfo(
@@ -227,8 +227,7 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
     glm::vec3 position, uint32_t count, glm::vec2 colorDist) {
     std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
-    vk::DeviceSize particleBufferSize =
-        16 + sizeof(Particle) * ParticleEmitter::MAX_PARTICLES;
+    vk::DeviceSize particleBufferSize = 16 + sizeof(Particle) * count;
     obj->particleBuffer =
         std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
                                     vk::BufferUsageFlagBits::eStorageBuffer |

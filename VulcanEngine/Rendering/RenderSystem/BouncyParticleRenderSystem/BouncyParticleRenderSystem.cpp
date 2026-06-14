@@ -84,7 +84,7 @@ void BouncyParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
     particleInfo.buffer = obj.particleBuffer->getBuffer();
     particleInfo.offset = 0;
     particleInfo.range =
-        16 + sizeof(BouncyParticle) * ParticleEmitter::MAX_PARTICLES;
+        16 + sizeof(BouncyParticle) * obj.particleCount;
 
     vk::DescriptorBufferInfo simParamsInfo =
         obj.simulationParamsBuffer->descriptorInfo(
@@ -233,8 +233,7 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
                                                         glm::vec2 colorDist) {
     std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
-    vk::DeviceSize particleBufferSize =
-        16 + sizeof(BouncyParticle) * ParticleEmitter::MAX_PARTICLES;
+    vk::DeviceSize particleBufferSize = 16 + sizeof(BouncyParticle) * count;
     obj->particleBuffer =
         std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
                                     vk::BufferUsageFlagBits::eStorageBuffer |
@@ -305,10 +304,10 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
             for (uint32_t i = 0; i < current_count; ++i) {
                 uint32_t global_idx = current_start + i;
                 BouncyParticle& p = particles[global_idx];
-                p.positionLifetime =
-                    glm::vec4(position + glm::normalize(glm::vec3(posDist(gen), posDist(gen),
-                                                   posDist(gen))),
-                              obj->simParams.particlesPosLife.w);
+                p.positionLifetime = glm::vec4(
+                    position + glm::normalize(glm::vec3(
+                                   posDist(gen), posDist(gen), posDist(gen))),
+                    obj->simParams.particlesPosLife.w);
                 auto randomVel =
                     glm::vec3{velDist(gen), velDist(gen), velDist(gen)};
                 // MAKES A SHPERE

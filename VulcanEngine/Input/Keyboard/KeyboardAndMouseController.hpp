@@ -2,46 +2,42 @@
 #define KEYBOARD_CONTROLLER_HPP
 
 // dix
-#include <Model/GameObject/GameObject.hpp>
-#include <Window/WindowClass/WindowClass.hpp>
+#include <Input/InputBase.hpp>
 
 namespace dix {
 
-class KeyboardAndMouseController {
+class KeyboardAndMouseController : public InputBase {
    public:
-    struct KeyMappings {
-        int moveLeft = GLFW_KEY_A;
-        int moveRight = GLFW_KEY_D;
-        int moveForward = GLFW_KEY_W;
-        int moveBackward = GLFW_KEY_S;
-        int moveUp = GLFW_KEY_SPACE;
-        int moveDown = GLFW_KEY_LEFT_CONTROL;
-        int lookLeft = GLFW_KEY_LEFT;
-        int lookRight = GLFW_KEY_RIGHT;
-        int lookUp = GLFW_KEY_UP;
-        int lookDown = GLFW_KEY_DOWN;
-        int speedUp = GLFW_KEY_LEFT_SHIFT;
-    };
-    KeyboardAndMouseController(Window& dixWindow): m_window(dixWindow) {}
+    using InputBase::InputBase;
+    KeyboardAndMouseController(Window& dixWindow)
+        : InputBase{dixWindow,
+                    {
+                        .moveLeft = GLFW_KEY_A,
+                        .moveRight = GLFW_KEY_D,
+                        .moveForward = GLFW_KEY_W,
+                        .moveBackward = GLFW_KEY_S,
+                        .moveUp = GLFW_KEY_SPACE,
+                        .moveDown = GLFW_KEY_LEFT_CONTROL,
+                        .lookLeft = GLFW_KEY_LEFT,
+                        .lookRight = GLFW_KEY_RIGHT,
+                        .lookUp = GLFW_KEY_UP,
+                        .lookDown = GLFW_KEY_DOWN,
+                        .speedUp = GLFW_KEY_LEFT_SHIFT,
+                    }} {}
 
-    ~KeyboardAndMouseController() = default;
+    ~KeyboardAndMouseController() override = default;
 
-    void moveInPlaneXZ(float dt, GameObject& gameObject);
+    void moveInPlaneXZ(float dt, GameObject& gameObject) override;
 
-    KeyMappings keys{};
-    float moveSpeed{3.f};
-    float lookSpeed{1.5f};
     // mouse look state
     bool mouseCaptured{false};
     double lastMouseX{0.0};
     double lastMouseY{0.0};
     bool firstMouse{true};
 
-    constexpr static float minMoveSpeed{3.f};
-    constexpr static float maxMoveSpeed{10.f};
-    constexpr static float AccelerationCoefficient{5.f};
-private:
-    Window& m_window;
+    static constexpr float minMoveSpeed{3.f};
+    static constexpr float maxMoveSpeed{10.f};
+    static constexpr float AccelerationCoefficient{5.f};
 };
 }  // namespace dix
 #endif  // KEYBOARD_CONTROLLER_HPP

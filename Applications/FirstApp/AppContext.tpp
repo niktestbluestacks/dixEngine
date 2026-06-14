@@ -48,7 +48,8 @@ inline constexpr vk::BufferUsageFlags descriptorTypeToBufferUsage(
 template <typename... RenderSystems>
 void AppContext<RenderSystems...>::drawFrame(
     DixCamera& camera, float frameTime,
-    std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>& gameObjects,
+    std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>&
+        gameObjects,
     const glm::vec3& playerPosition) {
     auto extent = m_Window.getExtent();
     if (extent.width == 0 || extent.height == 0) return;
@@ -79,11 +80,12 @@ void AppContext<RenderSystems...>::drawFrame(
     // system has no compute pipeline, so this is always safe.
     // Each system is also responsible for inserting its own
     // compute → graphics memory barrier inside dispatchCompute.
-    forEachInTuple(
-        m_renderSystemRegistery.getRenderSystemDescriptions(),
-        [&](auto&& renderSystemDesc) {
-            renderSystemDesc.renderSystem->dispatchCompute(commandBuffer, gameObjects[renderSystemDesc.renderSystemName]);
-        });
+    forEachInTuple(m_renderSystemRegistery.getRenderSystemDescriptions(),
+                   [&](auto&& renderSystemDesc) {
+                       renderSystemDesc.renderSystem->dispatchCompute(
+                           commandBuffer,
+                           gameObjects[renderSystemDesc.renderSystemName]);
+                   });
 
     // Graphics pass
     beginSwapChainRenderPass(commandBuffer);
@@ -148,6 +150,25 @@ void AppContext<RenderSystems...>::drawFrame(
 
     endSwapChainRenderPass(commandBuffer);
     endFrame();
+}
+
+template <typename... RenderSystems>
+template <typename T, typename... Args>
+    requires std::derived_from<T, DixUIElement>
+void AppContext<RenderSystems...>::addUIElement(DixUIInfo&& info,
+                                                Args&&... args) {
+    if (m_uiManager) {
+        m_uiManager->addElement(std::move(
+            std::make_unique<T>(std::move(info), std::forward<Args>(args)...)));
+    }
+}
+template <typename... RenderSystems>
+template <typename T>
+    requires std::derived_from<T, DixUIElement>
+void AppContext<RenderSystems...>::addUIElement(std::unique_ptr<T> ui) {
+    if (m_uiManager) {
+        m_uiManager->addElement(std::move(ui));
+    }
 }
 
 template <typename... RenderSystems>

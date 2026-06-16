@@ -18,20 +18,19 @@ constexpr std::string formatRuntime(const char* fmt, Args&&... args) {
     }
 }
 
-constexpr std::variant<std::string, int, float> string_to_num(const std::string& str) noexcept {
-     if (str.empty()) return str;
+constexpr std::variant<std::string, int, float> string_to_num(
+    const std::string& str) noexcept {
+    if (str.empty()) return str;
 
     const char* first = str.data();
     const char* last = str.data() + str.size();
 
-    // 1. Пробуем получить int
     int int_val{};
     auto [ptr_int, ec_int] = std::from_chars(first, last, int_val);
     if (ec_int == std::errc{} && ptr_int == last) {
         return int_val;
     }
 
-    // 2. Пробуем получить float
     float float_val{};
     auto [ptr_float, ec_float] = std::from_chars(first, last, float_val);
     if (ec_float == std::errc{} && ptr_float == last) {
@@ -39,6 +38,6 @@ constexpr std::variant<std::string, int, float> string_to_num(const std::string&
     }
 
     return str;
-} 
+}
 }  // namespace dix
 #endif  // FUNCTIONS_HPP

@@ -8,8 +8,6 @@ namespace dix {
 using CurrentAppContext =
     AppContext<SimpleRenderSystem, SkyboxRenderSystem, ParticleRenderSystem,
                BouncyParticleRenderSystem>;
-
-using CurrentConsole = DixConsole;
 class FirstApp {
    private:
     void loadGameObjects(void);
@@ -30,17 +28,25 @@ class FirstApp {
 
     void run(void);
 
+    using CurrentConsole = DixConsole;
+    using PendingDestruction =
+        ThreadSafeWrapper<std::vector<std::shared_ptr<GameObject>>>;
+    using PendingConstruction = ThreadSafeWrapper<std::list<
+        std::future<std::pair<std::string, std::shared_ptr<GameObject>>>>>;
+
    private:
     glm::vec3 playerPosition{-1.f, -2.f, 2.f};
     glm::vec3 playerLookAt{0.f, 0.f, 2.5f};
-    std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>> m_gameObjects;
+    std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>
+        m_gameObjects;
     std::unordered_map<std::string, std::vector<std::shared_ptr<GameObject>>>
         m_initialGameObects;
     std::unordered_map<std::string, DixAudio> m_sounds;
     std::unique_ptr<CurrentAppContext> m_context{
         std::make_unique<CurrentAppContext>(
             WIDTH, HEIGHT, static_cast<std::string>("First Application"))};
-    std::vector<std::shared_ptr<GameObject>> m_pendingDestruction{};
+    PendingDestruction m_pendingDestruction{};
+    PendingConstruction m_pendingConstruction{};
     float m_gameSpeed{1.f};
     bool m_recording = false;
     bool m_playing = false;

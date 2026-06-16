@@ -99,6 +99,25 @@ void FirstApp::run(void) {
             m_context->device().device().waitIdle();
             m_pendingDestruction.clear();
         }
+        if (!m_pendingConstruction.empty()) {
+            for (auto it = m_pendingConstruction.begin();
+                 it != m_pendingConstruction.end();) {
+                auto& future = *it;
+                if (future.valid()) {
+                    auto res = future.wait_for(std::chrono::milliseconds(0));
+                    if (res != std::future_status::ready) {
+                        ++it;
+                    } else {
+                        m_context->device().device().waitIdle();
+                        auto value = future.get();
+                        m_gameObjects[value.first].push_back(value.second);
+                        it = m_pendingConstruction.erase(it);
+                    }
+                } else {
+                    ++it;
+                }
+            }
+        }
     }
     m_context->device().device().waitIdle();
     // Stop recording if app closes while recording
@@ -534,18 +553,52 @@ void FirstApp::loadConsoleCommands(void) {
                     result);
             }
             if (!to_clear) {
+                // if (is_bouncy) {
+                //     m_gameObjects["BouncyParticleRenderSystem"].push_back(
+                //         std::move(
+                //             m_context
+                //                 ->getRenderSystem<BouncyParticleRenderSystem>()
+                //                 .createBouncyParticleEmitter(position,
+                //                 amount,
+                //                                              colorDist)));
+                // } else {
+                //     m_gameObjects["ParticleRenderSystem"].push_back(std::move(
+                //         m_context->getRenderSystem<ParticleRenderSystem>()
+                //             .createParticleEmitter(position, amount,
+                //                                    colorDist)));
+                // }
                 if (is_bouncy) {
-                    m_gameObjects["BouncyParticleRenderSystem"].push_back(
-                        std::move(
-                            m_context
-                                ->getRenderSystem<BouncyParticleRenderSystem>()
-                                .createBouncyParticleEmitter(position, amount,
-                                                             colorDist)));
+                    m_pendingConstruction.emplace_back(std::async(
+                        std::launch::async,
+                        [this, position, amount, colorDist]()
+                            -> std::pair<std::string,
+                                         std::shared_ptr<GameObject>> {
+                            std::string name = "BouncyParticleRenderSystem";
+                            auto emitter = m_context
+                                               ->getRenderSystem<
+                                                   BouncyParticleRenderSystem>()
+                                               .createBouncyParticleEmitter(
+                                                   position, amount, colorDist);
+                            return std::make_pair(
+                                name,
+                                std::static_pointer_cast<GameObject>(emitter));
+                        }));
                 } else {
-                    m_gameObjects["ParticleRenderSystem"].push_back(std::move(
-                        m_context->getRenderSystem<ParticleRenderSystem>()
-                            .createParticleEmitter(position, amount,
-                                                   colorDist)));
+                    m_pendingConstruction.emplace_back(std::async(
+                        std::launch::async,
+                        [this, position, amount, colorDist]()
+                            -> std::pair<std::string,
+                                         std::shared_ptr<GameObject>> {
+                            std::string name = "ParticleRenderSystem";
+                            auto emitter =
+                                m_context
+                                    ->getRenderSystem<ParticleRenderSystem>()
+                                    .createParticleEmitter(position, amount,
+                                                           colorDist);
+                            return std::make_pair(
+                                name,
+                                std::static_pointer_cast<GameObject>(emitter));
+                        }));
                 }
             }
         }},

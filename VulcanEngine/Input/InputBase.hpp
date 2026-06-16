@@ -27,7 +27,7 @@ class InputBase {
 
     virtual ~InputBase() = default;
     
-    virtual void moveInPlaneXZ(float dt, GameObject& gameObject);
+    virtual void moveInPlaneXZ(float dt, GameObject& gameObject)=0;
 
     KeyMappings keys;
     float moveSpeed{3.f};

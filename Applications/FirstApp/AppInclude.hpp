@@ -50,6 +50,7 @@
 #include <Utils/DixRandom.hpp>
 #include <Utils/FrameInfo.hpp>
 #include <Utils/TupleHelper.hpp>
+#include <Utils/DixThreads.hpp>
 
 // dix
 

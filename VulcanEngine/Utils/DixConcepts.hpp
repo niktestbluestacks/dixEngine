@@ -1,15 +1,17 @@
 #ifndef DIX_CONCEPTS_HPP
 #define DIX_CONCEPTS_HPP
 
+// dix
+#include <Utils/DixMacroes.hpp>
+
 // std
 #include <concepts>
 #include <cstdint>
+#include <functional>
 #include <tuple>
 #include <type_traits>
-#include <functional>
 
 // libs
-
 #include <vulkan/vulkan.hpp>
 
 namespace dix {
@@ -57,13 +59,33 @@ template <typename T>
 struct is_supported_command_type : std::false_type {};
 
 template <typename... FuncArgs>
-struct is_supported_command_type<std::pair<std::string, std::function<void(FuncArgs...)>>> : std::true_type{};
+struct is_supported_command_type<
+    std::pair<std::string, std::function<void(FuncArgs...)>>> : std::true_type {
+};
 
 template <typename T>
-inline constexpr bool is_supported_command_type_v = is_supported_command_type<T>::value;
+inline constexpr bool is_supported_command_type_v =
+    is_supported_command_type<T>::value;
 
 template <typename... Commands>
 concept IsSupportedCommandType = (is_supported_command_type_v<Commands> && ...);
+
 }  // namespace dix
+
+#define DIX_CREATE_IF_EXISTS(returnValue, methodName, Container, ...)       \
+    constexpr returnValue methodName(                                       \
+        __VA_OPT__(DIX_RECURSIVE_TO_TYPE_NAME(__VA_ARGS__)))                \
+        requires requires(Container __c __VA_OPT__(                         \
+            , DIX_RECURSIVE_TO_TYPE_NAME(__VA_ARGS__))) {                   \
+            __c.methodName(__VA_OPT__(DIX_RECURSIVE_TO_NAME(__VA_ARGS__))); \
+        }
+
+#define DIX_CREATE_IF_EXISTS_CONST(returnValue, methodName, Container, ...) \
+    constexpr returnValue methodName(                                       \
+        __VA_OPT__(DIX_RECURSIVE_TO_TYPE_NAME(__VA_ARGS__))) const          \
+        requires requires(const Container __c __VA_OPT__(                         \
+            , DIX_RECURSIVE_TO_TYPE_NAME(__VA_ARGS__))) {                   \
+            __c.methodName(__VA_OPT__(DIX_RECURSIVE_TO_NAME(__VA_ARGS__))); \
+        }
 
 #endif  // DIX_CONCEPTS_HPP

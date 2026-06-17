@@ -99,23 +99,32 @@ void FirstApp::run(void) {
             m_context->device().device().waitIdle();
             m_pendingDestruction.clear();
         }
-        if (!m_pendingConstruction.empty()) {
-            for (auto it = m_pendingConstruction.begin();
-                 it != m_pendingConstruction.end();) {
-                auto& future = *it;
-                if (future.valid()) {
-                    auto res = future.wait_for(std::chrono::milliseconds(0));
-                    if (res != std::future_status::ready) {
-                        ++it;
+        static auto cooldownForAddition = std::chrono::milliseconds(0);
+        cooldownForAddition -=
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::microseconds(
+                    static_cast<unsigned int>(frameTime * 1e6f)));
+        if (cooldownForAddition <= std::chrono::milliseconds(0)) {
+            if (!m_pendingConstruction.empty()) {
+                for (auto it = m_pendingConstruction.begin();
+                     it != m_pendingConstruction.end();) {
+                    auto& future = *it;
+                    if (future.valid()) {
+                        auto res =
+                            future.wait_for(std::chrono::milliseconds(0));
+                        if (res != std::future_status::ready) {
+                            ++it;
+                        } else {
+                            m_context->device().device().waitIdle();
+                            auto value = future.get();
+                            m_gameObjects[value.first].push_back(value.second);
+                            it = m_pendingConstruction.erase(it);
+                        }
                     } else {
-                        m_context->device().device().waitIdle();
-                        auto value = future.get();
-                        m_gameObjects[value.first].push_back(value.second);
-                        it = m_pendingConstruction.erase(it);
+                        ++it;
                     }
-                } else {
-                    ++it;
                 }
+                cooldownForAddition = std::chrono::seconds(2);
             }
         }
     }

@@ -215,11 +215,13 @@ void ParticleRenderSystem::updateParticles(
     float deltaTime,
     const std::vector<std::shared_ptr<ParticleEmitter>>& particleEmitters) {
     for (auto& obj : particleEmitters) {
-        obj->simParams.gravityDeltaTime.w = deltaTime;
-        obj->simulationParamsBuffer->map();
-        obj->simulationParamsBuffer->writeToBuffer(
-            &obj->simParams, sizeof(ParticleSimulationParams));
-        obj->simulationParamsBuffer->unmap();
+        if (obj) {
+            obj->simParams.gravityDeltaTime.w = deltaTime;
+            obj->simulationParamsBuffer->map();
+            obj->simulationParamsBuffer->writeToBuffer(
+                &obj->simParams, sizeof(ParticleSimulationParams));
+            obj->simulationParamsBuffer->unmap();
+        }
     }
 }
 
@@ -228,13 +230,16 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
     std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
     vk::DeviceSize particleBufferSize = 16 + sizeof(Particle) * count;
-    obj->particleBuffer =
-        std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
-                                    vk::BufferUsageFlagBits::eStorageBuffer |
-                                        vk::BufferUsageFlagBits::eVertexBuffer |
-                                        vk::BufferUsageFlagBits::eTransferDst,
-                                    vk::MemoryPropertyFlagBits::eDeviceLocal);
-
+    try {
+        obj->particleBuffer = std::make_unique<DixBuffer>(
+            m_dixDevice, particleBufferSize, 1,
+            vk::BufferUsageFlagBits::eStorageBuffer |
+                vk::BufferUsageFlagBits::eVertexBuffer |
+                vk::BufferUsageFlagBits::eTransferDst,
+            vk::MemoryPropertyFlagBits::eDeviceLocal);
+    } catch (const vk::Error& e) {
+        return nullptr;
+    }
     vk::Buffer stagingBuffer;
     vk::DeviceMemory stagingBufferMemory;
     m_dixDevice.createBuffer(particleBufferSize,

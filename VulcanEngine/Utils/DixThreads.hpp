@@ -1,11 +1,45 @@
 #ifndef DIX_THREADS_HPP
 #define DIX_THREADS_HPP
 
+// dix
+#include <Utils/DixConcepts.hpp>
+
 // std
 #include <initializer_list>
 #include <iterator>
 #include <mutex>
 #include <thread>
+
+#define __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(returnValue, name, ...)    \
+    DIX_CREATE_IF_EXISTS(returnValue, name,                               \
+                         Container __VA_OPT__(, __VA_ARGS__)) {           \
+        std::lock_guard<std::mutex> lock(m_mutex);                        \
+        m_container.name(__VA_OPT__(DIX_RECURSIVE_TO_NAME(__VA_ARGS__))); \
+    }
+
+#define __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(returnValue, name, ...) \
+    DIX_CREATE_IF_EXISTS(returnValue, name,                                   \
+                         Container __VA_OPT__(, __VA_ARGS__)) {               \
+        std::lock_guard<std::mutex> lock(m_mutex);                            \
+        return m_container.name(                                              \
+            __VA_OPT__(DIX_RECURSIVE_TO_NAME(__VA_ARGS__)));                  \
+    }
+
+#define __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_CONST(returnValue, name, ...) \
+    DIX_CREATE_IF_EXISTS_CONST(returnValue, name,                            \
+                               Container __VA_OPT__(, __VA_ARGS__)) {        \
+        std::lock_guard<std::mutex> lock(m_mutex);                           \
+        m_container.name(__VA_OPT__(DIX_RECURSIVE_TO_NAME(__VA_ARGS__)));    \
+    }
+
+#define __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN_CONST(returnValue, name, \
+                                                            ...)               \
+    DIX_CREATE_IF_EXISTS_CONST(returnValue, name,                              \
+                               Container __VA_OPT__(, __VA_ARGS__)) {          \
+        std::lock_guard<std::mutex> lock(m_mutex);                             \
+        return m_container.name(                                               \
+            __VA_OPT__(DIX_RECURSIVE_TO_NAME(__VA_ARGS__)));                   \
+    }
 
 namespace dix {
 template <class Container>
@@ -21,41 +55,53 @@ class ThreadSafeWrapper {
         std::lock_guard<std::mutex> lock(m_mutex);
         m_container.~Container();
     }
-    ThreadSafeWrapper(const ThreadSafeWrapper&) = default;
-    ThreadSafeWrapper& operator=(const ThreadSafeWrapper&) = default;
-    ThreadSafeWrapper(ThreadSafeWrapper&&) = default;
-    ThreadSafeWrapper& operator=(ThreadSafeWrapper&&) = default;
+    ThreadSafeWrapper(const ThreadSafeWrapper& other) {
+        if (this == &other) return;
+        std::lock(m_mutex, other.m_mutex);
+        std::lock_guard<std::mutex> lock1(m_mutex, std::adopt_lock);
+        std::lock_guard<std::mutex> lock2(other.m_mutex, std::adopt_lock);
+        m_container = other.m_container;
+    }
+    ThreadSafeWrapper& operator=(const ThreadSafeWrapper& other) {
+        if (this == &other) return *this;
+        std::lock(m_mutex, other.m_mutex);
+        std::lock_guard<std::mutex> lock1(m_mutex, std::adopt_lock);
+        std::lock_guard<std::mutex> lock2(other.m_mutex, std::adopt_lock);
+        m_container = other.m_container;
+        return *this;
+    }
+    ThreadSafeWrapper(ThreadSafeWrapper&& other) noexcept {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_container = other.m_container;
+    }
+    ThreadSafeWrapper& operator=(ThreadSafeWrapper&& other) noexcept {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        m_container = other.m_container;
+        return *this;
+    }
 
     ThreadSafeWrapper(std::initializer_list<value_type> initList)
         : m_container{initList} {}
 
-    void push_back(const value_type& value)
-        requires requires(Container c, value_type v) { c.push_back(v); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_container.push_back(value);
-    }
-
-    void push_back(value_type&& value)
-        requires requires(Container c, value_type v) { c.push_back(v); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_container.push_back(value);
-    }
-
-    void push_front(const value_type& value)
-        requires requires(Container c, value_type v) { c.push_front(v); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_container.push_front(value);
-    }
-
-    void push_front(value_type&& value)
-        requires requires(Container c, value_type v) { c.push_front(v); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_container.push_front(value);
-    }
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(void, push_back, (const value_type&, value))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(void, push_back, (value_type&&, value))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(void, push_front, (const value_type&, value))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(void, push_front, (value_type&&, value))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN_CONST(bool, empty)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(void, clear)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(void, reserve, (size_type, t))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD(void, resize, (size_type, x))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(size_type, size)
+    [[nodiscard("Erase returns valid iterator!")]] 
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(iterator, erase, (iterator, pos))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(iterator, begin)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(iterator, end)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN_CONST(iterator, begin)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN_CONST(iterator, end)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(iterator, cbegin)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(iterator, bend)
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN(value_type, operator[], (size_type, index))
+    __DIX_THREAD_SAFE_WRAPPER_CLASS_METHOD_RETURN_CONST(value_type, operator[], (size_type, index))
 
     template <typename... Args>
     void emplace_back(Args&&... args)
@@ -65,94 +111,9 @@ class ThreadSafeWrapper {
         m_container.emplace_back(std::forward<Args>(args)...);
     }
 
-    bool empty() const
-        requires requires(Container c) { c.empty(); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.empty();
-    }
-
-    void clear()
-        requires requires(Container c) { c.empty(); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        m_container.clear();
-    }
-
-    size_type size()
-        requires requires(Container c) { c.size(); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.size();
-    }
-
-    [[nodiscard("Erase returns new, valid iterator!")]] iterator erase(iterator pos)
-        requires requires(Container c, iterator pos) { c.erase(pos); }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.erase(pos);
-    }
-
-    value_type operator[](size_type index) const
-        requires requires(const Container c, size_type idx) { c[idx]; }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container[index];
-    }
-
-    value_type operator[](size_type index)
-        requires requires(Container c, size_type idx) { c[idx]; }
-    {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container[index];
-    }
-
-    iterator begin() {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.begin();
-    }
-    iterator end() {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.end();
-    }
-
-    const_iterator begin() const {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.begin();
-    }
-    const_iterator end() const {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.end();
-    }
-    const_iterator cbegin() const {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.cbegin();
-    }
-    const_iterator cend() const {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_container.cend();
-    }
-
    private:
     mutable std::mutex m_mutex;
     Container m_container;
 };
-
-// template <typename T>
-// class ThreadSafe<std::list<T>> {
-// public:
-//     using value_type = T;
-//     using size_type = typename std::list<T>::size_type;
-
-//     ThreadSafe() = default;
-
-//     void push_front(const value_type& value) {
-//         std::lock_guard<std::mutex> lock(m_mutex);
-
-//     }
-// private:
-//     std::mutex m_mutex;
-//     std::list<T> m_container
-// };
 }  // namespace dix
 #endif  // DIX_THREADS_HPP

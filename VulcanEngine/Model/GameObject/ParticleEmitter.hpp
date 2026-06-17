@@ -28,7 +28,7 @@ class ParticleEmitter : public GameObject {
     ParticleSimulationParams simParams;
     uint32_t particleCount;
     vk::DescriptorSet computeDescriptorSet;
-    static constexpr uint32_t MAX_PARTICLES = 100'000'000;
+    static constexpr uint32_t MAX_PARTICLES = 10'000'000;
 };
 }  // namespace dix
 

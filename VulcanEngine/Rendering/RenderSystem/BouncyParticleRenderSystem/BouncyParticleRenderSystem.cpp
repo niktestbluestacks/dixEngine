@@ -83,8 +83,7 @@ void BouncyParticleRenderSystem::buildComputeDescriptors(ParticleEmitter& obj) {
     vk::DescriptorBufferInfo particleInfo{};
     particleInfo.buffer = obj.particleBuffer->getBuffer();
     particleInfo.offset = 0;
-    particleInfo.range =
-        16 + sizeof(BouncyParticle) * obj.particleCount;
+    particleInfo.range = 16 + sizeof(BouncyParticle) * obj.particleCount;
 
     vk::DescriptorBufferInfo simParamsInfo =
         obj.simulationParamsBuffer->descriptorInfo(
@@ -219,11 +218,13 @@ void BouncyParticleRenderSystem::updateBouncyParticles(
     float deltaTime,
     const std::vector<std::shared_ptr<ParticleEmitter>>& particleEmitters) {
     for (auto& obj : particleEmitters) {
-        obj->simParams.gravityDeltaTime.w = deltaTime;
-        obj->simulationParamsBuffer->map();
-        obj->simulationParamsBuffer->writeToBuffer(
-            &obj->simParams, sizeof(ParticleSimulationParams));
-        obj->simulationParamsBuffer->unmap();
+        if (obj) {
+            obj->simParams.gravityDeltaTime.w = deltaTime;
+            obj->simulationParamsBuffer->map();
+            obj->simulationParamsBuffer->writeToBuffer(
+                &obj->simParams, sizeof(ParticleSimulationParams));
+            obj->simulationParamsBuffer->unmap();
+        }
     }
 }
 
@@ -234,13 +235,16 @@ BouncyParticleRenderSystem::createBouncyParticleEmitter(glm::vec3 position,
     std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
     vk::DeviceSize particleBufferSize = 16 + sizeof(BouncyParticle) * count;
-    obj->particleBuffer =
-        std::make_unique<DixBuffer>(m_dixDevice, particleBufferSize, 1,
-                                    vk::BufferUsageFlagBits::eStorageBuffer |
-                                        vk::BufferUsageFlagBits::eVertexBuffer |
-                                        vk::BufferUsageFlagBits::eTransferDst,
-                                    vk::MemoryPropertyFlagBits::eDeviceLocal);
-
+    try {
+        obj->particleBuffer = std::make_unique<DixBuffer>(
+            m_dixDevice, particleBufferSize, 1,
+            vk::BufferUsageFlagBits::eStorageBuffer |
+                vk::BufferUsageFlagBits::eVertexBuffer |
+                vk::BufferUsageFlagBits::eTransferDst,
+            vk::MemoryPropertyFlagBits::eDeviceLocal);
+    } catch (const vk::Error& e) {
+        return nullptr;
+    }
     vk::Buffer stagingBuffer;
     vk::DeviceMemory stagingBufferMemory;
     m_dixDevice.createBuffer(particleBufferSize,

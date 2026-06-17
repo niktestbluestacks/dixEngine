@@ -15,6 +15,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(Vulkan REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(glm REQUIRED)
+find_package(Boost REQUIRED)
 
 # Find glslc
 if(Vulkan_GLSLC_EXECUTABLE)
@@ -115,6 +116,7 @@ target_link_libraries(VulcanApp PRIVATE
     glfw
     glm::glm
     Jolt
+    Boost::boost
 )
 
 target_compile_definitions(VulcanApp PRIVATE

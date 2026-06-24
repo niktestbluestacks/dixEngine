@@ -51,8 +51,8 @@ void main() {
 
     // Simple floor collision
     if (p.positionLife.y < 0.0) {
-        p.positionLife.y = 0.0;
-        p.velocitySize.y *= -0.999; // Bounce with energy loss
+        // p.positionLife.y = 0.0;
+        // p.velocitySize.y *= -0.999; // Bounce with energy loss
 
         // // SUPER CHAOS 
         // p.velocitySize.xyz *= 1.05;

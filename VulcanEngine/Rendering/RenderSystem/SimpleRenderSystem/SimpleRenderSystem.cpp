@@ -17,9 +17,10 @@ SimpleRenderSystem::SimpleRenderSystem(EngineDevice& engineDevice,
               // time.
               .transformGameObject =
                   [](void* push, GameObject& obj, FrameInfo& frameInfo) {
+                    SimpleGameObject& objRef = static_cast<SimpleGameObject&>(obj);
                       auto* p = static_cast<SimplePushConstantData*>(push);
-                      p->modelMatrix = obj.transform.mat4();
-                      p->normalMatrix = obj.transform.normalMatrix();
+                      p->modelMatrix = objRef.transform.mat4();
+                      p->normalMatrix = objRef.transform.normalMatrix();
                   },
               .pushConstantSize = sizeof(SimplePushConstantData),
           }) {}

@@ -12,20 +12,20 @@ Window::Window(int width, int height, std::string title)
     initWindow();
 }
 
-Window::~Window(void) {
+Window::~Window() {
     glfwDestroyWindow(m_window);
     m_window = nullptr;
     glfwTerminate();
 }
 
-bool Window::shouldClose(void) const { return glfwWindowShouldClose(m_window); }
+bool Window::shouldClose() const { return glfwWindowShouldClose(m_window); }
 
-vk::Extent2D Window::getExtent(void) const {
+vk::Extent2D Window::getExtent() const {
     return vk::Extent2D{static_cast<uint32_t>(m_width),
                         static_cast<uint32_t>(m_height)};
 }
 
-bool Window::wasWindowResized(void) const { return m_framebufferResized; }
+bool Window::wasWindowResized() const { return m_framebufferResized; }
 
 bool Window::isKeyPressedUsual(int key) const {
     return ((glfwGetKey(m_window, key) == GLFW_PRESS) &&
@@ -40,9 +40,9 @@ bool Window::isMouseButtonPressed(int key) const {
     return (glfwGetMouseButton(m_window, key));
 }
 
-void Window::resetWindowResizedFlag(void) { m_framebufferResized = false; }
+void Window::resetWindowResizedFlag() { m_framebufferResized = false; }
 
-GLFWwindow* Window::getGLFWwindow(void) const { return m_window; }
+GLFWwindow* Window::getGLFWwindow() const { return m_window; }
 
 const char* Window::getClipboardText() const {
     return glfwGetClipboardString(m_window);
@@ -61,7 +61,7 @@ void Window::createWindowSurface(vk::Instance instance,
     }
 }
 
-void Window::initWindow(void) {
+void Window::initWindow() {
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);

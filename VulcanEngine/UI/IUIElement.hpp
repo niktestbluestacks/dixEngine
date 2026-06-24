@@ -12,7 +12,7 @@ class IUIElement {
     // update CPU-side state
     virtual void render(FrameInfo& fi) = 0;
     // upload GPU resources for the upcoming frame (called after beginFrame)
-    virtual void upload(FrameInfo& fi) { (void)fi; }
+    virtual void upload(FrameInfo& fi) = 0;
 };
 }  // namespace dix
 

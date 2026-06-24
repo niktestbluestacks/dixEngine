@@ -16,7 +16,7 @@ namespace dix {
 
 class Logger {
    public:
-    enum LogLevel { DEBUG, INFO, WARN, ERR };
+    enum LogLevel { DEBUG, INFO, WARN, ERR, NONE };
 
     static Logger& get();
 
@@ -29,7 +29,7 @@ class Logger {
     dix::Logger::get().log(level, \
                            dix::formatRuntime(msg __VA_OPT__(, ) __VA_ARGS__))
 #ifdef NDEBUG
-#define DixLogDebug(msg, ...)
+#define DixLogDebug(msg, ...) 
 #else
 #define DixLogDebug(msg, ...) \
     DixLog(dix::Logger::LogLevel::DEBUG, msg __VA_OPT__(, ) __VA_ARGS__)

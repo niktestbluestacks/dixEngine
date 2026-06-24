@@ -47,7 +47,7 @@ inline uint32_t packRGBA(float r, float g, float b, float a) {
 class DixUIElement {
    public:
     DixUIElement(const DixUIInfo& info);
-    DixUIElement(DixUIElement&&) = default;
+    DixUIElement(DixUIElement&&) noexcept = default;
     virtual ~DixUIElement();
 
    protected:

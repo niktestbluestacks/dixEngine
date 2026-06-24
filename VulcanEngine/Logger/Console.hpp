@@ -5,6 +5,7 @@
 #include <DixUI/DixConsoleUI.hpp>
 #include <Utils/Class.hpp>
 #include <Utils/DixConcepts.hpp>
+#include <Utils/Functions.hpp>
 
 // std
 #include <any>
@@ -48,8 +49,8 @@ class DixConsole {
     void logInfo(const std::vector<std::string>& message);
     void logWarn(const std::string& message);
     void logWarn(const std::vector<std::string>& message);
-    void logError(const std::string& message);
-    void logError(const std::vector<std::string>& message);
+    void logErr(const std::string& message);
+    void logErr(const std::vector<std::string>& message);
 
     void executeCommand(const std::string& command);
     std::string getConsoleText() const;
@@ -81,52 +82,17 @@ class DixConsole {
 
     const std::string& getInputBuffer() const { return m_inputBuffer; }
 
-    void register_function(const std::string& name,
-                           std::function<void()> func) {
-        if (m_internalCommands.contains(name) || m_commands.contains(name)) {
-            throw std::runtime_error("The command with name " + name +
-                                     " already exists!");
-        }
-        m_commands[name] = func;
-        m_commandsArgs[name] = {};
-    }
+    void register_function(const std::string& name, std::function<void()> func);
 
-    void register_function(DixCommandInputType<>& command) {
-        if (m_internalCommands.contains(command.first) ||
-            m_commands.contains(command.first)) {
-            throw std::runtime_error("The command with name " + command.first +
-                                     " already exists!");
-        }
-        m_commands[command.first] = command.second;
-        m_commandsArgs[command.first] = {};
-    }
+    void register_function(DixCommandInputType<>& command);
 
     void register_function(
         const std::string& name,
         std::function<void(const std::vector<std::string>&)> func,
-        const std::vector<std::string>& flags) {
-        if (m_internalCommandsWithArgs.contains(name) ||
-            m_commandsWithArgs.contains(name)) {
-            throw std::runtime_error("The command with name " + name +
-                                     " already exists!");
-        }
-        m_commandsWithArgs[name] = func;
-        m_commandsArgs[name] = flags;
-        std::sort(m_commandsArgs[name].begin(), m_commandsArgs[name].end());
-    }
+        const std::vector<std::string>& flags);
 
     void register_function(
-        DixCommandInputType<const std::vector<std::string>&> command) {
-        if (m_internalCommandsWithArgs.contains(command.first) ||
-            m_commandsWithArgs.contains(command.first)) {
-            throw std::runtime_error("The command with name " + command.first +
-                                     " already exists!");
-        }
-        m_commandsWithArgs[command.first] = command.second;
-        m_commandsArgs[command.first] = command.flags;
-        std::sort(m_commandsArgs[command.first].begin(),
-                  m_commandsArgs[command.first].end());
-    }
+        DixCommandInputType<const std::vector<std::string>&> command);
 
     static constexpr size_t MAX_HISTORY_SIZE = DixConsoleUI::LINES_TO_DISPLAY;
 
@@ -179,6 +145,26 @@ class DixConsole {
 };
 
 }  // namespace dix
+
+#define DixLogConsole(msg, ...)           \
+    dix::DixConsole::getDixConsole().log( \
+        dix::formatRuntime(msg __VA_OPT__(, ) __VA_ARGS__))
+#ifdef NDEBUG
+#define DixLogDebugConsole(msg, ...)
+#else
+#define DixLogDebugConsole(msg, ...)           \
+    dix::DixConsole::getDixConsole().logDebug( \
+        dix::formatRuntime(msg __VA_OPT__(, ) __VA_ARGS__))
+#endif
+#define DixLogInfoConsole(msg, ...)       \
+    dix::DixConsole::getDixConsole().logInfo( \
+        dix::formatRuntime(msg __VA_OPT__(, ) __VA_ARGS__))
+#define DixLogWarnConsole(msg, ...) \
+    dix::DixConsole::getDixConsole().logWarn( \
+        dix::formatRuntime(msg __VA_OPT__(, ) __VA_ARGS__))
+#define DixLogErrConsole(msg, ...) \
+    dix::DixConsole::getDixConsole().logErr( \
+        dix::formatRuntime(msg __VA_OPT__(, ) __VA_ARGS__))
 
 #include <Logger/Console.tpp>
 

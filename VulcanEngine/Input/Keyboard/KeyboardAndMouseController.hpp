@@ -3,6 +3,7 @@
 
 // dix
 #include <Input/InputBase.hpp>
+#include <Model/GameObject/SimpleGameObject.hpp>
 
 namespace dix {
 

@@ -111,7 +111,8 @@ void DixRenderSystem::renderGameObjects(
     std::vector<std::shared_ptr<GameObject>>& gameObjects) const {
     m_pipeline->bind(frameInfo.commandBuffer);
 
-    for (auto& obj : gameObjects) {
+    for (auto& objNo : gameObjects) {
+        std::shared_ptr<SimpleGameObject> obj = std::static_pointer_cast<SimpleGameObject>(objNo);
         // Use a fixed-size stack buffer — avoids heap allocation per object
         // while supporting any push-constant size up to 256 bytes.
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};
@@ -146,7 +147,8 @@ void DixRenderSystem::renderGameObjects(
     std::vector<std::shared_ptr<GameObject>>& gameObjects) {
     m_pipeline->bind(frameInfo.commandBuffer);
 
-    for (auto& obj : gameObjects) {
+    for (auto& objNorm : gameObjects) {
+        std::shared_ptr<SimpleGameObject> obj = std::static_pointer_cast<SimpleGameObject>(objNorm);
         // Use a fixed-size stack buffer — avoids heap allocation per object
         // while supporting any push-constant size up to 256 bytes.
         std::array<std::byte, MAX_PUSH_CONSTANT_BYTES> pushBuffer{};

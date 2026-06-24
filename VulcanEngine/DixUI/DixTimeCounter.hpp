@@ -13,7 +13,7 @@ using Clock = std::chrono::system_clock;
 class DixTimeCounter : public DixUIElement {
    public:
     using DixUIElement::DixUIElement;
-    DixTimeCounter(DixTimeCounter&& other)
+    DixTimeCounter(DixTimeCounter&& other) noexcept
         : DixUIElement(std::move(other)),
           m_currTime(std::move(other.m_currTime)),
           m_startTime(std::move(other.m_startTime)) {};

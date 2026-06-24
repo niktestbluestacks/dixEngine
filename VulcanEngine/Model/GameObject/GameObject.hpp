@@ -11,6 +11,7 @@
 
 // std
 #include <memory>
+#include <mutex>
 
 namespace dix {
 struct TransformComponent {
@@ -28,36 +29,18 @@ class GameObject {
     using id_t = unsigned int;
 
     static GameObject createGameObject() {
+        static std::mutex mtx;
+        std::lock_guard<std::mutex> lock{mtx};
         return GameObject{};
     }
 
-    GameObject(const GameObject& other) {
-        model = other.model;
-        color = other.color;
-        transform = other.transform;
-        id = getNewId();
-    }
+    GameObject(const GameObject& other) = default;
 
-    GameObject& operator=(const GameObject& other) {
-        model = other.model;
-        color = other.color;
-        transform = other.transform;
-        id = getNewId();
-        return *this;
-    }
+    GameObject& operator=(const GameObject& other) = default;
+    GameObject(GameObject&& other) noexcept = default;
 
-    GameObject(GameObject&& other) {
-        model = other.model;
-        color = other.color;
-        transform = other.transform;
-        id = getNewId();
-    }
-
-    GameObject operator=(GameObject&& other) {
-        model = other.model;
-        color = other.color;
-        transform = other.transform;
-        id = getNewId();
+    GameObject& operator=(GameObject&& other) noexcept {
+        this->id = std::move(other.id);
         return *this;
     }
 
@@ -65,17 +48,13 @@ class GameObject {
 
     const id_t getId() const { return id; };
 
-    std::shared_ptr<Model> model{};
-    glm::vec3 color{};
-    TransformComponent transform{};
-
    protected:
     static id_t getNewId() {
         static id_t currentId = 0;
         return currentId++;
     }
 
-    GameObject(): id(getNewId()) {}
+    GameObject() : id{getNewId()} {}
 
    private:
     id_t id;

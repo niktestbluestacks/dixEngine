@@ -31,7 +31,7 @@ inline bool GLFWIsLetterOrNumber(int key) {
 
 class Window {
    private:
-    void initWindow(void);
+    void initWindow();
     static void framebufferResizeCallback(GLFWwindow* window, int width,
                                           int height);
     static void keyCallback(GLFWwindow* window, int key, int scancode,
@@ -45,18 +45,18 @@ class Window {
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
 
-    ~Window(void);
+    ~Window();
 
-    bool shouldClose(void) const;
-    vk::Extent2D getExtent(void) const;
-    bool wasWindowResized(void) const;
+    bool shouldClose() const;
+    vk::Extent2D getExtent() const;
+    bool wasWindowResized() const;
     bool isKeyPressedUsual(int key) const;
     bool isKeyPressedUnUsual(int key) const;
     bool isMouseButtonPressed(int key) const;
     const char* getClipboardText() const;
     void setClipboardText(const char* text) const;
-    void resetWindowResizedFlag(void);
-    GLFWwindow* getGLFWwindow(void) const;
+    void resetWindowResizedFlag();
+    GLFWwindow* getGLFWwindow() const;
 
     void createWindowSurface(vk::Instance instance,
                              vk::SurfaceKHR* surface) const;

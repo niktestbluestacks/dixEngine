@@ -42,8 +42,9 @@ ParticleRenderSystem::ParticleRenderSystem(
 
               .transformGameObject =
                   [](void* push, GameObject& obj, FrameInfo& frameInfo) {
+                    ParticleEmitter& objRef = static_cast<ParticleEmitter&>(obj);
                       auto* p = static_cast<ParticlePushConstantData*>(push);
-                      p->modelMatrix = obj.transform.mat4();
+                      p->modelMatrix = objRef.transform.mat4();
                   },
               .pushConstantSize = sizeof(ParticlePushConstantData),
 
@@ -227,7 +228,7 @@ void ParticleRenderSystem::updateParticles(
 
 std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
     glm::vec3 position, uint32_t count, glm::vec2 colorDist) {
-    std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>();
+    std::shared_ptr<ParticleEmitter> obj = std::make_shared<ParticleEmitter>(ParticleEmitter::createParticleEmitter());
     // 1. Particle storage buffer  [uint32_t count | Particle × MAX]
     vk::DeviceSize particleBufferSize = 16 + sizeof(Particle) * count;
     try {
@@ -253,7 +254,7 @@ std::shared_ptr<ParticleEmitter> ParticleRenderSystem::createParticleEmitter(
         stagingBufferMemory, 0, particleBufferSize, {}, &stagingData);
     if (res != vk::Result::eSuccess) {
         auto& console = DixConsole::getDixConsole();
-        console.logError("Failed to create particle emitter!");
+        console.logErr("Failed to create particle emitter!");
         m_dixDevice.device().unmapMemory(stagingBufferMemory);
         return nullptr;
     }

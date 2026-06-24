@@ -105,8 +105,8 @@ struct PipelineConfigInfo {
 
     PipelineConfigInfo(const PipelineConfigInfo&) = delete;
     PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
-    PipelineConfigInfo(PipelineConfigInfo&&) = default;
-    PipelineConfigInfo& operator=(PipelineConfigInfo&&) = default;
+    PipelineConfigInfo(PipelineConfigInfo&&) noexcept = default;
+    PipelineConfigInfo& operator=(PipelineConfigInfo&&) noexcept = default;
 
     // Fluent configuration methods for common settings
     PipelineConfigInfo& enableBlending(

@@ -24,8 +24,8 @@ class DixCamera {
 
     void setViewYXZ(glm::vec3 position, glm::vec3 rotation);
 
-    const glm::mat4& getProjection(void) const { return m_projectionMatrix; }
-    const glm::mat4& getView(void) const { return m_viewMatrix; }
+    const glm::mat4& getProjection() const { return m_projectionMatrix; }
+    const glm::mat4& getView() const { return m_viewMatrix; }
 
    private:
     glm::mat4 m_projectionMatrix{1.f};

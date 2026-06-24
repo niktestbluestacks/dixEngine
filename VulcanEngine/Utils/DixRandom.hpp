@@ -3,26 +3,25 @@
 
 // dix
 #include <Utils/Converter.hpp>
+#include <Utils/DixFilesystem.hpp>
 
 // std
 #include <cstdlib>
-#include <filesystem>
 #include <vector>
-#ifndef __clang__
 #include <random>
-#endif // __clang__
 
 namespace dix {
-namespace fs = std::filesystem;
 inline std::string getRandomFile(std::string filepath = toAudioPath("")) {
+    static std::random_device rd;
+    static std::mt19937 gen{rd()};
     if (filepath.back() == '/') filepath.pop_back();
 
     std::vector<fs::path> files(0);
-    for (auto const& entry : fs::directory_iterator(filepath)) {
+    for (const auto& entry : fs::directory_iterator{filepath}) {
         if (fs::is_regular_file(entry.status())) files.push_back(entry.path());
     }
-
-    std::size_t idx = static_cast<std::size_t>(std::rand()) % files.size();
+    std::uniform_int_distribution<std::size_t> dist{0, files.size() - 1};
+    std::size_t idx = dist(gen);
 
     return files[idx].string();
 }

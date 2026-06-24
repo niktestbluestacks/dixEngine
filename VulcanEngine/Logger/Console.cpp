@@ -102,11 +102,11 @@ void DixConsole::logWarn(const std::vector<std::string>& message) {
     log(message);
 }
 
-void DixConsole::logError(const std::string& message) {
+void DixConsole::logErr(const std::string& message) {
     log("[ERROR] " + message);
 }
 
-void DixConsole::logError(const std::vector<std::string>& message) {
+void DixConsole::logErr(const std::vector<std::string>& message) {
     log("[ERROR]: ");
     log(message);
 }
@@ -316,6 +316,53 @@ void DixConsole::tabCommand() {
     }
 }
 
+void DixConsole::register_function(const std::string& name,
+                                   std::function<void()> func) {
+    if (m_internalCommands.contains(name) || m_commands.contains(name)) {
+        throw std::runtime_error("The command with name " + name +
+                                 " already exists!");
+    }
+    m_commands[name] = func;
+    m_commandsArgs[name] = {};
+}
+
+void DixConsole::register_function(DixCommandInputType<>& command) {
+    if (m_internalCommands.contains(command.first) ||
+        m_commands.contains(command.first)) {
+        throw std::runtime_error("The command with name " + command.first +
+                                 " already exists!");
+    }
+    m_commands[command.first] = command.second;
+    m_commandsArgs[command.first] = {};
+}
+
+void DixConsole::register_function(
+    const std::string& name,
+    std::function<void(const std::vector<std::string>&)> func,
+    const std::vector<std::string>& flags) {
+    if (m_internalCommandsWithArgs.contains(name) ||
+        m_commandsWithArgs.contains(name)) {
+        throw std::runtime_error("The command with name " + name +
+                                 " already exists!");
+    }
+    m_commandsWithArgs[name] = func;
+    m_commandsArgs[name] = flags;
+    std::sort(m_commandsArgs[name].begin(), m_commandsArgs[name].end());
+}
+
+void DixConsole::register_function(
+    DixCommandInputType<const std::vector<std::string>&> command) {
+    if (m_internalCommandsWithArgs.contains(command.first) ||
+        m_commandsWithArgs.contains(command.first)) {
+        throw std::runtime_error("The command with name " + command.first +
+                                 " already exists!");
+    }
+    m_commandsWithArgs[command.first] = command.second;
+    m_commandsArgs[command.first] = command.flags;
+    std::sort(m_commandsArgs[command.first].begin(),
+              m_commandsArgs[command.first].end());
+}
+
 void DixConsole::fillFromClipboard(const std::string& str) {
     m_inputBuffer += str;
 }
@@ -323,7 +370,7 @@ void DixConsole::fillFromClipboard(const std::string& str) {
 void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
     switch (args.size()) {
         case 0: {
-            logError("No command provided");
+            logErr("No command provided");
             break;
         }
         case 1: {
@@ -338,7 +385,7 @@ void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
                 found = true;
             }
             if (!found) {
-                logError("Unknown command: " + commandName);
+                logErr("Unknown command: " + commandName);
             }
             break;
         }
@@ -356,7 +403,7 @@ void DixConsole::executeCommandImpl(const std::vector<std::string>& args) {
             }
 
             if (!found) {
-                logError("Unknown command: " + commandName);
+                logErr("Unknown command: " + commandName);
             }
             break;
         }
@@ -469,7 +516,7 @@ void DixConsole::fillInternalCommands() {
                 logWarn(std::vector(arguments.begin() + 1, arguments.end()));
                 break;
             case FLAGS::Err:
-                logError(std::vector(arguments.begin() + 1, arguments.end()));
+                logErr(std::vector(arguments.begin() + 1, arguments.end()));
                 break;
         }
     };

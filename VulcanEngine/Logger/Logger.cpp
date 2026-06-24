@@ -33,12 +33,15 @@ void Logger::log(LogLevel level, const std::string message) {
         case ERR:
             oss << "ERROR]: ";
             break;
+        case NONE:
+            break;
     }
     oss << message;
 
     switch (level) {
         case DEBUG:
         case INFO:
+        case NONE:
             std::clog << oss.str() << std::endl;
             break;
         case WARN:

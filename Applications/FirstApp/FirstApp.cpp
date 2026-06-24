@@ -4,7 +4,7 @@
 
 namespace dix {
 
-FirstApp::FirstApp(void) : viewerObject{GameObject::createGameObject()} {
+FirstApp::FirstApp() : viewerObject{SimpleGameObject::createSimpleGameObject()} {
     DixLogInfo("Initializing FirstApp...");
     DixLogInfo("Loading Game Objects");
     // FirstApp focuses on game objects and game logic only.
@@ -14,14 +14,14 @@ FirstApp::FirstApp(void) : viewerObject{GameObject::createGameObject()} {
     DixLogInfo("FirstApp initialized successfully!");
 }
 
-FirstApp::~FirstApp(void) {
+FirstApp::~FirstApp() {
     DixLogInfo("Closing FirstApp...");
     m_gameObjects.clear();
     m_context.reset();
     DixLogInfo("FirstApp closed successfully!");
 }
 
-void FirstApp::run(void) {
+void FirstApp::run() {
     DixCamera dixcamera{};
     dixcamera.setViewTarget(playerPosition, playerLookAt);
     KeyboardAndMouseController cameraController{m_context->getDixWindow()};
@@ -53,41 +53,41 @@ void FirstApp::run(void) {
 
         frameTime = glm::min(frameTime, MAX_FRAME_TIME);
         // If playing back, use recorded camera data and object states
-        if (m_playing) {
-            auto& recorder = getFrameRecorder();
-            if (!recorder.updatePlayback(m_gameObjects, playerPosition,
-                                         playerLookAt)) {
-                DixLogInfo("Playback finished");
-                m_playing = false;
-                recorder.stopPlayback();
-            } else {
-                if (recorder.getCurrentFrame()) {
-                    frameTime = recorder.getCurrentFrame()->frameTime;
-                }
-                dixcamera.setViewYXZ(playerPosition, playerLookAt);
-            }
-        } else {
+        // if (m_playing) {
+        //     auto& recorder = getFrameRecorder();
+        //     if (!recorder.updatePlayback(m_gameObjects, playerPosition,
+        //                                  playerLookAt)) {
+        //         DixLogInfo("Playback finished");
+        //         m_playing = false;
+        //         recorder.stopPlayback();
+        //     } else {
+        //         if (recorder.getCurrentFrame()) {
+        //             frameTime = recorder.getCurrentFrame()->frameTime;
+        //         }
+        //         dixcamera.setViewYXZ(playerPosition, playerLookAt);
+        //     }
+        // } else {
             cameraController.moveInPlaneXZ(frameTime, viewerObject);
             playerPosition = viewerObject.transform.translation;
             playerLookAt = viewerObject.transform.rotation;
             dixcamera.setViewYXZ(playerPosition, playerLookAt);
-        }
+        // }
 
         float aspect = m_context->getAspectRatio();
         dixcamera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f,
                                            5000.f);
 
-        // Record frame if recording
-        if (m_recording) {
-            auto& recorder = getFrameRecorder();
-            // Record initial structure once at the start of recording
-            if (!initialStructureRecorded) {
-                recorder.recordInitialStructure(m_gameObjects);
-                initialStructureRecorded = true;
-            }
-            recorder.recordFrame(m_gameObjects, playerPosition, playerLookAt,
-                                 frameTime);
-        }
+        // // Record frame if recording
+        // if (m_recording) {
+        //     auto& recorder = getFrameRecorder();
+        //     // Record initial structure once at the start of recording
+        //     if (!initialStructureRecorded) {
+        //         recorder.recordInitialStructure(m_gameObjects);
+        //         initialStructureRecorded = true;
+        //     }
+        //     recorder.recordFrame(m_gameObjects, playerPosition, playerLookAt,
+        //                          frameTime);
+        // }
         try {
             m_context->drawFrame(dixcamera, frameTime, m_gameObjects,
                                  playerPosition);
@@ -130,10 +130,10 @@ void FirstApp::run(void) {
     }
     m_context->device().device().waitIdle();
     // Stop recording if app closes while recording
-    if (m_recording) {
-        getFrameRecorder().stopRecording();
-        m_recording = false;
-    }
+    // if (m_recording) {
+    //     getFrameRecorder().stopRecording();
+    //     m_recording = false;
+    // }
 }
 
 void FirstApp::loadGameObjects() {
@@ -141,7 +141,7 @@ void FirstApp::loadGameObjects() {
                 m_context->device().getMaximumAllocationSize());
     std::random_device rd;
 
-    std::mt19937 gen(rd());
+    std::mt19937 gen{rd()};
 
     std::uniform_real_distribution<float> dist(0.0f, 10.0f);
 
@@ -157,12 +157,12 @@ void FirstApp::loadGameObjects() {
             m_context->device(), std::filesystem::absolute(entry).string(),
             m_context->getDescriptorPool(), m_context->getModelSetLayout());
 
-        auto gameObj = GameObject::createGameObject();
-        gameObj.model = dixModel;
-        gameObj.transform.translation = {dist(gen), dist(gen), dist(gen)};
-        gameObj.transform.scale = {1.f, 1.f, 1.f};
+        auto gameObj = std::make_shared<SimpleGameObject>(SimpleGameObject::createSimpleGameObject());
+        gameObj->model = dixModel;
+        gameObj->transform.translation = {dist(gen), dist(gen), dist(gen)};
+        gameObj->transform.scale = {1.f, 1.f, 1.f};
         m_gameObjects["SimpleRenderSystem"].push_back(
-            std::make_shared<GameObject>(gameObj));
+            std::shared_ptr<GameObject>(gameObj));
     }
 
     // skybox
@@ -173,14 +173,14 @@ void FirstApp::loadGameObjects() {
         m_context->device(), std::filesystem::absolute(entry).string(),
         m_context->getDescriptorPool(), m_context->getModelSetLayout());
 
-    auto Skybox = GameObject::createGameObject();
-    Skybox.model = dixModel;
+    auto Skybox = std::make_shared<SimpleGameObject>(SimpleGameObject::createSimpleGameObject());
+    Skybox->model = dixModel;
     dixModel.reset();
     m_gameObjects["SkyboxRenderSystem"].push_back(
-        std::make_shared<GameObject>(Skybox));
+        std::shared_ptr<GameObject>(Skybox));
 }
 
-void FirstApp::loadUIElements(void) {
+void FirstApp::loadUIElements() {
     m_context->getDixWindow().setWindowIcon(toModelPath("Images/icon.ico"));
 
     m_context->addUIElement<DixFpsCounter>(DixUIInfo{
@@ -295,139 +295,139 @@ void FirstApp::loadUIElements(void) {
 
     console.logInfo("Console initialized");
 
-    m_context->getDixWindow().bindKey(GLFW_KEY_R, [this, &console]() {
-        console.logError("This function is currently disabled");
-        return;
-        static float keyCooldown = 0.f;
-        static auto lastFrame = std::chrono::steady_clock::now();
-        auto currentFrame = std::chrono::steady_clock::now();
-        float frameTime = (currentFrame - lastFrame) / std::chrono::seconds(1);
-        lastFrame = currentFrame;
+    // m_context->getDixWindow().bindKey(GLFW_KEY_R, [this, &console]() {
+    //     console.logErr("This function is currently disabled");
+    //     return;
+    //     static float keyCooldown = 0.f;
+    //     static auto lastFrame = std::chrono::steady_clock::now();
+    //     auto currentFrame = std::chrono::steady_clock::now();
+    //     float frameTime = (currentFrame - lastFrame) / std::chrono::seconds(1);
+    //     lastFrame = currentFrame;
 
-        keyCooldown -= frameTime;
+    //     keyCooldown -= frameTime;
 
-        if (keyCooldown > 0.f) {
-            return;
-        }
+    //     if (keyCooldown > 0.f) {
+    //         return;
+    //     }
 
-        if (!this->m_recording && !this->m_playing) {
-            this->m_recording = true;
-            getFrameRecorder().startRecording("recording.txt");
-            DixLogInfo("Recording started - press R again to stop");
-            keyCooldown = 0.3f;  // 300ms cooldown
-        } else if (this->m_recording) {
-            this->m_recording = false;
-            getFrameRecorder().stopRecording();
-            DixLogInfo("Recording stopped");
-            keyCooldown = 0.3f;
-        }
-    });
+    //     // if (!this->m_recording && !this->m_playing) {
+    //     //     this->m_recording = true;
+    //     //     getFrameRecorder().startRecording("recording.txt");
+    //     //     DixLogInfo("Recording started - press R again to stop");
+    //     //     keyCooldown = 0.3f;  // 300ms cooldown
+    //     // } else if (this->m_recording) {
+    //     //     this->m_recording = false;
+    //     //     getFrameRecorder().stopRecording();
+    //     //     DixLogInfo("Recording stopped");
+    //     //     keyCooldown = 0.3f;
+    //     // }
+    // });
 
-    m_context->getDixWindow().bindKey(GLFW_KEY_P, [this, &console]() {
-        console.logError("This function is currently disabled");
-        return;
-        static float keyCooldown = 0.f;
-        static auto lastFrame = std::chrono::steady_clock::now();
-        auto currentFrame = std::chrono::steady_clock::now();
-        float frameTime = (currentFrame - lastFrame) / std::chrono::seconds(1);
-        lastFrame = currentFrame;
+    // m_context->getDixWindow().bindKey(GLFW_KEY_P, [this, &console]() {
+    //     console.logErr("This function is currently disabled");
+    //     return;
+    //     static float keyCooldown = 0.f;
+    //     static auto lastFrame = std::chrono::steady_clock::now();
+    //     auto currentFrame = std::chrono::steady_clock::now();
+    //     float frameTime = (currentFrame - lastFrame) / std::chrono::seconds(1);
+    //     lastFrame = currentFrame;
 
-        keyCooldown -= frameTime;
+    //     keyCooldown -= frameTime;
 
-        if (keyCooldown > 0.f) {
-            return;
-        }
-        m_context->device().device().waitIdle();
+    //     if (keyCooldown > 0.f) {
+    //         return;
+    //     }
+    //     m_context->device().device().waitIdle();
 
-        if (!this->m_playing && !this->m_recording) {
-            this->m_playing = true;
-            this->m_initialGameObects = this->m_gameObjects;
-            getFrameRecorder().startPlayback(
-                "recording.txt", this->m_gameObjects, this->playerPosition,
-                this->playerLookAt);
-            DixLogInfo("Playback started - press P again to stop");
-            keyCooldown = 0.3f;
-        } else if (this->m_playing) {
-            this->m_playing = false;
-            getFrameRecorder().stopPlayback();
-            this->m_gameObjects = this->m_initialGameObects;
-            DixLogInfo("Playback stopped");
-            keyCooldown = 0.3f;
-        }
-    });
+    //     // if (!this->m_playing && !this->m_recording) {
+    //     //     this->m_playing = true;
+    //     //     this->m_initialGameObects = this->m_gameObjects;
+    //     //     getFrameRecorder().startPlayback(
+    //     //         "recording.txt", this->m_gameObjects, this->playerPosition,
+    //     //         this->playerLookAt);
+    //     //     DixLogInfo("Playback started - press P again to stop");
+    //     //     keyCooldown = 0.3f;
+    //     // } else if (this->m_playing) {
+    //     //     this->m_playing = false;
+    //     //     getFrameRecorder().stopPlayback();
+    //     //     this->m_gameObjects = this->m_initialGameObects;
+    //     //     DixLogInfo("Playback stopped");
+    //     //     keyCooldown = 0.3f;
+    //     // }
+    // });
 }
 
-void FirstApp::loadConsoleCommands(void) {
+void FirstApp::loadConsoleCommands() {
     auto& console = CurrentConsole::getDixConsole();
-    console.register_function(
-        "play", std::function{[&]() {
-            console.logError("This function is currently disabled");
-            return;
-            static float keyCooldown = 0.f;
-            static auto lastFrame = std::chrono::steady_clock::now();
-            auto currentFrame = std::chrono::steady_clock::now();
-            float frameTime =
-                (currentFrame - lastFrame) / std::chrono::seconds(1);
-            lastFrame = currentFrame;
+    // console.register_function(
+    //     "play", std::function{[&]() {
+    //         console.logErr("This function is currently disabled");
+    //         return;
+    //         static float keyCooldown = 0.f;
+    //         static auto lastFrame = std::chrono::steady_clock::now();
+    //         auto currentFrame = std::chrono::steady_clock::now();
+    //         float frameTime =
+    //             (currentFrame - lastFrame) / std::chrono::seconds(1);
+    //         lastFrame = currentFrame;
 
-            keyCooldown -= frameTime;
+    //         keyCooldown -= frameTime;
 
-            if (keyCooldown > 0.f) {
-                return;
-            }
+    //         if (keyCooldown > 0.f) {
+    //             return;
+    //         }
 
-            m_context->device().device().waitIdle();
+    //         m_context->device().device().waitIdle();
 
-            if (!this->m_playing && !this->m_recording) {
-                this->m_playing = true;
-                this->m_initialGameObects = this->m_gameObjects;
-                getFrameRecorder().startPlayback(
-                    "recording.txt", this->m_gameObjects, this->playerPosition,
-                    this->playerLookAt);
-                console.log("Playback started - use play again to stop");
-                keyCooldown = 0.3f;
-            } else if (this->m_playing) {
-                this->m_playing = false;
-                getFrameRecorder().stopPlayback();
-                this->m_gameObjects = this->m_initialGameObects;
-                console.log("Playback stopped");
-                keyCooldown = 0.3f;
-            }
-        }});
+    //         if (!this->m_playing && !this->m_recording) {
+    //             this->m_playing = true;
+    //             this->m_initialGameObects = this->m_gameObjects;
+    //             getFrameRecorder().startPlayback(
+    //                 "recording.txt", this->m_gameObjects, this->playerPosition,
+    //                 this->playerLookAt);
+    //             console.log("Playback started - use play again to stop");
+    //             keyCooldown = 0.3f;
+    //         } else if (this->m_playing) {
+    //             this->m_playing = false;
+    //             getFrameRecorder().stopPlayback();
+    //             this->m_gameObjects = this->m_initialGameObects;
+    //             console.log("Playback stopped");
+    //             keyCooldown = 0.3f;
+    //         }
+    //     }});
 
-    console.register_function(
-        "record", std::function{[&]() {
-            console.logError("This function is currently disabled");
-            return;
-            static float keyCooldown = 0.f;
-            static auto lastFrame = std::chrono::steady_clock::now();
-            auto currentFrame = std::chrono::steady_clock::now();
-            float frameTime =
-                (currentFrame - lastFrame) / std::chrono::seconds(1);
-            lastFrame = currentFrame;
+    // console.register_function(
+    //     "record", std::function{[&]() {
+    //         console.logErr("This function is currently disabled");
+    //         return;
+    //         static float keyCooldown = 0.f;
+    //         static auto lastFrame = std::chrono::steady_clock::now();
+    //         auto currentFrame = std::chrono::steady_clock::now();
+    //         float frameTime =
+    //             (currentFrame - lastFrame) / std::chrono::seconds(1);
+    //         lastFrame = currentFrame;
 
-            keyCooldown -= frameTime;
+    //         keyCooldown -= frameTime;
 
-            if (keyCooldown > 0.f) {
-                return;
-            }
+    //         if (keyCooldown > 0.f) {
+    //             return;
+    //         }
 
-            if (!this->m_recording && !this->m_playing) {
-                this->m_recording = true;
-                getFrameRecorder().startRecording("recording.txt");
-                console.log("Recording started - use record to stop recording");
-                keyCooldown = 0.3f;  // 300ms cooldown
-            } else if (this->m_recording) {
-                this->m_recording = false;
-                getFrameRecorder().stopRecording();
-                console.log("Recording stopped");
-                keyCooldown = 0.3f;
-            }
-        }});
+    //         if (!this->m_recording && !this->m_playing) {
+    //             this->m_recording = true;
+    //             getFrameRecorder().startRecording("recording.txt");
+    //             console.log("Recording started - use record to stop recording");
+    //             keyCooldown = 0.3f;  // 300ms cooldown
+    //         } else if (this->m_recording) {
+    //             this->m_recording = false;
+    //             getFrameRecorder().stopRecording();
+    //             console.log("Recording stopped");
+    //             keyCooldown = 0.3f;
+    //         }
+    //     }});
 
     console.register_function(
         "background_theme",
-        std::function([&](const std::vector<std::string>& arguments) {
+        std::function{[&](const std::vector<std::string>& arguments) {
             auto volume = m_sounds["background_theme"].getVolume();
             bool play = m_sounds["background_theme"].isPlaying();
             bool isNextVolume = false;
@@ -480,7 +480,7 @@ void FirstApp::loadConsoleCommands(void) {
                     },
                     res);
             }
-        }),
+        }},
         {"--help", "--resume", "--pause", "--stop", "--play", "--volume",
          "--switch_to"});
 
@@ -615,7 +615,7 @@ void FirstApp::loadConsoleCommands(void) {
 
     console.register_function(
         "gamespeed",
-        std::function([this](const std::vector<std::string>& arguments) {
+        std::function{[this](const std::vector<std::string>& arguments) {
             for (auto& elem : arguments) {
                 auto result = string_to_num(elem);
                 std::visit(
@@ -628,11 +628,11 @@ void FirstApp::loadConsoleCommands(void) {
                     },
                     result);
             }
-        }),
+        }},
         {});
 
     console.register_function(
-        "tp", std::function([this](const std::vector<std::string>& arguments) {
+        "tp", std::function{[this](const std::vector<std::string>& arguments) {
             std::array<bool, 3> visited{};
             m_context->device().device().waitIdle();
             for (auto& elem : arguments) {
@@ -659,7 +659,7 @@ void FirstApp::loadConsoleCommands(void) {
                     },
                     result);
             }
-        }),
+        }},
         {});
 }
 

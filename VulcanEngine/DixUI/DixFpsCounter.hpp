@@ -9,7 +9,7 @@ namespace dix {
 class DixFpsCounter : public DixUIElement {
    public:
     using DixUIElement::DixUIElement;  // inherit constructor
-    DixFpsCounter(DixFpsCounter&& other);
+    DixFpsCounter(DixFpsCounter&& other) noexcept;
     ~DixFpsCounter() override = default;
 
     void update(float dt, const AdditionalUIInfo& additionalInfo) override;

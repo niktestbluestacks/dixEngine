@@ -1,6 +1,7 @@
 #ifndef _FIRST_APP_HPP
 #define _FIRST_APP_HPP
 
+// dix
 #include <FirstApp/AppContext.hpp>
 
 namespace dix {
@@ -10,9 +11,9 @@ using CurrentAppContext =
                BouncyParticleRenderSystem>;
 class FirstApp {
    private:
-    void loadGameObjects(void);
-    void loadUIElements(void);
-    void loadConsoleCommands(void);
+    void loadGameObjects();
+    void loadUIElements();
+    void loadConsoleCommands();
 
    public:
     static constexpr int WIDTH = 800;
@@ -21,12 +22,12 @@ class FirstApp {
     static constexpr std::string_view MODEL_FILEPATH_RELATIVE =
         "Applications/models";
 
-    FirstApp(void);
-    ~FirstApp(void);
+    FirstApp();
+    ~FirstApp();
 
     DIX_DISABLE_COPY(FirstApp)
 
-    void run(void);
+    void run();
 
     using CurrentConsole = DixConsole;
     using PendingDestruction =
@@ -50,7 +51,7 @@ class FirstApp {
     float m_gameSpeed{1.f};
     bool m_recording = false;
     bool m_playing = false;
-    GameObject viewerObject;
+    SimpleGameObject viewerObject;
 };
 }  // namespace dix
 

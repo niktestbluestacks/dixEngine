@@ -4,6 +4,7 @@
 // dix
 #include <DixCamera/DixCamera.hpp>
 #include <Model/GameObject/GameObject.hpp>
+#include <Model/GameObject/SimpleGameObject.hpp>
 #include <Pipeline/ComputePipeline/ComputePipeline.hpp>
 #include <Pipeline/DixDescriptors/DixDescriptors.hpp>
 #include <Pipeline/EngineDevice/EngineDevice.hpp>

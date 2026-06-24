@@ -2,7 +2,7 @@
 
 namespace dix {
 
-DixFpsCounter::DixFpsCounter(DixFpsCounter&& other)
+DixFpsCounter::DixFpsCounter(DixFpsCounter&& other) noexcept
     : DixUIElement(std::move(other)) {
     this->m_acc = other.m_acc;
     this->m_frames = other.m_frames;

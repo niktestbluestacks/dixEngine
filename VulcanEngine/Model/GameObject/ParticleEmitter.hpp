@@ -14,12 +14,13 @@ class ParticleEmitter : public GameObject {
    public:
     DIX_ENABLE_MOVE(ParticleEmitter)
     using GameObject::GameObject;
-    ParticleEmitter()
-        : GameObject{},
-          particleBuffer{nullptr},
-          simulationParamsBuffer{nullptr},
-          simParams{},
-          particleCount{} {}
+    static ParticleEmitter createParticleEmitter() {
+        static std::mutex mtx;
+        std::lock_guard<std::mutex> lock{mtx};
+        return ParticleEmitter{};
+    }
+    TransformComponent transform;
+        
     // Particle storage buffer: [uint32_t count | Particle[MAX_PARTICLES]]
     std::unique_ptr<DixBuffer> particleBuffer;
     // UBO for simulation params fed to the compute shader
@@ -29,6 +30,14 @@ class ParticleEmitter : public GameObject {
     uint32_t particleCount;
     vk::DescriptorSet computeDescriptorSet;
     static constexpr uint32_t MAX_PARTICLES = 10'000'000;
+    private:
+        ParticleEmitter()
+        : GameObject{},
+          particleBuffer{nullptr},
+          simulationParamsBuffer{nullptr},
+          simParams{},
+          particleCount{},
+          transform{} {}
 };
 }  // namespace dix
 

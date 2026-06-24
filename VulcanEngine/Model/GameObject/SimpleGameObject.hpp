@@ -1,26 +1,60 @@
-// #ifndef SIMPLE_GAME_OBJ_HPP
-// #define SIMPLE_GAME_OBJ_HPP
+#ifndef SIMPLE_GAME_OBJ_HPP
+#define SIMPLE_GAME_OBJ_HPP
 
-// // dix
-// #include <Model/GameObject/GameObject.hpp>
+// dix
+#include <Model/GameObject/GameObject.hpp>
 
-// namespace dix {
+namespace dix {
 
-// class SimpleGameObject : public GameObject {
-//    private:
+class SimpleGameObject : public GameObject {
+   public:
+    static SimpleGameObject createSimpleGameObject() {
+        static std::mutex mtx;
+        std::lock_guard<std::mutex> lock{mtx};
+        return SimpleGameObject{};
+    }
 
+    ~SimpleGameObject() = default;
+    SimpleGameObject(const SimpleGameObject& other)
+        : GameObject{other},
+          model{other.model},
+          color{other.color},
+          transform{other.transform} {}
 
+    SimpleGameObject& operator=(const SimpleGameObject& other) {
+        if (this != &other) {
+            GameObject::operator=(other);
+            this->color = other.color;
+            this->model = other.model;
+            this->transform = other.transform;
+        }
+        return *this;
+    }
 
-//     SimpleGameObject(GameObject::Key key, id_t id) : GameObject{key, id} {}
+    SimpleGameObject(SimpleGameObject&& other) noexcept
+        : GameObject{std::move(other)},
+          model{std::move(other.model)},
+          color{std::move(other.color)},
+          transform{std::move(other.transform)} {}
 
-//     friend class GameObject;
+    SimpleGameObject& operator=(SimpleGameObject&& other) noexcept {
+        if (this != &other) {
+            GameObject::operator=(std::move(other));
+            this->model = std::move(other.model);
+            this->color = std::move(other.color);
+            this->transform = std::move(other.transform);
+        }
+        return *this;
+    }
 
-//    public:
-//     std::shared_ptr<Model> model{};
-//     glm::vec3 color{};
-//     TransformComponent transform{};
-// };
+    std::shared_ptr<Model> model;
+    glm::vec3 color;
+    TransformComponent transform;
+    private:
+    using GameObject::GameObject;
+    SimpleGameObject(): GameObject{}, model{}, color{}, transform{} {}
+};
 
-// }  // namespace dix
+}  // namespace dix
 
-// #endif  // SIMPLE_GAME_OBJ_HPP
+#endif  // SIMPLE_GAME_OBJ_HPP

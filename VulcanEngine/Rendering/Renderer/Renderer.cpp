@@ -17,7 +17,7 @@ Renderer::Renderer(Window& window, EngineDevice& engineDevice)
 
 Renderer::~Renderer() { freeCommandBuffers(); }
 
-void Renderer::recreateSwapChain(void) {
+void Renderer::recreateSwapChain() {
     auto extent = m_Window.getExtent();
     while (extent.width == 0 || extent.height == 0) {
         extent = m_Window.getExtent();
@@ -40,7 +40,7 @@ void Renderer::recreateSwapChain(void) {
     // TODO: if render pass is compatable do nothing else recreate
 }
 
-void Renderer::createCommandBuffers(void) {
+void Renderer::createCommandBuffers() {
     m_commandBuffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
     vk::CommandBufferAllocateInfo allocInfo{};
@@ -56,7 +56,7 @@ void Renderer::createCommandBuffers(void) {
     }
 }
 
-void Renderer::freeCommandBuffers(void) {
+void Renderer::freeCommandBuffers() {
     m_dixDevice.device().freeCommandBuffers(
         m_dixDevice.getCommandPool(),
         static_cast<uint32_t>(m_commandBuffers.size()),
@@ -65,13 +65,13 @@ void Renderer::freeCommandBuffers(void) {
     m_commandBuffers.clear();
 }
 
-int Renderer::getFrameIndex(void) const {
+int Renderer::getFrameIndex() const {
     assert(m_isFrameStarted &&
            "Can't call GetFrameIndex when frame is not in progress");
     return m_currentFrameIndex;
 }
 
-vk::CommandBuffer Renderer::beginFrame(void) {
+vk::CommandBuffer Renderer::beginFrame() {
     assert(!m_isFrameStarted &&
            "Can't call begin frame while already in progress");
     vk::Result result;
@@ -105,7 +105,7 @@ vk::CommandBuffer Renderer::beginFrame(void) {
     return commandBuffer;
 }
 
-void Renderer::endFrame(void) {
+void Renderer::endFrame() {
     assert(m_isFrameStarted &&
            "Can't call endFrame while frame is not in progress");
     auto commandBuffer = getCurrentCommandBuffer();

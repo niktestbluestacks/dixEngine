@@ -14,9 +14,9 @@
 namespace dix {
 class Renderer {
    private:
-    void createCommandBuffers(void);
-    void freeCommandBuffers(void);
-    void recreateSwapChain(void);
+    void createCommandBuffers();
+    void freeCommandBuffers();
+    void recreateSwapChain();
 
    public:
     Renderer(Window& window, EngineDevice& engineDevice);
@@ -37,10 +37,10 @@ class Renderer {
         return m_commandBuffers[m_currentFrameIndex];
     }
 
-    int getFrameIndex(void) const;
+    int getFrameIndex() const;
 
-    vk::CommandBuffer beginFrame(void);
-    void endFrame(void);
+    vk::CommandBuffer beginFrame();
+    void endFrame();
     void beginSwapChainRenderPass(vk::CommandBuffer commandBuffer);
     void endSwapChainRenderPass(vk::CommandBuffer commandBuffer);
 

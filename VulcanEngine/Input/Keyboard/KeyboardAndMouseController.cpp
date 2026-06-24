@@ -5,7 +5,9 @@
 namespace dix {
 
 void KeyboardAndMouseController::moveInPlaneXZ(float dt,
-                                               GameObject& gameObject) {
+                                               GameObject& gameObj) {
+    
+    SimpleGameObject& gameObject = static_cast<SimpleGameObject&>(gameObj);
     glm::vec3 rotate{0.f};
     if (m_window.isKeyPressedUsual(keys.lookRight)) rotate.y += 1.f;
     if (m_window.isKeyPressedUsual(keys.lookLeft)) rotate.y -= 1.f;
